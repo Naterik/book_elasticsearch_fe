@@ -1,17 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import About from "./pages/client/About.tsx";
-import Home from "./pages/client/Home.tsx";
+
 import Layout from "./layout.tsx";
 import AboutPage from "./pages/client/About.tsx";
 import HomePage from "./pages/client/Home.tsx";
-import BookPage from "./pages/client/Book.tsx";
+import BookPage from "./pages/client/Filter.tsx";
 import LoginPage from "./pages/client/auth/Login.tsx";
 import RegisterPage from "./pages/client/auth/Register.tsx";
+
+import { AppProvider } from "./components/context/app.context.tsx";
+import { Toaster } from "sonner";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,7 +28,16 @@ const router = createBrowserRouter([
 ]);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
-    {/* <App /> */}
+    <Toaster
+      position="top-center"
+      richColors
+      closeButton
+      expand
+      duration={1000}
+      theme="system"
+    />
+    <AppProvider>
+      <RouterProvider router={router} />
+    </AppProvider>
   </StrictMode>
 );
