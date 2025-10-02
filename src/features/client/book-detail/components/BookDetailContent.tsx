@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 type Props = {
@@ -36,7 +36,7 @@ type Props = {
 };
 const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
   return (
-    <div className="container mx-auto">
+    <>
       <Breadcrumb className="my-5">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -137,19 +137,7 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
         </Card>
       </div>
       <hr className="my-5" />
-      <div>
-        <Tabs defaultValue="account" className="w-[400px]">
-          <TabsList>
-            <TabsTrigger value="detail">Details</TabsTrigger>
-            <TabsTrigger value="content">Content</TabsTrigger>
-          </TabsList>
-          <TabsContent value="detail">
-            Make changes to your account here.
-          </TabsContent>
-          <TabsContent value="content">Change your password here.</TabsContent>
-        </Tabs>
-      </div>
-    </div>
+    </>
   );
 };
 

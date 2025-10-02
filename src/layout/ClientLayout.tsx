@@ -4,6 +4,7 @@ import AppHeader from "../components/layout/AppHeader";
 import { fetchAPI } from "../services/api";
 import { useCurrentApp } from "../app/providers/app.context";
 import { DotLoader } from "react-spinners";
+import AppFooter from "@/components/layout/AppFooter";
 const ClientLayout = () => {
   const { setUser, setIsLoading, setIsAuthenticated, isLoading } =
     useCurrentApp();
@@ -26,6 +27,7 @@ const ClientLayout = () => {
         <>
           <AppHeader />
           <Outlet />
+          <AppFooter />
         </>
       ) : (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

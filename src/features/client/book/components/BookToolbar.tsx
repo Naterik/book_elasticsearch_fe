@@ -43,14 +43,14 @@ export default function BookToolbar({
           <ToggleGroupItem
             value="List"
             aria-label="List view"
-            className="px-2 hover:bg-gray-100 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
+            className="px-2 hover:bg-gray-400 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
           >
             <List className="h-5 w-5" />
           </ToggleGroupItem>
           <ToggleGroupItem
             value="Kanban"
             aria-label="Kanban view"
-            className="px-2 hover:bg-gray-100 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
+            className="px-2 hover:bg-gray-400 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
           >
             <LayoutGrid className="h-5 w-5" />
           </ToggleGroupItem>

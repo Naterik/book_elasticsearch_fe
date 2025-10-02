@@ -33,7 +33,7 @@ const AppHeader = () => {
       <header className="bg-neutral-900 text-white px-4 h-16 ">
         <div className="container mx-auto flex items-center">
           <div className="">
-            <img src={logo} className="size-20" alt="logo" />
+            <img src={logo} className="size-16" alt="logo" />
           </div>
           <nav className="flex-1 flex justify-end">
             <ul className="flex items-center gap-6">

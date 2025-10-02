@@ -6,7 +6,6 @@ import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
 
-// demo data
 const MOCK: Item[] = Array.from({ length: 15 }).map((_, i) => ({
   id: String(i + 1),
   kind: (["BOOK", "ARTICLE", "STANDARD"] as const)[i % 3],
@@ -32,11 +31,9 @@ const PRICE_BOUNDS: [number, number] = [120_000, 15_000_000];
 const YEAR_BOUNDS: [number, number] = [1999, 2025];
 
 export default function BookPage() {
-  // search box (đúng vị trí như ảnh)
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
-  // filters
   const [genres, setGenres] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([
@@ -113,7 +110,6 @@ export default function BookPage() {
 
   return (
     <div className="container mx-auto">
-      {/* SEARCH (giữa như ảnh) */}
       <form
         onSubmit={handleSubmitSearch}
         className="flex items-center justify-center gap-2 my-8"
