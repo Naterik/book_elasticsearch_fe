@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router";
-import AppHeader from "./layout/app.header";
-import { fetchAPI } from "./services/api";
-import { useCurrentApp } from "./components/context/app.context";
+import AppHeader from "../components/layout/AppHeader";
+import { fetchAPI } from "../services/api";
+import { useCurrentApp } from "../app/providers/app.context";
 import { DotLoader } from "react-spinners";
-const Layout = () => {
+const ClientLayout = () => {
   const { setUser, setIsLoading, setIsAuthenticated, isLoading } =
     useCurrentApp();
   useEffect(() => {
@@ -36,4 +36,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default ClientLayout;

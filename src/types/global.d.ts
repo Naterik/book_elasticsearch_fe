@@ -40,4 +40,14 @@ declare global {
     status: string;
     role: string;
   }
+  interface Item {
+    id: string;
+    kind: "BOOK" | "ARTICLE" | "STANDARD";
+    image: string;
+    title: string;
+    authors: string;
+    meta1?: string;
+    meta2?: string;
+    publisher: string;
+  }
 }

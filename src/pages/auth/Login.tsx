@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useCurrentApp } from "@/components/context/app.context";
+import { useCurrentApp } from "@/app/providers/app.context";
 import { loginAPI } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
