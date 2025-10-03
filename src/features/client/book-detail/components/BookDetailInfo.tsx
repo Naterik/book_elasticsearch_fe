@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BookCard from "../../book/components/BookCard";
-const MOCK: Item[] = Array.from({ length: 3 }).map((_, i) => ({
+const MOCK: Item[] = Array.from({ length: 4 }).map((_, i) => ({
   id: String(i + 1),
   kind: (["BOOK", "ARTICLE", "STANDARD"] as const)[i % 3],
   image:
@@ -35,7 +35,7 @@ const BookDetailInfo = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="detail">
-            <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
+            <h2 className=" scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-2">
               Detail
             </h2>
             <table className="border-separate border-spacing-5">
@@ -68,7 +68,7 @@ const BookDetailInfo = () => {
             </table>
           </TabsContent>
           <TabsContent value="content" className="w-full">
-            <h2 className="scroll-m-100 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
+            <h2 className="scroll-m-100 border-b pb-2 text-xl font-semibold tracking-tight first:mt-2">
               Content
             </h2>
             <p className="text-muted-foreground text-md p-5">
@@ -78,10 +78,10 @@ const BookDetailInfo = () => {
             </p>
           </TabsContent>
           <TabsContent value="related" className="w-full">
-            <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
+            <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-2">
               Related
             </h2>
-            <div className="grid grid-cols-3 ">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 ">
               {MOCK.map((item) => {
                 return <BookCard item={item} />;
               })}

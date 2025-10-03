@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import testimg from "@/assets/1.webp";
+import testsmall from "@/assets/Screenshot 2025-08-11 171331.png";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
@@ -30,6 +31,7 @@ import {
 
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 type Props = {
   borrowDuration: string;
   setBorrowDuration: (v: string) => void;
@@ -56,38 +58,38 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="grid grid-cols-3 ">
+      <div className="grid grid-cols-1 space-y-3  md:grid-cols-3 ">
         <div>
-          <Card>
-            <AspectRatio ratio={16 / 9}>
+          <Card className="w-full h-135 md:max-w-120 max-h-135 overflow-hidden rounded-xl bg-muted">
+            <div className="aspect-[5/4] md:aspect-[4/5]">
               <img
                 src={testimg}
                 alt="Image"
-                className="rounded-md object-cover"
+                className="rounded-md object-cover object-center size-full"
               />
-            </AspectRatio>
+            </div>
           </Card>
         </div>
-        <div className="max-w-sm p-3">
+        <div className="w-full md: max-0 p-3 ">
           <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl leading-snug">
+            <CardTitle className="text-2xl text-center md:text-left leading-snug">
               Big Bang (ed. 3x - 2019)
             </CardTitle>
-            <div className="flex w-full flex-wrap gap-2">
+            <div className="text-2xl text-center md:flex w-full flex-wrap gap-2">
               <Badge variant="secondary">novel</Badge>
               <Badge variant="secondary">novel</Badge>
             </div>
 
-            <CardDescription>
+            <CardDescription className="font-medium text-center md:text-left w-auto">
               by <span className="font-medium">Jacob, Irene</span>
             </CardDescription>
-            <p className="text-muted-foreground text-xl">
+            <p className="text-center   md:text-left text-xl text-muted-foreground ">
               A modal dialog that interrupts the user with important content and
               expects a response.
             </p>
           </CardHeader>
         </div>
-        <Card>
+        <Card className="h-full max-h-90">
           <CardHeader>
             <CardTitle>Borrow</CardTitle>
             <div className="space-y-2">
@@ -129,14 +131,14 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
               </div>
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex justify-center">
-            <Button type="submit" className="w-2/5">
+          <CardFooter>
+            <Button type="submit" className="w-full">
               Login
             </Button>
           </CardFooter>
         </Card>
       </div>
-      <hr className="my-5" />
+      <Separator className="my-5" />
     </>
   );
 };
