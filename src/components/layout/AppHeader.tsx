@@ -7,7 +7,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -19,6 +18,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { Bell, Menu, Info, LogOut, User, History } from "lucide-react";
 import Notifications from "../Notification";
 import MobileSheet from "./MobileSheet";
@@ -27,8 +31,24 @@ const NAV_ITEMS = [
   { to: "/book", label: "Search" },
   { to: "/about", label: "About" },
 ];
-
-export default function AppHeader() {
+const sampleNotifications = [
+  {
+    id: 1,
+    title: "New feature: Dark Mode available now!",
+    body: "We're excited to announce that Dark Mode is finally here! Head over to settings to enable the new look for a more comfortable experience.",
+    read: false, // Chưa đọc
+    time: "5 minutes ago",
+  },
+  {
+    id: 2,
+    title: "Your subscription renewal is successful",
+    body: "Your Pro plan subscription has been successfully renewed for another year. Thank you for your continued support!",
+    read: true, // Đã đọc
+    time: "3 hours ago",
+  },
+];
+export default function AppHeader({ items = sampleNotifications }) {
+  const unreadCount = items.filter((i) => !i.read).length;
   return (
     <header className="container mx-auto  sticky top-0 z-50 border-b bg-neutral-900/90 backdrop-blur text-white">
       <div className="flex h-16 items-center justify-between ">
@@ -56,7 +76,33 @@ export default function AppHeader() {
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <Bell />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open notifications"
+              >
+                <span className="relative">
+                  <Bell className="size-5.5" />
+                  {unreadCount > 0 && (
+                    <span
+                      className="absolute -right-1 -top-1 inline-flex items-center justify-center
+                           rounded-full bg-red-500 text-white text-[10px] leading-none
+                           h-4 min-w-4 px-1"
+                      aria-label={`${unreadCount} unread notifications`}
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </span>
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent align="end" className="w-80 p-0">
+              <Notifications />
+            </PopoverContent>
+          </Popover>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

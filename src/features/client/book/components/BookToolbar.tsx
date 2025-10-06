@@ -10,7 +10,6 @@ import {
 import { List, LayoutGrid } from "lucide-react";
 
 const SORT_OPTIONS = [
-  { value: "most_relevant", label: "Most relevant" },
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
   { value: "title", label: "Title (A–Z)" },

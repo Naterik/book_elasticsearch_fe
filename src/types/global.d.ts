@@ -7,13 +7,40 @@ declare global {
   }
 
   interface IModelPaginate<T> {
-    meta: {
-      current: number;
+    pagination: {
+      currentPage: number;
+      totalPages: number;
       pageSize: number;
-      pages: number;
-      total: number;
+      totalItems: number;
     };
-    results: T[];
+    result: T[];
+  }
+  interface IBook {
+    id: number;
+    isbn: string;
+    title: string;
+    shortDesc: string;
+    detailDesc: string;
+    price: number;
+    quantity: number;
+    publishDate: string;
+    image: string;
+    language: string;
+    pages: number;
+    borrowed: number;
+    authorId: number;
+    publisherId: number;
+    authors: IAuthor;
+    genres: [genres: IGenre];
+  }
+  interface IAuthor {
+    id: number;
+    name: string;
+    description: string;
+  }
+  interface IGenre {
+    id: number;
+    name: string;
   }
 
   interface ILogin {
@@ -40,6 +67,11 @@ declare global {
     status: string;
     role: string;
   }
+  interface ILanguages {
+    key: string;
+    doc_count: number;
+  }
+
   interface Item {
     id: string;
     kind: "BOOK" | "ARTICLE" | "STANDARD";

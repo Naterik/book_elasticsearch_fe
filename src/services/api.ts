@@ -1,5 +1,5 @@
 import axios from "services/axios.customize";
-
+import qs from "qs";
 const registerAPI = (
   username: string,
   password: string,
@@ -40,4 +40,76 @@ const fetchAPI = () => {
   });
 };
 
-export { registerAPI, loginAPI, fetchAPI };
+const filterBookAPI = (
+  title: string,
+  detailDesc: string,
+  minPrice: number,
+  maxPrice: number,
+  publishDate: string,
+  genres: string[],
+  page: number
+) => {
+  const urlBackend = "/api/v1/filter";
+  return axios.get<IModelPaginate<IBook>>(urlBackend, {
+    params: {
+      page,
+      title,
+      detailDesc,
+      minPrice,
+      maxPrice,
+      publishDate,
+      genres,
+    },
+  });
+};
+
+const getAllBookAPI = (page: number) => {
+  const urlBackend = "/api/v1/books";
+  return axios.get<IBackendRes<IModelPaginate<IBook>>>(urlBackend, {
+    params: { page },
+  });
+};
+
+const getAllGenreAPI = () => {
+  return axios.get("/api/v1/genres/display");
+};
+
+const getAllLanguagesElasticAPI = () => {
+  return axios.get("/api/v1/languages/elastic");
+};
+
+const getFilterBookAPI = (
+  page: number,
+  yearRange: number[],
+  priceRange: number[],
+  search: string,
+  order: string,
+  genres: string[],
+  language: string | null
+) => {
+  const urlBackend = "/api/v1/books/filter";
+  return axios.get(urlBackend, {
+    params: { page, yearRange, priceRange, search, order, genres, language },
+    paramsSerializer: {
+      serialize: (params) =>
+        qs.stringify(params, {
+          arrayFormat: "repeat", // <-- quan trọng
+          skipNulls: true,
+          // loại bỏ mảng rỗng để BE không nhận genres=[]
+          filter: (prefix, value) =>
+            Array.isArray(value) && value.length === 0 ? undefined : value,
+        }),
+    },
+  });
+};
+
+export {
+  registerAPI,
+  loginAPI,
+  fetchAPI,
+  filterBookAPI,
+  getAllBookAPI,
+  getAllGenreAPI,
+  getAllLanguagesElasticAPI,
+  getFilterBookAPI,
+};

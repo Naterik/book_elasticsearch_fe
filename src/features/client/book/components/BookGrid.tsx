@@ -1,7 +1,7 @@
 import BookCard from "./BookCard";
 
 type Props = {
-  items: Item[];
+  items: IBook[] | undefined;
   view: "List" | "Kanban";
 };
 
@@ -11,7 +11,7 @@ export default function BookGrid({ items, view }: Props) {
 
   return (
     <div className={cls}>
-      {items.map((it) => (
+      {items?.map((it) => (
         <BookCard key={it.id} item={it} />
       ))}
     </div>

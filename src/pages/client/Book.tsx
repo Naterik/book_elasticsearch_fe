@@ -1,108 +1,125 @@
-import { useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BookToolbar from "@/features/client/book/components/BookToolbar";
 import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
+import {
+  getAllBookAPI,
+  getAllGenreAPI,
+  getAllLanguagesElasticAPI,
+  getFilterBookAPI,
+} from "@/services/api";
+import { Value } from "@radix-ui/react-select";
 
-const MOCK: Item[] = Array.from({ length: 15 }).map((_, i) => ({
-  id: String(i + 1),
-  kind: (["BOOK", "ARTICLE", "STANDARD"] as const)[i % 3],
-  image:
-    i % 3 === 1
-      ? "https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=400"
-      : i % 3 === 2
-      ? "https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=400"
-      : "https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=400",
-  title:
-    i % 2
-      ? "Aliquam eius etincidunt quia quisquam..."
-      : "Ipsum dolorem adipisci etincidunt quaerat dolor.",
-  authors: i % 2 ? "Glover, Bruno" : "Doe, Jane; CERN",
-  meta1: i % 2 ? "1966 - Edition 7" : "1855 - Edition 5 - Vol. 2",
-  meta2: i % 3 === 0 ? "Etincidunt ut etincidunt sit sit." : undefined,
-  publisher: i % 2 ? "Springer" : "CERN",
-}));
-
-const GENRES = ["A", "B", "C"];
-const LANGS = ["EN", "VI", "JP"];
-const PRICE_BOUNDS: [number, number] = [120_000, 15_000_000];
+const PRICE_BOUNDS: [number, number] = [120_000, 1_500_000];
 const YEAR_BOUNDS: [number, number] = [1999, 2025];
 
 export default function BookPage() {
   const [searchInput, setSearchInput] = useState("");
+  const [dataBook, setDataBook] = useState<IBook[]>();
   const [search, setSearch] = useState("");
 
   const [genres, setGenres] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<ILanguages[]>();
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [appliedLanguage, setAppliedLanguage] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     PRICE_BOUNDS[0],
     1_500_000,
   ]);
   const [yearRange, setYearRange] = useState<[number, number]>([
-    2005,
+    1999,
     YEAR_BOUNDS[1],
   ]);
 
   const [view, setView] = useState<"List" | "Kanban">("Kanban");
-  const [sortBy, setSortBy] = useState<string>("most_relevant");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 15;
+  const [totalPages, setTotalPages] = useState(1);
 
+  useEffect(() => {
+    const fetchAllBook = async () => {
+      const res = await getAllBookAPI(1);
+
+      if (res.data) {
+        const result = res?.data?.result;
+        const pagination = res.data.pagination;
+        setDataBook(result);
+        setCurrentPage(pagination.currentPage);
+        setTotalPages(pagination.totalPages);
+      }
+    };
+    const fetchAllGenre = async () => {
+      const res = await getAllGenreAPI();
+      if (res.data) {
+        setGenres(res.data);
+      }
+    };
+    const fetchAllLanguages = async () => {
+      const res = await getAllLanguagesElasticAPI();
+      if (res.data) {
+        setLanguages(res.data);
+      }
+    };
+    fetchAllBook();
+    fetchAllGenre();
+    fetchAllLanguages();
+  }, []);
+  useEffect(() => {
+    const fetchAllFilterBook = async () => {
+      const res = await getFilterBookAPI(
+        currentPage,
+        yearRange,
+        priceRange,
+        search,
+        sortBy,
+        appliedGenres,
+        appliedLanguage
+      );
+      if (res.data) {
+        setDataBook(res.data.result);
+        setCurrentPage(res.data.pagination.currentPage);
+        setTotalPages(res.data.pagination.totalPages);
+      }
+    };
+    fetchAllFilterBook();
+  }, [
+    currentPage,
+    yearRange,
+    priceRange,
+    search,
+    sortBy,
+    appliedGenres,
+    appliedLanguage,
+  ]);
   const handleSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearch(searchInput.trim());
+    setSearch(searchInput);
     setCurrentPage(1);
   };
 
-  const toggleGenre = (value: string, checked: boolean) => {
-    setGenres((prev) =>
+  const toggleGenre = (value: any, checked: boolean) => {
+    setSelectedGenres((prev) =>
       checked ? [...prev, value] : prev.filter((g) => g !== value)
     );
-    setCurrentPage(1);
-  };
-  const toggleLanguage = (value: string, checked: boolean) => {
-    setLanguages((prev) =>
-      checked ? [...prev, value] : prev.filter((l) => l !== value)
-    );
-    setCurrentPage(1);
   };
 
-  const filtered = useMemo(() => {
-    let items = [...MOCK];
-    if (search) {
-      const q = search.toLowerCase();
-      items = items.filter(
-        (it) =>
-          it.title.toLowerCase().includes(q) ||
-          it.authors.toLowerCase().includes(q)
-      );
-    }
-    return items;
-  }, [search, genres, languages, priceRange, yearRange]);
-
-  // sort
-  const sorted = useMemo(() => {
-    const items = [...filtered];
-    if (sortBy === "title")
-      items.sort((a, b) => a.title.localeCompare(b.title));
-    if (sortBy === "newest") items.sort((a, b) => Number(b.id) - Number(a.id));
-    if (sortBy === "oldest") items.sort((a, b) => Number(a.id) - Number(b.id));
-    return items;
-  }, [filtered, sortBy]);
-
-  // paging
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
-  const pageItems = useMemo(() => {
-    const start = (currentPage - 1) * perPage;
-    return sorted.slice(start, start + perPage);
-  }, [sorted, currentPage]);
+  const applyFilters = () => {
+    setAppliedGenres(selectedGenres);
+    setAppliedLanguage(selectedLanguage);
+    setCurrentPage(1);
+  };
 
   const resetFilters = () => {
-    setGenres([]);
+    setSelectedGenres([]);
+    setAppliedGenres([]);
     setLanguages([]);
+    setSelectedLanguage(null);
+    setAppliedLanguage(null);
     setPriceRange([PRICE_BOUNDS[0], 1_500_000]);
     setYearRange([2005, YEAR_BOUNDS[1]]);
     setCurrentPage(1);
@@ -136,19 +153,19 @@ export default function BookPage() {
 
       <div className="flex gap-8">
         <BookFilter
-          genresAll={GENRES}
-          genresSelected={genres}
+          genresAll={genres as any}
+          genresSelected={selectedGenres}
           onToggleGenre={toggleGenre}
-          languagesAll={LANGS}
-          languagesSelected={languages}
-          onToggleLanguage={toggleLanguage}
+          selectedLanguage={selectedLanguage}
+          onChangeLanguage={setSelectedLanguage}
+          languagesAll={languages!}
           priceRange={priceRange}
           priceBounds={PRICE_BOUNDS}
           onPriceChange={setPriceRange}
           yearRange={yearRange}
           yearBounds={YEAR_BOUNDS}
           onYearChange={setYearRange}
-          onApply={() => setCurrentPage(1)}
+          onApply={applyFilters}
           onReset={resetFilters}
           sticky
         />
@@ -159,9 +176,9 @@ export default function BookPage() {
             onChangeView={setView}
             sortBy={sortBy}
             onChangeSort={setSortBy}
-            total={total}
+            total={123}
           />
-          <BookGrid items={pageItems} view={view} />
+          <BookGrid items={dataBook} view={view} />
           <BookPagination
             currentPage={currentPage}
             totalPages={totalPages}

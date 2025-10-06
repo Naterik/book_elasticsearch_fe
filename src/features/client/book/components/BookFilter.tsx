@@ -5,15 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Funnel } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type Props = {
-  genresAll: string[];
+  genresAll: IGenre[];
   genresSelected: string[];
-  onToggleGenre: (value: string, checked: boolean) => void;
-
-  languagesAll: string[];
-  languagesSelected: string[];
-  onToggleLanguage: (value: string, checked: boolean) => void;
+  onToggleGenre: (value: any, checked: boolean) => void;
+  selectedLanguage: string | null;
+  onChangeLanguage: (value: string | null) => void;
+  languagesAll: ILanguages[] | undefined;
 
   priceRange: [number, number];
   priceBounds: [number, number];
@@ -32,9 +32,9 @@ export default function BookFilter({
   genresAll,
   genresSelected,
   onToggleGenre,
+  selectedLanguage,
+  onChangeLanguage,
   languagesAll,
-  languagesSelected,
-  onToggleLanguage,
   priceRange,
   priceBounds,
   onPriceChange,
@@ -84,20 +84,23 @@ export default function BookFilter({
         {/* Genres */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Genres</h3>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
             {genresAll.map((g) => {
-              const checked = genresSelected.includes(g);
+              const checked = genresSelected.includes(g.name);
+              const id = `genre-${g.id}`;
               return (
                 <label
-                  key={g}
+                  key={g.id}
                   className="flex items-center gap-3 cursor-pointer"
+                  htmlFor={id}
                 >
                   <Checkbox
+                    id={id}
                     checked={checked}
-                    onCheckedChange={(c) => onToggleGenre(g, Boolean(c))}
-                    id={`genre-${g}`}
+                    className="ring-1"
+                    onCheckedChange={(c) => onToggleGenre(g.name, Boolean(c))}
                   />
-                  <Label htmlFor={`genre-${g}`}>{g}</Label>
+                  <Label htmlFor={id}>{g.name}</Label>
                 </label>
               );
             })}
@@ -109,24 +112,40 @@ export default function BookFilter({
         {/* Languages */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Languages</h3>
-          <div className="space-y-2">
-            {languagesAll.map((l) => {
-              const checked = languagesSelected.includes(l);
+          <RadioGroup
+            className="grid grid-cols-2 gap-2"
+            value={selectedLanguage ?? ""}
+            onValueChange={(v) => onChangeLanguage(v || null)}
+          >
+            <label
+              className="group flex w-full items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted"
+              htmlFor="lang-all"
+            >
+              <RadioGroupItem id="lang-all" value="" className="ring-1" />
+              <Label htmlFor="lang-all" className="leading-5">
+                All
+              </Label>
+            </label>
+
+            {languagesAll?.map((l) => {
+              const id = `lang-${l.key}`;
               return (
                 <label
-                  key={l}
-                  className="flex items-center gap-3 cursor-pointer"
+                  key={id}
+                  htmlFor={id}
+                  className="group flex w-full items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted"
                 >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={(c) => onToggleLanguage(l, Boolean(c))}
-                    id={`lang-${l}`}
-                  />
-                  <Label htmlFor={`lang-${l}`}>{l}</Label>
+                  <RadioGroupItem id={id} value={l.key} className="ring-1" />
+                  <Label htmlFor={id} className="leading-5">
+                    {l.key}
+                  </Label>
+                  <span className="ml-auto min-w-[1.25rem] tabular-nums text-right text-xs leading-5 text-muted-foreground opacity-60 group-hover:opacity-100">
+                    {l.doc_count}
+                  </span>
                 </label>
               );
             })}
-          </div>
+          </RadioGroup>
         </section>
 
         <Separator />
@@ -157,7 +176,7 @@ export default function BookFilter({
                   type="number"
                   value={priceRange[0]}
                   onChange={(e) => updatePriceMin(Number(e.target.value))}
-                  className="w-[120px] border rounded px-2 py-1"
+                  className="w-[100px] border rounded px-2 py-1"
                 />
               </div>
               <span className="text-muted-foreground">—</span>
@@ -170,7 +189,7 @@ export default function BookFilter({
                   type="number"
                   value={priceRange[1]}
                   onChange={(e) => updatePriceMax(Number(e.target.value))}
-                  className="w-[120px] border rounded px-2 py-1"
+                  className="w-[100px] border rounded px-2 py-1"
                 />
               </div>
             </div>

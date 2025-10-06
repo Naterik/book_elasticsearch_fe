@@ -15,6 +15,7 @@ import type {
   ActivityType,
   NotificationType,
 } from "@/types/info";
+import Notifications from "@/components/Notification";
 
 type Props = {
   recentActivity: Activity[];
@@ -94,40 +95,8 @@ export default function InfoOverview({
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="font-montserrat">Notifications</CardTitle>
-          <CardDescription>Important notices and reminders</CardDescription>
-        </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {notifications.slice(0, 4).map((n) => (
-              <div
-                key={n.id}
-                className={`flex items-start gap-3 p-3 rounded-lg ${
-                  !n.read ? "bg-muted/50" : ""
-                }`}
-              >
-                {getNotificationIcon(n.type)}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium line-clamp-1">{n.title}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {n.message}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{n.date}</p>
-                </div>
-                {!n.read && (
-                  <div className="w-2 h-2 bg-secondary rounded-full" />
-                )}
-              </div>
-            ))}
-          </div>
-          <Button
-            variant="outline"
-            className="w-full mt-4 bg-transparent"
-            onClick={onViewAllNotifications}
-          >
-            View all notifications
-          </Button>
+          <Notifications />
         </CardContent>
       </Card>
     </div>
