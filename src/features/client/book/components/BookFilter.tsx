@@ -25,7 +25,7 @@ type Props = {
 
   onApply: () => void;
   onReset: () => void;
-  sticky?: boolean; // tùy chọn: dính bên trái khi scroll
+  sticky?: boolean;
 };
 
 export default function BookFilter({
@@ -81,7 +81,6 @@ export default function BookFilter({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Genres */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Genres</h3>
           <div className="grid grid-cols-2 gap-2">
@@ -108,8 +107,6 @@ export default function BookFilter({
         </section>
 
         <Separator />
-
-        {/* Languages */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Languages</h3>
           <RadioGroup
@@ -150,7 +147,6 @@ export default function BookFilter({
 
         <Separator />
 
-        {/* Price */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Price</h3>
           <div className="space-y-4">
@@ -160,10 +156,7 @@ export default function BookFilter({
               step={10_000}
               value={priceRange}
               onValueChange={(v) =>
-                onPriceChange([
-                  v[0] ?? priceBounds[0],
-                  v[1] ?? priceBounds[1],
-                ] as [number, number])
+                onPriceChange([v[0] ?? priceBounds[0], v[1] ?? priceBounds[1]])
               }
             />
             <div className="flex items-center gap-3">
@@ -198,7 +191,6 @@ export default function BookFilter({
 
         <Separator />
 
-        {/* Publish year */}
         <section>
           <h3 className="text-xl font-semibold mb-3">Publish</h3>
           <div className="space-y-4">

@@ -93,11 +93,30 @@ const getFilterBookAPI = (
     paramsSerializer: {
       serialize: (params) =>
         qs.stringify(params, {
-          arrayFormat: "repeat", // <-- quan trọng
+          arrayFormat: "repeat",
           skipNulls: true,
-          // loại bỏ mảng rỗng để BE không nhận genres=[]
-          filter: (prefix, value) =>
-            Array.isArray(value) && value.length === 0 ? undefined : value,
+        }),
+    },
+  });
+};
+
+const getFilterBookElasticAPI = (
+  page: number,
+  yearRange: number[],
+  priceRange: number[],
+  search: string,
+  order: string,
+  genres: string[],
+  language: string | null
+) => {
+  const urlBackend = "/api/v1/filter/elastic";
+  return axios.get(urlBackend, {
+    params: { page, yearRange, priceRange, search, order, genres, language },
+    paramsSerializer: {
+      serialize: (params) =>
+        qs.stringify(params, {
+          arrayFormat: "repeat",
+          skipNulls: true,
         }),
     },
   });
@@ -112,4 +131,5 @@ export {
   getAllGenreAPI,
   getAllLanguagesElasticAPI,
   getFilterBookAPI,
+  getFilterBookElasticAPI,
 };

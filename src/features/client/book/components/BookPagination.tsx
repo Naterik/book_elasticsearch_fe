@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/pagination";
 
 type Props = {
+  error: boolean;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -38,6 +39,7 @@ function getCompactItems(
 }
 
 export default function BookPagination({
+  error,
   currentPage,
   totalPages,
   onPageChange,
@@ -50,9 +52,9 @@ export default function BookPagination({
   const items = getCompactItems(currentPage, totalPages, siblingCount);
 
   if (totalPages <= 1) return null;
-
+  if (error) return null;
   return (
-    <div className="cursor-pointer my -4 flex justify-center">
+    <div className="cursor-pointer my-4 flex justify-center">
       <div className="flex w-full items-center justify-between sm:hidden">
         <button
           onClick={goPrev}

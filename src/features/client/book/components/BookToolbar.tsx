@@ -20,6 +20,7 @@ type Props = {
   onChangeView: (v: "List" | "Kanban") => void;
   sortBy: string;
   onChangeSort: (v: string) => void;
+  countFilter: number;
   total: number;
 };
 
@@ -28,6 +29,7 @@ export default function BookToolbar({
   onChangeView,
   sortBy,
   onChangeSort,
+  countFilter,
   total,
 }: Props) {
   return (
@@ -54,11 +56,14 @@ export default function BookToolbar({
             <LayoutGrid className="h-5 w-5" />
           </ToggleGroupItem>
         </ToggleGroup>
-
-        <div className="flex items-center gap-2">
-          <Badge className="rounded-md px-2 py-1 text-base">{total}</Badge>
-          <span className="text-sm text-muted-foreground">results found</span>
-        </div>
+        {countFilter > 0 ? (
+          <div className="flex items-center gap-2">
+            <Badge className="rounded-md px-2 py-1 text-base">{total}</Badge>
+            <span className="text-sm text-muted-foreground">results found</span>
+          </div>
+        ) : (
+          <div></div>
+        )}
       </div>
 
       <div className="flex items-center justify-end gap-2">

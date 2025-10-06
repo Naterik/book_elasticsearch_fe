@@ -1,4 +1,4 @@
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BookToolbar from "@/features/client/book/components/BookToolbar";
@@ -10,49 +10,61 @@ import {
   getAllGenreAPI,
   getAllLanguagesElasticAPI,
   getFilterBookAPI,
+  getFilterBookElasticAPI,
 } from "@/services/api";
-import { Value } from "@radix-ui/react-select";
 
 const PRICE_BOUNDS: [number, number] = [120_000, 1_500_000];
-const YEAR_BOUNDS: [number, number] = [1999, 2025];
+const YEAR_BOUNDS: [number, number] = [1960, 2025];
 
 export default function BookPage() {
+  const [dataBook, setDataBook] = useState<IBook[]>([]);
   const [searchInput, setSearchInput] = useState("");
-  const [dataBook, setDataBook] = useState<IBook[]>();
   const [search, setSearch] = useState("");
 
   const [genres, setGenres] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
+
   const [languages, setLanguages] = useState<ILanguages[]>();
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [appliedLanguage, setAppliedLanguage] = useState<string | null>(null);
+
   const [priceRange, setPriceRange] = useState<[number, number]>([
     PRICE_BOUNDS[0],
-    1_500_000,
+    PRICE_BOUNDS[1],
+  ]);
+  const [appliedPrice, setAppliedPrice] = useState<[number, number]>([
+    PRICE_BOUNDS[0],
+    PRICE_BOUNDS[1],
   ]);
   const [yearRange, setYearRange] = useState<[number, number]>([
-    1999,
+    YEAR_BOUNDS[0],
+    YEAR_BOUNDS[1],
+  ]);
+  const [appliedYear, setAppliedYear] = useState<[number, number]>([
+    YEAR_BOUNDS[0],
     YEAR_BOUNDS[1],
   ]);
 
   const [view, setView] = useState<"List" | "Kanban">("Kanban");
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [countFilter, setCountFilter] = useState<number>(0);
+  const [error, setError] = useState<boolean>(false);
+  const fetchAllBook = async () => {
+    const res = await getAllBookAPI(1);
 
+    if (res.data) {
+      const result = res?.data?.result;
+      const pagination = res.data.pagination;
+      setDataBook(result);
+      setCurrentPage(pagination.currentPage);
+      setTotalPages(pagination.totalPages);
+    }
+  };
   useEffect(() => {
-    const fetchAllBook = async () => {
-      const res = await getAllBookAPI(1);
-
-      if (res.data) {
-        const result = res?.data?.result;
-        const pagination = res.data.pagination;
-        setDataBook(result);
-        setCurrentPage(pagination.currentPage);
-        setTotalPages(pagination.totalPages);
-      }
-    };
     const fetchAllGenre = async () => {
       const res = await getAllGenreAPI();
       if (res.data) {
@@ -71,27 +83,33 @@ export default function BookPage() {
   }, []);
   useEffect(() => {
     const fetchAllFilterBook = async () => {
-      const res = await getFilterBookAPI(
+      const res = await getFilterBookElasticAPI(
         currentPage,
-        yearRange,
-        priceRange,
-        search,
+        appliedYear,
+        appliedPrice,
+        searchInput,
         sortBy,
         appliedGenres,
         appliedLanguage
       );
-      if (res.data) {
+      if (res.data !== null) {
+        const pagination = res.data.pagination;
         setDataBook(res.data.result);
-        setCurrentPage(res.data.pagination.currentPage);
-        setTotalPages(res.data.pagination.totalPages);
+        setCurrentPage(pagination.currentPage);
+        setTotalPages(pagination.totalPages);
+        setTotalItems(pagination.totalItems);
+        setError(false);
+      } else {
+        setError(true);
+        setTotalItems(0);
       }
     };
     fetchAllFilterBook();
   }, [
     currentPage,
-    yearRange,
-    priceRange,
-    search,
+    appliedYear,
+    appliedPrice,
+    searchInput,
     sortBy,
     appliedGenres,
     appliedLanguage,
@@ -99,6 +117,7 @@ export default function BookPage() {
   const handleSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
+    setCountFilter(1);
     setCurrentPage(1);
   };
 
@@ -107,24 +126,30 @@ export default function BookPage() {
       checked ? [...prev, value] : prev.filter((g) => g !== value)
     );
   };
-
   const applyFilters = () => {
     setAppliedGenres(selectedGenres);
     setAppliedLanguage(selectedLanguage);
+    setAppliedPrice(priceRange);
+    setAppliedYear(yearRange);
+    setCountFilter(1);
     setCurrentPage(1);
   };
 
   const resetFilters = () => {
+    setCountFilter(0);
+    setError(false);
+    setSearchInput("");
+    setSearch("");
     setSelectedGenres([]);
     setAppliedGenres([]);
-    setLanguages([]);
     setSelectedLanguage(null);
     setAppliedLanguage(null);
-    setPriceRange([PRICE_BOUNDS[0], 1_500_000]);
-    setYearRange([2005, YEAR_BOUNDS[1]]);
+    setAppliedPrice([PRICE_BOUNDS[0], PRICE_BOUNDS[1]]);
+    setPriceRange([PRICE_BOUNDS[0], PRICE_BOUNDS[1]]);
+    setYearRange([YEAR_BOUNDS[0], YEAR_BOUNDS[1]]);
+    setAppliedYear([YEAR_BOUNDS[0], YEAR_BOUNDS[1]]);
     setCurrentPage(1);
   };
-
   return (
     <div className="container mx-auto">
       <form
@@ -132,20 +157,16 @@ export default function BookPage() {
         className="flex items-center justify-center gap-2 my-8"
       >
         <Input
-          placeholder="input search text"
+          placeholder="Input search text"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={(e) => (setSearchInput(e.target.value), setCountFilter(1))}
           className="w-[520px]"
         />
         <Button size="lg" type="submit">
           Search
         </Button>
         {searchInput && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setSearchInput("")}
-          >
+          <Button type="button" variant="ghost" onClick={resetFilters}>
             Clear
           </Button>
         )}
@@ -176,10 +197,12 @@ export default function BookPage() {
             onChangeView={setView}
             sortBy={sortBy}
             onChangeSort={setSortBy}
-            total={123}
+            countFilter={countFilter}
+            total={totalItems}
           />
-          <BookGrid items={dataBook} view={view} />
+          <BookGrid items={dataBook} view={view} error={error} />
           <BookPagination
+            error={error}
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
