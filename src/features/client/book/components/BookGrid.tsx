@@ -9,7 +9,7 @@ type Props = {
 
 export default function BookGrid({ items, view, error }: Props) {
   const cls =
-    view === "Kanban" ? "grid grid-cols-4 gap-10" : "grid grid-cols-1 gap-4"; // List: 1 cột (có thể tùy biến)
+    view === "Kanban" ? "grid grid-cols-4 gap-10" : "grid grid-cols-1 gap-4";
   if (error)
     return (
       <Card className=" border-0 shadow-none hover:shadow-2xl transition p-4 text-center">

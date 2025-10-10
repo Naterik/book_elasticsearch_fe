@@ -6,10 +6,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useNavigate, useParams } from "react-router";
 
 export default function BookCard({ item }: { item: IBook }) {
+  const navigate = useNavigate();
   return (
-    <Card className="w-[240px] border-0 shadow-none hover:shadow-2xl transition p-4">
+    <Card
+      className="w-[240px] border-0 shadow-none hover:shadow-2xl transition p-4"
+      onClick={() => navigate(`/book/${item.id}`)}
+    >
       <div className="aspect-[3/4] overflow-hidden rounded">
         <img
           src={item.image}

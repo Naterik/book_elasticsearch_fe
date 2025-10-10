@@ -16,7 +16,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { setUser, setIsAuthenticated } = useCurrentApp();
 
-  const onFinish = async () => {
+  const onFinish = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsSubmit(true);
     const res = await loginAPI(username, password);
     setIsSubmit(false);

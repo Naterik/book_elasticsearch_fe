@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")!).render(
       richColors
       closeButton
       expand
-      duration={1000}
+      duration={3000}
       theme="system"
     />
     <AppProvider>

@@ -25,10 +25,12 @@ const registerAPI = (
 
 const loginAPI = (username: string, password: string) => {
   const urlBackend = "/api/v1/login";
-  return axios.post<IBackendRes<ILogin>>(urlBackend, {
+  const respond = axios.post<IBackendRes<ILogin>>(urlBackend, {
     username,
     password,
   });
+  console.log("respond :>> ", respond);
+  return respond;
 };
 
 const fetchAPI = () => {
@@ -122,6 +124,10 @@ const getFilterBookElasticAPI = (
   });
 };
 
+const getBookByIdAPI = (id: number) => {
+  return axios.get<IBackendRes<IBook>>(`/api/v1/books/${id}`);
+};
+
 export {
   registerAPI,
   loginAPI,
@@ -132,4 +138,5 @@ export {
   getAllLanguagesElasticAPI,
   getFilterBookAPI,
   getFilterBookElasticAPI,
+  getBookByIdAPI,
 };

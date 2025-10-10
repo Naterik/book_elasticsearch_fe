@@ -31,14 +31,22 @@ declare global {
     authorId: number;
     publisherId: number;
     authors: IAuthor;
-    genres: [genres: IGenre];
+    genres: IGenreBook[];
+    publishers: IPublisher;
   }
   interface IAuthor {
     id: number;
     name: string;
     description: string;
   }
+  interface IGenreBook {
+    genres: IGenre;
+  }
   interface IGenre {
+    id: number;
+    name: string;
+  }
+  interface IPublisher {
     id: number;
     name: string;
   }

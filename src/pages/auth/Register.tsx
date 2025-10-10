@@ -36,7 +36,8 @@ const RegisterPage = () => {
     }));
   };
 
-  const onFinish = async () => {
+  const onFinish = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const { fullName, username, password, confirmPassword } = formValues;
 
     try {
@@ -74,7 +75,7 @@ const RegisterPage = () => {
       toast.warning("Password and Confirm Password do not match.");
       return;
     }
-    onFinish();
+    onFinish(e);
   };
 
   return (

@@ -35,8 +35,14 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 type Props = {
   borrowDuration: string;
   setBorrowDuration: (v: string) => void;
+  dataDetailBook: IBook | null;
 };
-const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
+const BookDetailContent = ({
+  borrowDuration,
+  setBorrowDuration,
+  dataDetailBook,
+}: Props) => {
+  console.log("dataDetailBook :>> ", dataDetailBook);
   return (
     <>
       <Breadcrumb className="my-5">
@@ -54,7 +60,7 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>1</BreadcrumbPage>
+            <BreadcrumbPage>{dataDetailBook?.id}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -63,7 +69,7 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
           <Card className="w-full h-135 md:max-w-120 max-h-135 overflow-hidden rounded-xl bg-muted">
             <div className="aspect-[5/4] md:aspect-[4/5]">
               <img
-                src={testimg}
+                src={dataDetailBook?.image}
                 alt="Image"
                 className="rounded-md object-cover object-center size-full"
               />
@@ -73,19 +79,22 @@ const BookDetailContent = ({ borrowDuration, setBorrowDuration }: Props) => {
         <div className="w-full md: max-0 p-3 ">
           <CardHeader className="space-y-2">
             <CardTitle className="text-2xl text-center md:text-left leading-snug">
-              Big Bang (ed. 3x - 2019)
+              {dataDetailBook?.title}
             </CardTitle>
             <div className="text-2xl text-center md:flex w-full flex-wrap gap-2">
-              <Badge variant="secondary">novel</Badge>
-              <Badge variant="secondary">novel</Badge>
+              {dataDetailBook?.genres?.map((g) => (
+                <Badge variant="secondary">{g.genres.name}</Badge>
+              ))}
             </div>
 
             <CardDescription className="font-medium text-center md:text-left w-auto">
-              by <span className="font-medium">Jacob, Irene</span>
+              by{" "}
+              <span className="font-medium">
+                {dataDetailBook?.authors?.name}
+              </span>
             </CardDescription>
             <p className="text-center   md:text-left text-xl text-muted-foreground ">
-              A modal dialog that interrupts the user with important content and
-              expects a response.
+              {dataDetailBook?.shortDesc}
             </p>
           </CardHeader>
         </div>

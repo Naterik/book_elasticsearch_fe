@@ -11,6 +11,7 @@ import RegisterPage from "@/pages/auth/Register";
 import BookPage from "@/pages/client/Book";
 import DetailPage from "@/pages/client/BookDetail";
 import InfoPage from "@/pages/client/Info";
+import { getBookByIdAPI } from "@/services/api";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -19,9 +20,12 @@ const router = createBrowserRouter([
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
       { path: "book", Component: BookPage },
-      { path: "bookdetail", Component: DetailPage },
+      // { path: "bookdetail", Component: DetailPage },
+      {
+        path: "book/:id",
+        Component: DetailPage,
+      },
       { path: "info", Component: InfoPage },
-      { path: "bookdetail", Component: DetailPage },
     ],
   },
   { path: "login", Component: LoginPage },
