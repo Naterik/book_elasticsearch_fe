@@ -19,8 +19,8 @@ declare global {
     id: number;
     isbn: string;
     title: string;
-    shortDesc: string;
-    detailDesc: string;
+    shortDesc: string | null;
+    detailDesc: string | null;
     price: number;
     quantity: number;
     publishDate: string;
@@ -79,15 +79,52 @@ declare global {
     key: string;
     doc_count: number;
   }
+  interface IUserInfo {
+    id: number;
+    username: string;
+    fullName: string | null;
+    address: string | null;
+    phone: string | null;
+    avatar: string | null;
+    cardNumber: string | null;
+    membershipStart: string | null;
+    membershipEnd: string | null;
+    status: UserStatus;
+    roleId: number;
+  }
 
-  interface Item {
-    id: string;
-    kind: "BOOK" | "ARTICLE" | "STANDARD";
-    image: string;
-    title: string;
-    authors: string;
-    meta1?: string;
-    meta2?: string;
-    publisher: string;
+  interface IBookCopy {
+    id: number;
+    yearPublished: number;
+    copyNumber: string;
+    status: BookCopyStatus;
+    location: string;
+    heldByUserId: number | null;
+    holdExpiryDate: string | null;
+    bookId: number;
+    books: IBook;
+  }
+  interface ILoan {
+    id: number;
+    loanDate: string;
+    dueDate: string;
+    returnDate: string | null;
+    renewalCount: number;
+    status: LoanStatus;
+    bookcopyId: number;
+    userId: number;
+    bookCopy: IBookCopy;
+    user: IUserInfo;
+  }
+  interface IFine {
+    id: number;
+    amount: number;
+    reason: string;
+    isPaid: boolean;
+    loanId: number;
+    userId: number;
+  }
+  interface IFineDetail extends IFine {
+    user: IUserInfo;
   }
 }

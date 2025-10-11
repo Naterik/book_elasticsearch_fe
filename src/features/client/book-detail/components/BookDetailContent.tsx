@@ -60,7 +60,7 @@ const BookDetailContent = ({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{dataDetailBook?.id}</BreadcrumbPage>
+            <BreadcrumbPage>{dataDetailBook?.title}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

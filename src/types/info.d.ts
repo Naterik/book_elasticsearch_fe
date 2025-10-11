@@ -43,3 +43,23 @@ export type Stats = {
   readingGoal: number;
   readingStreak: number;
 };
+
+export interface Loan {
+  id: string;
+  bookId: string;
+  bookTitle: string;
+  authors: string[];
+  isbn: string;
+  copyId: string;
+  loanDate: string;
+  dueDate: string;
+  status: "borrowed" | "overdue" | "returned";
+  renewalCount: number;
+  maxRenewals: number;
+  fineAmount: number;
+  image: string;
+}
+
+export type LoanStatus = "ON_LOAN" | "RETURNED" | "OVERDUE" | "LOST";
+export type BookCopyStatus = "AVAILABLE" | "ON_LOAN" | "ON_HOLD" | "LOST";
+export type UserStatus = "ACTIVE" | "PENDING_CARD" | "INACTIVE" | "SUSPENDED";

@@ -11,7 +11,7 @@ const ClientLayout = () => {
   useEffect(() => {
     const fetchAccount = async () => {
       const res = await fetchAPI();
-
+      console.log("resFetchAccount :>> ", res);
       if (res.data) {
         setUser(res.data);
         setIsAuthenticated(true);
