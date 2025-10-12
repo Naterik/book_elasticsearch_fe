@@ -19,9 +19,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/helper";
-import { Book, AlertCircle, Loader2 } from "lucide-react";
+import { Book, AlertCircle } from "lucide-react";
 import { getStatusVariant } from "@/components/Statusbook";
 import { Spinner } from "@/components/ui/spinner";
+import { useNavigate } from "react-router";
 interface LoanReservationProps {
   reservationData: IReservation[];
   onCancelReservation: (reservationId: number) => void;
@@ -33,25 +34,24 @@ const LoanReservation = ({
   onCancelReservation,
   cancellingId,
 }: LoanReservationProps) => {
+  const navigate = useNavigate();
   if (reservationData.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="font-montserrat">Sách đặt trước</CardTitle>
-          <CardDescription>
-            Danh sách các cuốn sách bạn đã đặt trước
-          </CardDescription>
+          <CardTitle className="font-montserrat">Reservation book</CardTitle>
+          <CardDescription>List reservation of book</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-lg">
             <Book className="w-12 h-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-1">
-              Chưa có lượt đặt trước nào
+              Haven't reservation yet !!
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Hãy bắt đầu khám phá và đặt trước những cuốn sách bạn yêu thích.
+              Explore more with our fascinating library books
             </p>
-            <Button>Khám phá sách</Button>
+            <Button onClick={() => navigate("/")}>Explore more book</Button>
           </div>
         </CardContent>
       </Card>
@@ -61,10 +61,8 @@ const LoanReservation = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-montserrat">Sách đặt trước</CardTitle>
-        <CardDescription>
-          Danh sách các cuốn sách bạn đã đặt trước
-        </CardDescription>
+        <CardTitle className="font-montserrat">Reservation book</CardTitle>
+        <CardDescription>List of reservation book</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -88,7 +86,7 @@ const LoanReservation = ({
                       <h3 className="font-semibold font-montserrat text-lg leading-tight">
                         {reservation.book.title}
                       </h3>
-                      {/* Hiển thị trạng thái rõ ràng */}
+
                       <Badge
                         variant={getStatusVariant(reservation.status)}
                         className="flex-shrink-0 w-fit"
@@ -103,7 +101,9 @@ const LoanReservation = ({
 
                   <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mt-2">
                     <div className="text-sm">
-                      <span className="text-muted-foreground">Ngày đặt: </span>
+                      <span className="text-muted-foreground">
+                        Request date:{" "}
+                      </span>
                       <span className="font-medium">
                         {formatDate(reservation.requestDate)}
                       </span>
@@ -122,28 +122,25 @@ const LoanReservation = ({
                             ) : (
                               <AlertCircle className="mr-2 h-4 w-4" />
                             )}
-                            Hủy đặt trước
+                            Cancel reservation
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Bạn có chắc chắn không?
-                            </AlertDialogTitle>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Hành động này sẽ hủy lượt đặt trước cho cuốn sách
-                              "{reservation.book.title}". Bạn không thể hoàn tác
-                              hành động này.
+                              This action will cancel the reservation "
+                              {reservation.book.title}". You cannot redo this.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Thoát</AlertDialogCancel>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() =>
                                 onCancelReservation(reservation.id)
                               }
                             >
-                              Hủy
+                              Yes
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

@@ -1,5 +1,3 @@
-// features/client/loan/LoanCurrent.tsx (Đã dịch sang Tiếng Anh)
-
 import {
   Card,
   CardContent,
@@ -12,7 +10,7 @@ import { LoanItem } from "./LoanItem";
 interface LoanCurrentProps {
   loanCurrent: ILoan[];
   onRenewLoan: (loanId: number) => Promise<void>;
-  renewingId: number | null; // Nhận renewingId
+  renewingId: number | null;
 }
 
 const LoanCurrent = ({

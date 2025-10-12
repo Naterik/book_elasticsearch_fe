@@ -18,11 +18,11 @@ export const getStatusVariant = (status: ReservationStatus) => {
   console.log("status :>> ", status);
   switch (status) {
     case "NOTIFIED":
-      return "default"; // Màu xanh lá (mặc định của Shadcn)
+      return "default";
     case "PENDING":
-      return "secondary"; // Màu xám
+      return "secondary";
     case "CANCELED":
-      return "destructive"; // Màu đỏ
+      return "destructive";
     default:
       return "outline";
   }

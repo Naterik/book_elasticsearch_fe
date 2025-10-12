@@ -15,7 +15,7 @@ import {
   putCancelReservationAPI,
 } from "@/services/loans";
 import { AlertTriangle } from "lucide-react";
-import { useEffect, useState, useCallback, use, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 const LoanPage = () => {
   const { user, showLoader, hideLoader } = useCurrentApp();
@@ -76,7 +76,7 @@ const LoanPage = () => {
         setDataOnLoan(res?.data);
       }
     } catch (error) {
-      toast.error("Không thể tải danh sách sách đang mượn.");
+      toast.error("Cannot load the book on loan.");
     } finally {
       hideLoader();
     }

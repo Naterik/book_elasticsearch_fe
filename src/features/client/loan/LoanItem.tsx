@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Calendar, Clock, CreditCard, RotateCcw, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Calendar, Clock, CreditCard, RotateCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -131,8 +131,8 @@ export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
                     }`}
                   >
                     {daysLeft >= 0
-                      ? `Còn ${daysLeft} ngày`
-                      : `Quá hạn ${Math.abs(daysLeft)} ngày`}
+                      ? `Have ${daysLeft} day`
+                      : `Due ${Math.abs(daysLeft)} day`}
                   </span>
                 </div>
 

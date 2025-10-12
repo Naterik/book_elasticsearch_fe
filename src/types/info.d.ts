@@ -5,7 +5,7 @@ export type Activity = {
   id: string;
   type: ActivityType;
   bookTitle: string;
-  date: string; // ISO hoặc dạng 'YYYY-MM-DD'
+  date: string;
   description: string;
 };
 
