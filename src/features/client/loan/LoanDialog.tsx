@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   Clock,
   Hash,
   BadgePercent,
+  Loader2,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/helper";
 import { DetailRow } from "./DetailRow";
@@ -29,6 +30,7 @@ interface LoanActionDialogsProps {
   canRenew: boolean;
   onRenew: (loanId: number) => void;
   fine: IFine | null;
+  renewingId: number | null;
 }
 
 export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
@@ -36,32 +38,33 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
   canRenew,
   onRenew,
   fine,
+  renewingId,
 }) => {
+  const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false);
   const book = loan?.bookCopy?.books;
   const fineAmount = fine?.amount ?? 0;
-
+  const isRenewing = renewingId === loan.id;
   if (!book) {
     return null;
   }
-
+  const handleConfirmRenew = async () => {
+    await onRenew(loan.id);
+    setIsRenewDialogOpen(false);
+  };
   return (
     <div className="flex gap-2 flex-wrap">
-      {/* Dialog Chi tiết */}
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm" className="cursor-pointer">
             <Eye className="h-4 w-4 mr-2" />
-            Chi tiết
+            Details
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Book className="h-5 w-5 text-primary" />
-              <span className="font-montserrat">Chi tiết lượt mượn</span>
-            </DialogTitle>
+            <DialogTitle>Loan Details</DialogTitle>
             <DialogDescription>
-              Thông tin tổng quan về sách và lịch sử mượn của bạn.
+              Overview of the book and your loan history.
             </DialogDescription>
           </DialogHeader>
 
@@ -95,7 +98,7 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
           <div className="space-y-3">
             <DetailRow
               icon={Hash}
-              label="Mã bản sao"
+              label="Copy code"
               value={
                 <span className="font-mono bg-muted px-2 py-1 rounded">
                   {loan.bookcopyId}
@@ -104,17 +107,17 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
             />
             <DetailRow
               icon={Calendar}
-              label="Ngày mượn"
+              label="Loan date"
               value={formatDate(loan.loanDate)}
             />
             <DetailRow
               icon={Clock}
-              label="Hạn trả"
+              label="Due date"
               value={formatDate(loan.dueDate)}
             />
             <DetailRow
               icon={RotateCcw}
-              label="Số lần gia hạn"
+              label="Renewal Count"
               value={`${loan.renewalCount} / 2`}
             />
           </div>
@@ -124,7 +127,7 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
           <div className="space-y-3">
             <DetailRow
               icon={BadgePercent}
-              label="Tiền phạt"
+              label="Fine"
               value={formatCurrency(fineAmount)}
               valueClassName={
                 fineAmount > 0 ? "text-red-600" : "text-green-600"
@@ -135,33 +138,31 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
       </Dialog>
 
       {canRenew && (
-        <Dialog>
+        <Dialog open={isRenewDialogOpen} onOpenChange={setIsRenewDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="secondary" size="sm" className="cursor-pointer">
+            <Button variant="secondary" size="sm">
               <RotateCcw className="h-4 w-4 mr-2" />
-              Gia hạn
+              Renew
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-montserrat">
-                Xác nhận gia hạn sách
-              </DialogTitle>
+              <DialogTitle>Confirm Book Renewal</DialogTitle>
               <DialogDescription>
-                Bạn sẽ gia hạn cuốn <strong>"{book.title}"</strong> thêm 14
-                ngày.
+                You are about to renew the book <strong>"{book.title}"</strong>{" "}
+                for another 14 days.
               </DialogDescription>
             </DialogHeader>
             <div className="p-4 my-4 bg-muted/50 rounded-lg border">
               <div className="space-y-3">
                 <DetailRow
                   icon={Clock}
-                  label="Hạn trả hiện tại"
+                  label="Current Due Date"
                   value={formatDate(loan.dueDate)}
                 />
                 <DetailRow
+                  label="New Due Date"
                   icon={Clock}
-                  label="Hạn trả mới"
                   value={formatDate(
                     new Date(
                       new Date(loan.dueDate).getTime() +
@@ -172,20 +173,30 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
                 />
                 <DetailRow
                   icon={RotateCcw}
-                  label="Lượt gia hạn"
+                  label="Renewal Count"
                   value={`${loan.renewalCount + 1} / 2`}
                 />
               </div>
             </div>
             <DialogFooter className="sm:justify-end gap-2">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Hủy
-                </Button>
-              </DialogClose>
-              <Button type="button" onClick={() => onRenew(loan.id)}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Xác nhận
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsRenewDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmRenew}
+                disabled={isRenewing}
+              >
+                {isRenewing ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                )}
+                {isRenewing ? "Renewing..." : "Confirm"}
               </Button>
             </DialogFooter>
           </DialogContent>

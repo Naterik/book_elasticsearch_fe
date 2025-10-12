@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// features/client/loan/LoanCurrent.tsx (Đã dịch sang Tiếng Anh)
+
 import {
   Card,
   CardContent,
@@ -7,40 +8,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoanItem } from "./LoanItem";
-import { getLoanByUserIdAPI } from "@/services/api";
 
-const LoanCurrent = () => {
-  const [dataLoan, setDataLoan] = useState<any>();
+interface LoanCurrentProps {
+  loanCurrent: ILoan[];
+  onRenewLoan: (loanId: number) => Promise<void>;
+  renewingId: number | null; // Nhận renewingId
+}
 
-  useEffect(() => {
-    const fetchAllLoans = async () => {
-      const res: any = await getLoanByUserIdAPI(25);
-      console.log("res :>> ", res.data);
-      if (res.data) {
-        setDataLoan(res?.data);
-      }
-    };
-    fetchAllLoans();
-  }, []);
-  console.log("dataLoan :>> ", dataLoan);
+const LoanCurrent = ({
+  loanCurrent,
+  onRenewLoan,
+  renewingId,
+}: LoanCurrentProps) => {
   return (
     <div>
       <Card>
         <CardHeader>
-          <CardTitle className="font-montserrat">Sách đang mượn</CardTitle>
+          <CardTitle className="font-montserrat">
+            Currently Borrowed Books
+          </CardTitle>
           <CardDescription>
-            Danh sách các cuốn sách bạn đang mượn và thông tin trả sách
+            A list of books you are currently borrowing and their return
+            information.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {dataLoan?.length > 0 ? (
-              dataLoan.map((loan: ILoan) => (
-                <LoanItem key={loan.id} loan={loan} />
+            {loanCurrent?.length > 0 ? (
+              loanCurrent.map((loan: ILoan) => (
+                <LoanItem
+                  key={loan.id}
+                  loan={loan}
+                  onRenew={onRenewLoan}
+                  renewingId={renewingId}
+                />
               ))
             ) : (
               <p className="text-center text-muted-foreground">
-                Bạn không có sách nào đang mượn.
+                You have no books currently on loan.
               </p>
             )}
           </div>

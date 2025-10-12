@@ -3,18 +3,17 @@ import { Calendar, Clock, CreditCard, RotateCcw, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import {
-  formatCurrency,
-  formatDate,
-  getCountDate,
-  getDaysUntilDue,
-} from "@/helper/index";
+import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
 import { getStatusBadge } from "@/components/Statusbook";
 import { LoanActionDialogs } from "./LoanDialog";
-import { getFineByLoanIdAPI, getRenewalLoanAPI } from "@/services/api";
-// Import type đã tạo
+import { getFineByLoanIdAPI } from "@/services/loans";
 
-export const LoanItem = ({ loan }: { loan: ILoan }) => {
+interface LoanItemProps {
+  loan: ILoan;
+  onRenew: (loanId: number) => void;
+  renewingId: number | null;
+}
+export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
   const [dataFine, setDataFine] = useState<IFine | null>(null);
   const { percentRemaining, daysLeft } = getCountDate(
     loan.loanDate,
@@ -24,24 +23,19 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
   let amount = 0;
   const checkCard = loan.user.cardNumber ?? null;
 
-  const canRenew = loan.renewalCount <= 2 && loan.status !== "RETURNED";
+  const canRenew = loan.renewalCount < 2 && loan.status !== "RETURNED";
 
-  const handleRenewal = async (loanId: number) => {
-    const renewal = await getRenewalLoanAPI(loanId, loan.userId);
-    console.log("renewal :>> ", renewal);
-  };
-  const fetchFineByLoanId = async () => {
-    const res = await getFineByLoanIdAPI(loan.id);
-    if (res.data) {
-      setDataFine(res.data);
-      amount = dataFine?.amount ?? 0;
-    }
-  };
   useEffect(() => {
+    const fetchFineByLoanId = async () => {
+      const res = await getFineByLoanIdAPI(loan.id);
+      if (res.data) {
+        setDataFine(res.data);
+      }
+    };
     if (checkCard) {
       fetchFineByLoanId();
     }
-  }, []);
+  }, [loan.id, checkCard]);
 
   return (
     <Card
@@ -73,14 +67,14 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
               <div>
                 <div className="flex items-center gap-1 text-muted-foreground mb-1">
                   <Calendar className="h-3 w-3" />
-                  <span>Ngày mượn:</span>
+                  <span>Loan Date:</span>
                 </div>
                 <div className="font-medium">{formatDate(loan.loanDate)}</div>
               </div>
               <div>
                 <div className="flex items-center gap-1 text-muted-foreground mb-1">
                   <Clock className="h-3 w-3" />
-                  <span>Hạn trả:</span>
+                  <span>Due Date:</span>
                 </div>
                 <div
                   className={`font-medium ${
@@ -98,7 +92,7 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
                 <div>
                   <div className="flex items-center gap-1 text-muted-foreground mb-1">
                     <RotateCcw className="h-3 w-3" />
-                    <span>Gia hạn:</span>
+                    <span>Renewals:</span>
                   </div>
                   <div className="font-medium">{loan.renewalCount}/2</div>
                 </div>
@@ -109,7 +103,7 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
               <div>
                 <div className="flex items-center gap-1 text-muted-foreground mb-1">
                   <CreditCard className="h-3 w-3" />
-                  <span>Phạt:</span>
+                  <span>Fine:</span>
                 </div>
                 <div
                   className={`font-medium ${
@@ -126,7 +120,7 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
             ) : (
               <div className="mb-4">
                 <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                  <span>Thời gian mượn</span>
+                  <span>Loan Period</span>
                   <span
                     className={`font-medium ${
                       daysLeft < 0
@@ -154,8 +148,9 @@ export const LoanItem = ({ loan }: { loan: ILoan }) => {
             <LoanActionDialogs
               loan={loan}
               canRenew={canRenew}
-              onRenew={handleRenewal}
+              onRenew={onRenew}
               fine={dataFine}
+              renewingId={renewingId}
             />
           </div>
         </div>

@@ -11,7 +11,6 @@ import RegisterPage from "@/pages/auth/Register";
 import BookPage from "@/pages/client/Book";
 import DetailPage from "@/pages/client/BookDetail";
 import InfoPage from "@/pages/client/Info";
-import { getBookByIdAPI } from "@/services/api";
 import LoanPage from "@/pages/client/Loan";
 const router = createBrowserRouter([
   {

@@ -3,37 +3,30 @@ import { Outlet } from "react-router";
 import AppHeader from "../components/layout/AppHeader";
 import { fetchAPI } from "../services/api";
 import { useCurrentApp } from "../app/providers/app.context";
-import { DotLoader } from "react-spinners";
 import AppFooter from "@/components/layout/AppFooter";
+import { GlobalLoader } from "@/components/Loader";
 const ClientLayout = () => {
-  const { setUser, setIsLoading, setIsAuthenticated, isLoading } =
-    useCurrentApp();
+  const { setUser, setIsAuthenticated, hideLoader } = useCurrentApp();
   useEffect(() => {
     const fetchAccount = async () => {
       const res = await fetchAPI();
-      console.log("resFetchAccount :>> ", res);
       if (res.data) {
         setUser(res.data);
         setIsAuthenticated(true);
       }
-      setIsLoading(false);
+      hideLoader();
     };
 
     fetchAccount();
   }, []);
   return (
     <div>
-      {!isLoading ? (
-        <>
-          <AppHeader />
-          <Outlet />
-          <AppFooter />
-        </>
-      ) : (
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <DotLoader size={50} color="#078EF5" />
-        </div>
-      )}
+      <AppHeader />
+      <main>
+        <Outlet />
+      </main>
+      <AppFooter />
+      <GlobalLoader />
     </div>
   );
 };

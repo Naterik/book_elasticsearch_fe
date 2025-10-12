@@ -127,4 +127,14 @@ declare global {
   interface IFineDetail extends IFine {
     user: IUserInfo;
   }
+
+  interface IReservation {
+    id: number;
+    requestDate: string;
+    status: ReservationStatus;
+    bookId: number;
+    userId: number;
+    user: IUserInfo;
+    book: IBook;
+  }
 }

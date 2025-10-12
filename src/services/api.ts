@@ -128,27 +128,6 @@ const getBookByIdAPI = (id: number) => {
   return axios.get<IBackendRes<IBook>>(`/api/v1/books/${id}`);
 };
 
-const getLoanByUserIdAPI = (id: number) => {
-  return axios.get<IBackendRes<ILoan>>(`/api/v1/loans/${id}`);
-};
-
-const getAllLoanAPI = () => {
-  const urlBackend = "/api/v1/loans";
-  return axios.get<IBackendRes<ILoan>>(urlBackend);
-};
-
-const getFineByLoanIdAPI = (id: number) => {
-  return axios.get<IBackendRes<IFineDetail>>(`/api/v1/loans/${id}`);
-};
-
-const getRenewalLoanAPI = (loanId: number, userId: number) => {
-  const urlBackend = "/api/v1/loans/renewal";
-  return axios.put<IBackendRes<any>>(urlBackend, {
-    loanId,
-    userId,
-  });
-};
-
 export {
   registerAPI,
   loginAPI,
@@ -160,8 +139,4 @@ export {
   getFilterBookAPI,
   getFilterBookElasticAPI,
   getBookByIdAPI,
-  getAllLoanAPI,
-  getLoanByUserIdAPI,
-  getRenewalLoanAPI,
-  getFineByLoanIdAPI,
 };

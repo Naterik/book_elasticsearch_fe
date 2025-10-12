@@ -1,29 +1,63 @@
-import React from "react";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getStatusBadge } from "@/components/Statusbook";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-const mockReservations = [
-  {
-    id: "R001",
-    bookId: "2",
-    bookTitle: "Truyện Kiều",
-    authors: ["Nguyễn Du"],
-    isbn: "978-604-1-11111-1",
-    requestDate: "2023-12-15",
-    status: "pending",
-    position: 2,
-    estimatedAvailable: "2024-01-20",
-    image: "",
-  },
-];
-const LoanReservation = () => {
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/helper";
+import { Book, AlertCircle, Loader2 } from "lucide-react";
+import { getStatusVariant } from "@/components/Statusbook";
+import { Spinner } from "@/components/ui/spinner";
+interface LoanReservationProps {
+  reservationData: IReservation[];
+  onCancelReservation: (reservationId: number) => void;
+  cancellingId: number | null;
+}
+
+const LoanReservation = ({
+  reservationData,
+  onCancelReservation,
+  cancellingId,
+}: LoanReservationProps) => {
+  if (reservationData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-montserrat">Sách đặt trước</CardTitle>
+          <CardDescription>
+            Danh sách các cuốn sách bạn đã đặt trước
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-lg">
+            <Book className="w-12 h-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-1">
+              Chưa có lượt đặt trước nào
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Hãy bắt đầu khám phá và đặt trước những cuốn sách bạn yêu thích.
+            </p>
+            <Button>Khám phá sách</Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -34,68 +68,94 @@ const LoanReservation = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {mockReservations.map((reservation) => (
-            <Card key={reservation.id} className="border-l-4 border-l-blue-500">
-              <CardContent className="p-6">
-                <div className="flex gap-4">
-                  <img
-                    src={reservation.image}
-                    alt={reservation.bookTitle}
-                    className="w-16 h-20 object-cover rounded"
-                  />
+          {reservationData.map((reservation) => {
+            const isCancelling = reservation.status === "CANCELED";
+            const cancelId = cancellingId === reservation.id;
+            return (
+              <div
+                key={reservation.id}
+                className="border rounded-lg p-4 flex flex-col sm:flex-row gap-4"
+              >
+                <img
+                  src={reservation.book.image}
+                  alt={reservation.book.title}
+                  className="w-20 h-24 object-cover rounded flex-shrink-0"
+                />
 
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold font-montserrat text-lg mb-1">
-                          {reservation.bookTitle}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {reservation.authors.join(", ")}
-                        </p>
-                      </div>
-                      {getStatusBadge(reservation.status)}
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
-                      <div>
-                        <span className="text-muted-foreground">Ngày đặt:</span>
-                        <div className="font-medium">
-                          {reservation.requestDate}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Vị trí hàng đợi:
-                        </span>
-                        <div className="font-medium">
-                          #{reservation.position}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Dự kiến có sẵn:
-                        </span>
-                        <div className="font-medium">
-                          {reservation.estimatedAvailable}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 bg-transparent"
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                      <h3 className="font-semibold font-montserrat text-lg leading-tight">
+                        {reservation.book.title}
+                      </h3>
+                      {/* Hiển thị trạng thái rõ ràng */}
+                      <Badge
+                        variant={getStatusVariant(reservation.status)}
+                        className="flex-shrink-0 w-fit"
                       >
-                        Hủy đặt trước
-                      </Button>
+                        {reservation.status.replace("_", " ")}
+                      </Badge>
                     </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {reservation.book.authors.name}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mt-2">
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Ngày đặt: </span>
+                      <span className="font-medium">
+                        {formatDate(reservation.requestDate)}
+                      </span>
+                    </div>
+
+                    {!isCancelling ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={cancelId}
+                          >
+                            {cancelId ? (
+                              <Spinner className="mr-2 h-4 w-4" />
+                            ) : (
+                              <AlertCircle className="mr-2 h-4 w-4" />
+                            )}
+                            Hủy đặt trước
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Bạn có chắc chắn không?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Hành động này sẽ hủy lượt đặt trước cho cuốn sách
+                              "{reservation.book.title}". Bạn không thể hoàn tác
+                              hành động này.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Thoát</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                onCancelReservation(reservation.id)
+                              }
+                            >
+                              Hủy
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

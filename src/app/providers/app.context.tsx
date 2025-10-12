@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 
 interface IAppContext {
   isAuthenticated: boolean;
   user: IUser | null;
   setIsAuthenticated: (v: boolean) => void;
   setUser: (v: IUser) => void;
-  isLoading: boolean;
-  setIsLoading: (v: boolean) => void;
+  loadingCount: number;
+  showLoader: () => void;
+  hideLoader: () => void;
 }
 
 const CurrentAppContext = createContext<IAppContext | null>(null);
@@ -14,35 +15,40 @@ const CurrentAppContext = createContext<IAppContext | null>(null);
 type TProps = {
   children: React.ReactNode;
 };
+
 export const AppProvider = (props: TProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | null>(null);
+  const [loadingCount, setLoadingCount] = useState(0);
+  const showLoader = useCallback(() => {
+    setLoadingCount((prevCount) => prevCount + 1);
+  }, []);
+
+  const hideLoader = useCallback(() => {
+    setLoadingCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
+  }, []);
 
   return (
-    <CurrentAppContext
+    <CurrentAppContext.Provider
       value={{
         isAuthenticated,
         user,
         setIsAuthenticated,
         setUser,
-        isLoading,
-        setIsLoading,
+        loadingCount,
+        showLoader,
+        hideLoader,
       }}
     >
       {props.children}
-    </CurrentAppContext>
+    </CurrentAppContext.Provider>
   );
 };
 
 export const useCurrentApp = () => {
   const currentAppContext = useContext(CurrentAppContext);
-
   if (!currentAppContext) {
-    throw new Error(
-      "useCurrentUser has to be used within <currentAppContext.Provider>"
-    );
+    throw new Error("useCurrentApp has to be used within a AppProvider");
   }
-
   return currentAppContext;
 };
