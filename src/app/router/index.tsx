@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
 import Layout from "@/layout/ClientLayout";
-import AboutPage from "@/pages/client/About";
+import AboutPage from "@/features/client/home/Intro";
 import HomePage from "@/pages/client/Home";
 
 import LoginPage from "@/pages/auth/Login";

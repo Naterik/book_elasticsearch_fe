@@ -137,4 +137,18 @@ declare global {
     user: IUserInfo;
     book: IBook;
   }
+
+  interface IFine {
+    id: number;
+    amount: number;
+    reason: string;
+    isPaid: boolean;
+    loan: {
+      bookCopy: {
+        books: {
+          title: string;
+        };
+      };
+    };
+  }
 }

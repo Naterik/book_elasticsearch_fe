@@ -12,11 +12,12 @@ import {
   getFilterBookAPI,
   getFilterBookElasticAPI,
 } from "@/services/api";
+import { toast } from "sonner";
 
 const PRICE_BOUNDS: [number, number] = [120_000, 1_500_000];
 const YEAR_BOUNDS: [number, number] = [1960, 2025];
 
-export default function BookPage() {
+const BookPage = () => {
   const [dataBook, setDataBook] = useState<IBook[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -53,57 +54,10 @@ export default function BookPage() {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [countFilter, setCountFilter] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
-  const fetchAllBook = async () => {
-    const res = await getAllBookAPI(1);
-
-    if (res.data) {
-      const result = res?.data?.result;
-      const pagination = res.data.pagination;
-      setDataBook(result);
-      setCurrentPage(pagination.currentPage);
-      setTotalPages(pagination.totalPages);
-    }
-  };
   useEffect(() => {
-    const fetchAllGenre = async () => {
-      const res = await getAllGenreAPI();
-      if (res.data) {
-        setGenres(res.data);
-      }
-    };
-    const fetchAllLanguages = async () => {
-      const res = await getAllLanguagesElasticAPI();
-      if (res.data) {
-        setLanguages(res.data);
-      }
-    };
-    fetchAllBook();
-    fetchAllGenre();
-    fetchAllLanguages();
+    fetchInitialData();
   }, []);
   useEffect(() => {
-    const fetchAllFilterBook = async () => {
-      const res = await getFilterBookElasticAPI(
-        currentPage,
-        appliedYear,
-        appliedPrice,
-        searchInput,
-        sortBy,
-        appliedGenres,
-        appliedLanguage
-      );
-      if (res.data !== null) {
-        const pagination = res.data.pagination;
-        setDataBook(res.data.result);
-        setCurrentPage(pagination.currentPage);
-        setTotalPages(pagination.totalPages);
-        setTotalItems(pagination.totalItems);
-        setError(false);
-      } else {
-        setError(true);
-        setTotalItems(0);
-      }
-    };
     fetchAllFilterBook();
   }, [
     currentPage,
@@ -114,6 +68,47 @@ export default function BookPage() {
     appliedGenres,
     appliedLanguage,
   ]);
+  const fetchInitialData = async () => {
+    const [allBooks, allGenres, allLanguages] = await Promise.all([
+      getAllBookAPI(),
+      getAllGenreAPI(),
+      getAllLanguagesElasticAPI(),
+    ]);
+    if (allBooks.data && allGenres.data && allLanguages.data) {
+      const result = allBooks?.data?.result;
+      const pagination = allBooks.data.pagination;
+      setDataBook(result);
+      setCurrentPage(pagination.currentPage);
+      setTotalPages(pagination.totalPages);
+      setGenres(allGenres.data);
+      setLanguages(allLanguages.data);
+    } else {
+      toast.error("Failed to fetch initial data");
+    }
+  };
+  const fetchAllFilterBook = async () => {
+    const res = await getFilterBookElasticAPI(
+      currentPage,
+      appliedYear,
+      appliedPrice,
+      searchInput,
+      sortBy,
+      appliedGenres,
+      appliedLanguage
+    );
+    if (res.data !== null) {
+      const pagination = res.data.pagination;
+      setDataBook(res.data.result);
+      setCurrentPage(pagination.currentPage);
+      setTotalPages(pagination.totalPages);
+      setTotalItems(pagination.totalItems);
+      setError(false);
+    } else {
+      setError(true);
+      setTotalItems(0);
+    }
+  };
+
   const handleSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
@@ -211,4 +206,6 @@ export default function BookPage() {
       </div>
     </div>
   );
-}
+};
+
+export default BookPage;

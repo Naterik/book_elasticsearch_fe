@@ -65,7 +65,7 @@ const filterBookAPI = (
   });
 };
 
-const getAllBookAPI = (page: number) => {
+const getAllBookAPI = (page: number = 1) => {
   const urlBackend = "/api/v1/books";
   return axios.get<IBackendRes<IModelPaginate<IBook>>>(urlBackend, {
     params: { page },
@@ -128,6 +128,27 @@ const getBookByIdAPI = (id: number) => {
   return axios.get<IBackendRes<IBook>>(`/api/v1/books/${id}`);
 };
 
+const getMostBorrowedBooksAPI = () => {
+  return axios.get<IBackendRes<IBook[]>>("/api/v1/books/most-borrowed");
+};
+
+const getTrendingBooksAPI = () => {
+  return axios.get<IBackendRes<IBook[]>>("/api/v1/books/trending");
+};
+
+const getNewArrivalBooksAPI = () => {
+  return axios.get<IBackendRes<IBook[]>>("/api/v1/books/new-arrivals");
+};
+
+const getRecommendedBooksAPI = (userId: number) => {
+  return axios.get<IBackendRes<IBook[]>>(`/api/v1/books/recommend/${userId}`);
+};
+
+const postCreateMemberCardAPI = (data: any) => {
+  const urlBackend = "/api/v1/users/member";
+  return axios.post<IBackendRes<any>>(urlBackend, data);
+};
+
 export {
   registerAPI,
   loginAPI,
@@ -139,4 +160,9 @@ export {
   getFilterBookAPI,
   getFilterBookElasticAPI,
   getBookByIdAPI,
+  getMostBorrowedBooksAPI,
+  getTrendingBooksAPI,
+  getNewArrivalBooksAPI,
+  getRecommendedBooksAPI,
+  postCreateMemberCardAPI,
 };

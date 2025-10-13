@@ -1,14 +1,3 @@
-// src/features/client/info/types.ts
-export type ActivityType = "borrow" | "return" | "reserve" | "fine";
-
-export type Activity = {
-  id: string;
-  type: ActivityType;
-  bookTitle: string;
-  date: string;
-  description: string;
-};
-
 export type NotificationType = "reminder" | "available" | "overdue";
 
 export type NotificationItem = {
@@ -18,16 +7,6 @@ export type NotificationItem = {
   message: string;
   date: string;
   read: boolean;
-};
-
-export type Stats = {
-  totalBooksRead: number;
-  currentLoans: number;
-  overdueBooks: number;
-  totalFines: number;
-  favoriteBooks: number;
-  readingGoal: number;
-  readingStreak: number;
 };
 
 export type LoanStatus = "ON_LOAN" | "RETURNED" | "OVERDUE" | "LOST";
