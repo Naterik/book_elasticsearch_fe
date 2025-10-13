@@ -149,6 +149,11 @@ const postCreateMemberCardAPI = (data: any) => {
   return axios.post<IBackendRes<any>>(urlBackend, data);
 };
 
+const getSuggestAPI = (q: string, size = 5) => {
+  const urlBackend = "/api/v1/suggest/elastic";
+  return axios.get(urlBackend, { params: { q, size } });
+};
+
 export {
   registerAPI,
   loginAPI,
@@ -165,4 +170,5 @@ export {
   getNewArrivalBooksAPI,
   getRecommendedBooksAPI,
   postCreateMemberCardAPI,
+  getSuggestAPI,
 };

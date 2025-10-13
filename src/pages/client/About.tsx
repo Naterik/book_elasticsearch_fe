@@ -10,121 +10,14 @@ import {
   TypographyLead,
   TypographyList,
 } from "@/components/ui/typography";
-import {
-  Search,
-  Clock,
-  UserCircle,
-  CreditCard,
-  BookCopy,
-  Shield,
-} from "lucide-react";
+import { Search, UserCircle } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
-
-/** Note: we no longer rely on Unsplash for images. */
-
-const features = [
-  {
-    icon: <Clock className="h-6 w-6" />,
-    title: "Book Loan Management",
-    description: `Our loan management system helps you keep track of your borrowed books. 
-    Get notifications for due dates and manage your loans easily. View your borrowing history 
-    and current loans in one place, making it simple to stay organized with your library activities.`,
-    link: "/loan",
-    stats: { number: "Easy", label: "Tracking" },
-    imageUrl:
-      "https://images.pexels.com/photos/12170723/pexels-photo-12170723.jpeg",
-    imageAlt: "A vintage alarm clock sits atop a stack of books",
-  },
-  {
-    icon: <UserCircle className="h-6 w-6" />,
-    title: "User Profile",
-    description: `Manage your library account through your personal profile. 
-    Keep track of your borrowed books, reservations, and reading history. 
-    Receive notifications about due dates and available books you've reserved.`,
-    link: "/info",
-    stats: { number: "24/7", label: "Access" },
-    imageUrl:
-      "https://images.pexels.com/photos/9780867/pexels-photo-9780867.jpeg",
-    imageAlt: "Person using a smartphone with a music app indoors",
-  },
-  {
-    icon: <Search className="h-6 w-6" />,
-    title: "Book Search",
-    description: `Find books easily with our search system. Filter books by title, 
-    author, genre, or availability status. Our search helps you quickly locate the 
-    books you need in our collection.`,
-    link: "/book",
-    stats: { number: "Simple", label: "Search" },
-    imageUrl:
-      "https://images.pexels.com/photos/4494642/pexels-photo-4494642.jpeg",
-    imageAlt: "Magnifying glass highlighting a book index",
-  },
-  {
-    icon: <BookCopy className="h-6 w-6" />,
-    title: "Digital Catalog",
-    description: `Browse our comprehensive collection of books online. 
-    View detailed information about each book, including availability status, 
-    location, and descriptions. Reserve books directly through the system.`,
-    link: "/book",
-    stats: { number: "Full", label: "Catalog" },
-    imageUrl:
-      "https://images.pexels.com/photos/8036340/pexels-photo-8036340.jpeg",
-    imageAlt: "Laptop surrounded by books and scripts on a wooden desk",
-  },
-  {
-    icon: <Shield className="h-6 w-6" />,
-    title: "Secure Account",
-    description: `Your account security is important to us. We protect your personal 
-    information and library activities with secure login and data protection measures. 
-    Manage your account settings and privacy preferences easily.`,
-    link: "/info",
-    stats: { number: "Safe", label: "& Secure" },
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2017/04/19/23/13/security-2244006_1280.jpg",
-    imageAlt: "Close-up of a padlock on a computer keyboard",
-  },
-  {
-    icon: <CreditCard className="h-6 w-6" />,
-    title: "Online Payments",
-    description: `Handle library payments conveniently online. Pay membership fees 
-    and any late return fines through our secure payment system. View your payment 
-    history and receive digital receipts for your records.`,
-    link: "/payment",
-    stats: { number: "Easy", label: "Payments" },
-    imageUrl:
-      "https://images.pexels.com/photos/29205862/pexels-photo-29205862.jpeg",
-    imageAlt: "Hand holding a credit card in front of a laptop",
-  },
-];
-
-const stats = [
-  {
-    number: "24/7",
-    label: "Online Access",
-    description: "Access the library catalog anytime",
-  },
-  {
-    number: "Simple",
-    label: "Interface",
-    description: "Easy to use library management system",
-  },
-  {
-    number: "Secure",
-    label: "System",
-    description: "Protected user data and transactions",
-  },
-  {
-    number: "Full",
-    label: "Features",
-    description: "Complete library management solution",
-  },
-];
+import { features, stats } from "@/features/seed";
 
 const AboutPage = () => {
   return (
     <div className="container max-w-6xl mx-auto px-4 py-16">
-      {/* Hero Section */}
       <div className="relative text-center mb-24">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/5 to-primary/10 blur-3xl -z-10 animate-pulse" />
         <Badge variant="secondary" className="mb-4">
@@ -154,7 +47,6 @@ const AboutPage = () => {
         </div>
       </div>
 
-      {/* Main Features */}
       <div className="space-y-20">
         {features.map((feature, index) => {
           const isEven = index % 2 === 0;
@@ -246,7 +138,6 @@ const AboutPage = () => {
         })}
       </div>
 
-      {/* Statistics */}
       <div className="my-32 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 blur-3xl animate-pulse" />
         <Card className="border border-secondary/20 bg-background/95 backdrop-blur-xl shadow-xl">
@@ -276,7 +167,6 @@ const AboutPage = () => {
         </Card>
       </div>
 
-      {/* Get Started Section */}
       <div className="my-32 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 blur-3xl -z-10" />
         <Card className="border-none bg-background/50 backdrop-blur-sm">

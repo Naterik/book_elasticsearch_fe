@@ -1,6 +1,4 @@
 import { use, useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import BookToolbar from "@/features/client/book/components/BookToolbar";
 import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
@@ -13,19 +11,28 @@ import {
   getFilterBookElasticAPI,
 } from "@/services/api";
 import { toast } from "sonner";
+import { useNavigate, useSearchParams } from "react-router";
+import SearchBar from "@/components/Search";
 
 const PRICE_BOUNDS: [number, number] = [120_000, 1_500_000];
 const YEAR_BOUNDS: [number, number] = [1960, 2025];
 
 const BookPage = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
   const [dataBook, setDataBook] = useState<IBook[]>([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-
+  const [searchInput, setSearchInput] = useState(initialQuery);
   const [genres, setGenres] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
-
+  const [view, setView] = useState<"List" | "Kanban">("Kanban");
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [countFilter, setCountFilter] = useState<number>(0);
+  const [error, setError] = useState<boolean>(false);
   const [languages, setLanguages] = useState<ILanguages[]>();
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [appliedLanguage, setAppliedLanguage] = useState<string | null>(null);
@@ -47,16 +54,10 @@ const BookPage = () => {
     YEAR_BOUNDS[1],
   ]);
 
-  const [view, setView] = useState<"List" | "Kanban">("Kanban");
-  const [sortBy, setSortBy] = useState<string>("newest");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalItems, setTotalItems] = useState<number>(0);
-  const [countFilter, setCountFilter] = useState<number>(0);
-  const [error, setError] = useState<boolean>(false);
   useEffect(() => {
-    fetchInitialData();
-  }, []);
+    const keyword = searchParams.get("q") || "";
+    setSearchInput(keyword);
+  }, [searchParams]);
   useEffect(() => {
     fetchAllFilterBook();
   }, [
@@ -68,24 +69,29 @@ const BookPage = () => {
     appliedGenres,
     appliedLanguage,
   ]);
-  const fetchInitialData = async () => {
-    const [allBooks, allGenres, allLanguages] = await Promise.all([
-      getAllBookAPI(),
-      getAllGenreAPI(),
-      getAllLanguagesElasticAPI(),
-    ]);
-    if (allBooks.data && allGenres.data && allLanguages.data) {
-      const result = allBooks?.data?.result;
-      const pagination = allBooks.data.pagination;
-      setDataBook(result);
-      setCurrentPage(pagination.currentPage);
-      setTotalPages(pagination.totalPages);
-      setGenres(allGenres.data);
-      setLanguages(allLanguages.data);
-    } else {
-      toast.error("Failed to fetch initial data");
-    }
-  };
+
+  // Load initial data
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [allGenres, allLanguages] = await Promise.all([
+          getAllGenreAPI(),
+          getAllLanguagesElasticAPI(),
+        ]);
+        if (allGenres.data && allLanguages.data) {
+          setGenres(allGenres.data);
+          setLanguages(allLanguages.data);
+        } else {
+          toast.error("Failed to fetch initial data");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Error loading initial data");
+      }
+    };
+
+    loadInitialData();
+  }, []);
   const fetchAllFilterBook = async () => {
     const res = await getFilterBookElasticAPI(
       currentPage,
@@ -109,10 +115,9 @@ const BookPage = () => {
     }
   };
 
-  const handleSubmitSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
-    setCountFilter(1);
+  const handleSearch = (keyword: string) => {
+    setSearchInput(keyword);
+    navigate(`/book?q=${encodeURIComponent(keyword)}`);
     setCurrentPage(1);
   };
 
@@ -134,8 +139,8 @@ const BookPage = () => {
     setCountFilter(0);
     setError(false);
     setSearchInput("");
-    setSearch("");
     setSelectedGenres([]);
+    navigate("/book");
     setAppliedGenres([]);
     setSelectedLanguage(null);
     setAppliedLanguage(null);
@@ -147,25 +152,11 @@ const BookPage = () => {
   };
   return (
     <div className="container mx-auto">
-      <form
-        onSubmit={handleSubmitSearch}
-        className="flex items-center justify-center gap-2 my-8"
-      >
-        <Input
-          placeholder="Input search text"
-          value={searchInput}
-          onChange={(e) => (setSearchInput(e.target.value), setCountFilter(1))}
-          className="w-[520px]"
-        />
-        <Button size="lg" type="submit">
-          Search
-        </Button>
-        {searchInput && (
-          <Button type="button" variant="ghost" onClick={resetFilters}>
-            Clear
-          </Button>
-        )}
-      </form>
+      <SearchBar
+        initialQuery={initialQuery}
+        onSearch={handleSearch}
+        onClear={resetFilters}
+      />
 
       <div className="flex gap-8">
         <BookFilter

@@ -14,7 +14,6 @@ import {
 } from "@/services/api";
 import { toast } from "sonner";
 import IntroPage from "@/features/client/home/Intro";
-import AboutPage from "./About";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +67,7 @@ const HomePage: React.FC = () => {
   };
 
   const handleSearch = (query: string) => {
-    navigate(`/search?q=${encodeURIComponent(query)}`);
+    navigate(`/book?q=${encodeURIComponent(query)}`);
   };
 
   const handleBookClick = (bookId: number) => {
@@ -145,8 +144,6 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto">
         <IntroPage />
       </div>
-
-      <AboutPage />
     </div>
   );
 };

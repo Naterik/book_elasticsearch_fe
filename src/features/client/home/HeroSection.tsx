@@ -1,18 +1,15 @@
+import SearchBar from "@/components/Search";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
-const HeroSection = ({ isLoggedIn, onSearch, onRegister }: any) => {
-  const [searchQuery, setSearchQuery] = useState("");
+type Props = {
+  isLoggedIn: boolean;
+  onSearch: (query: string) => void;
+  onRegister: () => void;
+};
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      onSearch(searchQuery);
-    }
-  };
-
+const HeroSection = ({ isLoggedIn, onSearch, onRegister }: Props) => {
+  const location = useLocation();
   return (
     <section
       className=" relative py-24 bg-cover bg-center bg-no-repeat"
@@ -31,21 +28,7 @@ const HeroSection = ({ isLoggedIn, onSearch, onRegister }: any) => {
           read today!
         </p>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-10">
-          <div className="flex gap-2 bg-white rounded-lg p-2 shadow-2xl">
-            <Input
-              type="text"
-              placeholder="Search books, authors, genres..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 border-0 focus:ring-0 text-base"
-            />
-            <Button type="submit" size="icon" className="shrink-0">
-              <Search className="h-5 w-5" />
-            </Button>
-          </div>
-        </form>
+        <SearchBar onSearch={onSearch} />
 
         {!isLoggedIn && (
           <Button
