@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-invenio-ils.svg";
 
 import {
@@ -23,9 +23,10 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Bell, Menu, Info, LogOut, User, History } from "lucide-react";
+import { Bell, Info, LogOut, User, History } from "lucide-react";
 import Notifications from "../../Notification";
 import MobileSheet from "../MobileSheet";
+import { useCurrentApp } from "@/app/providers/app.context";
 
 const NAV_ITEMS = [
   { to: "/book", label: "Search" },
@@ -33,6 +34,21 @@ const NAV_ITEMS = [
 ];
 
 export default function AppHeader() {
+  const { setUser, setIsAuthenticated, showLoader, hideLoader } =
+    useCurrentApp();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    setUser(null);
+    setIsAuthenticated(false);
+    showLoader();
+    navigate("/");
+    setTimeout(() => {
+      hideLoader();
+    }, 1000);
+  };
+
   return (
     <header className="container mx-auto  sticky top-0 z-50 border-b bg-neutral-900/90 backdrop-blur text-white">
       <div className="flex h-16 items-center justify-between ">
@@ -109,7 +125,7 @@ export default function AppHeader() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className=" hover:bg-gray-500/10"
-                onClick={() => {}}
+                onClick={handleLogout}
               >
                 <LogOut className="mr-2 h-4 w-4 text-red-600" />
                 <span>Logout</span>

@@ -60,6 +60,7 @@ declare global {
       avatar: string;
       status: string;
       role: string;
+      cardNumber: string | null;
     };
   }
   interface IRegister {
@@ -74,23 +75,47 @@ declare global {
     avatar: string;
     status: string;
     role: string;
+    cardNumber: string | null;
   }
   interface ILanguages {
     key: string;
     doc_count: number;
   }
-  interface IUserInfo {
+
+  // Base User Core Properties
+  interface IUserBase {
     id: number;
     username: string;
     fullName: string | null;
     address: string | null;
     phone: string | null;
     avatar: string | null;
+    status: UserStatus;
+    roleId: number;
+  }
+
+  interface IUserInfo extends IUserBase {
     cardNumber: string | null;
     membershipStart: string | null;
     membershipEnd: string | null;
-    status: UserStatus;
-    roleId: number;
+  }
+
+  interface IAdminUser extends IUserBase {
+    fullName: string;
+    type: UserAccountType;
+    cardNumber: string | null;
+    membershipStart: string | null;
+    membershipEnd: string | null;
+    googleId: string | null;
+    role: {
+      id: number;
+      name: string;
+    };
+  }
+
+  interface IAdminUserDetail extends IAdminUser {
+    createdAt?: string;
+    updatedAt?: string;
   }
 
   interface IBookCopy {

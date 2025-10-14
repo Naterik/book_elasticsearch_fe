@@ -8,7 +8,7 @@ import { AppRouter } from "./app/router";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Toaster
-      position="top-center"
+      position="top-left"
       richColors
       closeButton
       expand

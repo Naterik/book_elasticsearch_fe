@@ -1,14 +1,8 @@
-// src/pages/client/MemberRegistrationPage.tsx
-
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-// Local imports
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -32,20 +26,22 @@ import {
   type MemberRegistrationSchema,
 } from "@/lib/validators/member";
 import { formatCurrency } from "@/helper";
-import { postCreateMemberCardAPI } from "@/services/api";
+import { getVNPayUrlAPI, postCreateMemberCardAPI } from "@/services/api";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { useNavigate } from "react-router";
-
+import { v4 as uuidv4 } from "uuid";
 // Define costs in a constant
 const DURATION_COST = {
   "6": 50000,
   "12": 100000,
+  COD: 0,
 };
 
-export default function MemberRegistrationPage() {
+export default function MemberPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useCurrentApp();
   const navigate = useNavigate();
+  const paymentRef = uuidv4();
   const userId = user?.id;
   if (!userId) {
     toast.error("User not authenticated");
@@ -57,7 +53,6 @@ export default function MemberRegistrationPage() {
       fullName: "",
       phone: "",
       address: "",
-      paymentRef: "",
     },
   });
 
@@ -65,13 +60,42 @@ export default function MemberRegistrationPage() {
 
   async function onSubmit(values: MemberRegistrationSchema) {
     setIsSubmitting(true);
+    let res = null;
     try {
-      const res = await postCreateMemberCardAPI({ ...values, userId });
+      if (user?.status === "ACTIVE") {
+        toast.message("You are already a member.");
+        navigate("/");
+        return;
+      }
+      if (values.duration === "COD" || !paymentRef) {
+        res = await postCreateMemberCardAPI({ ...values, userId });
+        if (res.data) {
+          toast.success("Registration successful! Please wait for approval.");
+          navigate("/");
+        }
+      } else {
+        res = await postCreateMemberCardAPI({
+          ...values,
+          userId,
+          paymentRef,
+        });
+      }
 
+      if (res.data) {
+        const r = await getVNPayUrlAPI(
+          res.data.amount,
+          "vn",
+          res.data.paymentRef
+        );
+        if (r.data) {
+          window.location.href = r.data.url;
+        } else {
+          toast.error("Failed to get payment URL");
+        }
+      }
       if (!res.data) {
         throw new Error(res.message || "An unexpected error occurred.");
       }
-
       toast.success("Registration successful! Please wait for approval.");
       navigate("/");
     } catch (error) {
@@ -164,6 +188,12 @@ export default function MemberRegistrationPage() {
                             12 Months - {formatCurrency(DURATION_COST["12"])}
                           </FormLabel>
                         </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="COD" />
+                          </FormControl>
+                          <FormLabel className="font-normal">COD</FormLabel>
+                        </FormItem>
                       </RadioGroup>
                     </FormControl>
                     <FormMessage />
@@ -178,31 +208,16 @@ export default function MemberRegistrationPage() {
                   </h4>
                   <p className="text-sm text-gray-700 mt-2">
                     Please transfer{" "}
-                    <strong className="text-blue-600">
-                      {formatCurrency(DURATION_COST[selectedDuration])}
-                    </strong>{" "}
+                    {!DURATION_COST["COD"] && (
+                      <strong className="text-blue-600">
+                        {formatCurrency(DURATION_COST[selectedDuration])}
+                      </strong>
+                    )}
                     to our bank account and enter the transaction reference
                     below (if any).
                   </p>
                 </div>
               )}
-
-              <FormField
-                control={form.control}
-                name="paymentRef"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment Reference (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., Your name or transaction code"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && (

@@ -30,7 +30,7 @@ const HeroSection = ({ isLoggedIn, onSearch, onRegister }: Props) => {
 
         <SearchBar onSearch={onSearch} />
 
-        {!isLoggedIn && (
+        {isLoggedIn && (
           <Button
             variant="outline"
             size="lg"

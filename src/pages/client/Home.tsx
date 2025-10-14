@@ -24,7 +24,7 @@ const HomePage: React.FC = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<IBook[]>([]);
   const [userLoans, setUserLoans] = useState<ILoan[]>([]);
   const [userReservations, setUserReservations] = useState<IReservation[]>([]);
-
+  console.log("isAuthenticated :>> ", isAuthenticated);
   useEffect(() => {
     fetchHomePageData();
   }, [isAuthenticated, user]);
@@ -106,7 +106,9 @@ const HomePage: React.FC = () => {
           onViewReservations={handleViewReservations}
         />
       )}
-
+      <div className="container mx-auto">
+        <IntroPage user={user} />
+      </div>
       {!isAuthenticated && <FeaturesSection />}
 
       <BookCarousel
@@ -141,9 +143,6 @@ const HomePage: React.FC = () => {
           onLearnMore={handleLearnMore}
         />
       )}
-      <div className="container mx-auto">
-        <IntroPage />
-      </div>
     </div>
   );
 };

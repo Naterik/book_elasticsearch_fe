@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { features, stats } from "@/features/seed";
+import { useCurrentApp } from "@/app/providers/app.context";
 
-const IntroPage = () => {
+const IntroPage = ({ user }: { user: IUser | null }) => {
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Hero Section */}
@@ -44,26 +45,44 @@ const IntroPage = () => {
       </div>
 
       {/* System Access */}
+
       <div className="text-center max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold mb-4">Start Using Our System</h2>
-        <p className="text-muted-foreground mb-6">
-          Create an account to start borrowing books and managing your library
-          activities online.
-        </p>
-        <div className="flex justify-center gap-4">
+        {user?.status !== "ACTIVE" ? (
+          <p className="text-muted-foreground mb-3">
+            Be your member and experience borrowing books and managing your
+            library activities online with many advice feature.
+          </p>
+        ) : (
+          <p className="text-muted-foreground mb-3">
+            Start borrowing books and managing your library activities online.
+          </p>
+        )}
+
+        {user?.status === "ACTIVE" && (
           <a
-            href="/register"
+            href="/member"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
           >
-            Create Account
+            Be a Member
           </a>
-          <a
-            href="/login"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
-          >
-            Member Login
-          </a>
-        </div>
+        )}
+        {!user && (
+          <div className="flex justify-center gap-4">
+            <a
+              href="/register"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+            >
+              Create Account
+            </a>
+            <a
+              href="/login"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            >
+              Member Login
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

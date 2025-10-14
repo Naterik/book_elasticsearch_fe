@@ -29,7 +29,7 @@ const LoginPage = () => {
       localStorage.setItem("access_token", res.data.access_token);
       navigate("/");
     } else {
-      toast.error("Có lỗi xảy ra", {
+      toast.error("Have error", {
         description: res.message,
         duration: 1000,
       });

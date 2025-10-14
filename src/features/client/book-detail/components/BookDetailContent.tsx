@@ -109,8 +109,6 @@ const BookDetailContent = ({
                 <SelectContent>
                   <SelectItem value="7">7 ngày</SelectItem>
                   <SelectItem value="14">14 ngày (Khuyến nghị)</SelectItem>
-                  <SelectItem value="21">21 ngày</SelectItem>
-                  <SelectItem value="30">30 ngày</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">

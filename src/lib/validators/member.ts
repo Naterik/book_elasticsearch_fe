@@ -10,7 +10,7 @@ export const memberRegistrationSchema = z.object({
   address: z.string().min(10, {
     message: "Address must be at least 10 characters.",
   }),
-  duration: z.enum(["6", "12"], {
+  duration: z.enum(["6", "12", "COD"], {
     message: "You must select a membership duration.",
   }),
   paymentRef: z.string().optional(),

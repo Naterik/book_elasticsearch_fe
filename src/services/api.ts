@@ -1,4 +1,10 @@
-import axios from "services/axios.customize";
+import createInstanceAxios from "services/axios.customize";
+
+const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
+
+const axiosPayment = createInstanceAxios(
+  import.meta.env.VITE_BACKEND_PAYMENT_URL
+);
 import qs from "qs";
 const registerAPI = (
   username: string,
@@ -29,7 +35,7 @@ const loginAPI = (username: string, password: string) => {
     username,
     password,
   });
-  console.log("respond :>> ", respond);
+
   return respond;
 };
 
@@ -149,6 +155,23 @@ const postCreateMemberCardAPI = (data: any) => {
   return axios.post<IBackendRes<any>>(urlBackend, data);
 };
 
+const getVNPayUrlAPI = (amount: number, locale: string, paymentRef: string) => {
+  const urlBackend = "/vnpay/payment-url";
+  return axiosPayment.post<IBackendRes<{ url: string }>>(urlBackend, {
+    amount,
+    locale,
+    paymentRef,
+  });
+};
+
+const updatePaymentMemberAPI = (paymentStatus: string, paymentRef: string) => {
+  const urlBackend = "/api/v1/users/member/update-status";
+  return axios.post<IBackendRes<IUser>>(urlBackend, {
+    paymentStatus,
+    paymentRef,
+  });
+};
+
 const getSuggestAPI = (q: string, size = 5) => {
   const urlBackend = "/api/v1/suggest/elastic";
   return axios.get(urlBackend, { params: { q, size } });
@@ -171,4 +194,6 @@ export {
   getRecommendedBooksAPI,
   postCreateMemberCardAPI,
   getSuggestAPI,
+  updatePaymentMemberAPI,
+  getVNPayUrlAPI,
 };
