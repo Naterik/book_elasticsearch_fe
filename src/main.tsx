@@ -1,33 +1,22 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
-import { createBrowserRouter } from "react-router";
-import { RouterProvider } from "react-router/dom";
-import About from "./pages/client/About.tsx";
-import Home from "./pages/client/Home.tsx";
-import Layout from "./layout.tsx";
-import AboutPage from "./pages/client/About.tsx";
-import HomePage from "./pages/client/Home.tsx";
-import BookPage from "./pages/client/Book.tsx";
-import LoginPage from "./pages/client/auth/Login.tsx";
-import RegisterPage from "./pages/client/auth/Register.tsx";
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { index: true, Component: HomePage },
-      { path: "about", Component: AboutPage },
-      { path: "book", Component: BookPage },
-    ],
-  },
-  { path: "login", Component: LoginPage },
-  { path: "register", Component: RegisterPage },
-]);
+import { AppProvider } from "@/app/providers/app.context";
+import { Toaster } from "sonner";
+import { AppRouter } from "./app/router";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
-    {/* <App /> */}
+    <Toaster
+      position="top-left"
+      richColors
+      closeButton
+      expand
+      duration={3000}
+      theme="system"
+    />
+    <AppProvider>
+      <AppRouter />
+    </AppProvider>
   </StrictMode>
 );
