@@ -1,15 +1,13 @@
 import SearchBar from "@/components/Search";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "react-router-dom";
 
 type Props = {
-  isLoggedIn: boolean;
+  isLoggedIn: boolean | null;
   onSearch: (query: string) => void;
-  onRegister: () => void;
+  onMember: () => void;
 };
 
-const HeroSection = ({ isLoggedIn, onSearch, onRegister }: Props) => {
-  const location = useLocation();
+const HeroSection = ({ isLoggedIn, onSearch, onMember }: Props) => {
   return (
     <section
       className=" relative py-24 bg-cover bg-center bg-no-repeat"
@@ -34,7 +32,7 @@ const HeroSection = ({ isLoggedIn, onSearch, onRegister }: Props) => {
           <Button
             variant="outline"
             size="lg"
-            onClick={onRegister}
+            onClick={onMember}
             className="bg-white/10 backdrop-blur-sm border-white text-white hover:bg-white hover:text-blue-600 shadow-lg"
           >
             Become a Member

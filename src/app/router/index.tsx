@@ -15,11 +15,13 @@ import MemberPage from "@/pages/client/Member";
 import ReturnPayment from "@/pages/client/ReturnPayment";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import ClientLayout from "@/layout/ClientLayout";
+import BookManagement from "@/pages/admin/Book";
 import AdminLayout from "@/layout/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import UserManagement from "@/pages/admin/User";
 import ForbiddenPage from "@/pages/403";
 import NotFoundPage from "@/pages/404";
+import AuthCallback from "@/pages/auth/AuthCallback";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
     Component: NotFoundPage,
   },
   {
+    path: "/auth/callback",
+    element: <AuthCallback />,
+  },
+  {
     path: "/",
     element: <ClientLayout />,
     children: [
@@ -46,20 +52,14 @@ const router = createBrowserRouter([
         Component: DetailPage,
       },
       {
-        Component: ProtectedRoute,
-        children: [
-          {
-            path: "member",
-            Component: MemberPage,
-          },
-
-          { path: "info", Component: InfoPage },
-          { path: "loan", Component: LoanPage },
-          {
-            path: "vnpay/return-url",
-            Component: ReturnPayment,
-          },
-        ],
+        path: "member",
+        Component: MemberPage,
+      },
+      { path: "info", Component: InfoPage },
+      { path: "loan", Component: LoanPage },
+      {
+        path: "vnpay/return-url",
+        Component: ReturnPayment,
       },
     ],
   },
@@ -71,20 +71,12 @@ const router = createBrowserRouter([
     Component: AdminLayout,
     children: [
       {
-        element: <ProtectedRoute />,
         children: [
           { index: true, Component: Dashboard },
           { path: "users", Component: UserManagement },
           {
             path: "books",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Books Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: BookManagement,
           },
           {
             path: "book-copies",

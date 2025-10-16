@@ -32,14 +32,18 @@ const ReturnPayment = () => {
         setIsProcessing(true);
 
         try {
-          const res = await updatePaymentMemberAPI(responseCode, paymentRef);
+          setPaymentStatus(
+            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED"
+          );
+          const res = await updatePaymentMemberAPI(
+            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED",
+            paymentRef
+          );
 
           if (res.data) {
             toast.success("Payment status updated successfully");
             setUser(res.data);
-            setPaymentStatus(
-              responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED"
-            );
+
             console.log("object :>> ", user);
           } else {
             toast.error("Failed to update payment status");

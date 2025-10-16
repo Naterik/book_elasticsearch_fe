@@ -16,7 +16,8 @@
       "services/*": ["./src/services/*"],
       "types/*": ["./src/types/*"],
       "styles/*": ["./src/styles/*"],
-      "features/*": ["./src/features/*"]
+      "features/*": ["./src/features/*"],
+      "hooks/*": ["./src/hooks/*"]
     },
 
     /* Bundler mode */

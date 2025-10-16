@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   Card,
   CardAction,
@@ -32,17 +32,42 @@ import {
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { postCreateLoanAPI } from "@/services/loans";
+import { toast } from "sonner";
 type Props = {
   borrowDuration: string;
   setBorrowDuration: (v: string) => void;
   dataDetailBook: IBook | null;
+  setDueDate: (v: string) => void;
+  user?: IUser | null;
+  isAuthenticated?: boolean | null;
+  dueDate: string;
+  count: any;
 };
 const BookDetailContent = ({
   borrowDuration,
   setBorrowDuration,
   dataDetailBook,
+  setDueDate,
+  dueDate,
+  user,
+  isAuthenticated,
+  count,
 }: Props) => {
-  console.log("dataDetailBook :>> ", dataDetailBook);
+  const checkUser = !isAuthenticated;
+  const checkCard = user?.cardNumber === null;
+  const navigate = useNavigate();
+  const fetchBookLoans = async () => {
+    if (!dataDetailBook) return;
+    setDueDate(borrowDuration);
+    navigate("/loan");
+    const res = await postCreateLoanAPI(user?.id!, dataDetailBook.id, dueDate!);
+    if (res.data) {
+      toast.success("Loan book success!");
+    } else {
+      toast.error(res.message);
+    }
+  };
   return (
     <>
       <Breadcrumb className="my-5">
@@ -108,7 +133,14 @@ const BookDetailContent = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="7">7 ngày</SelectItem>
-                  <SelectItem value="14">14 ngày (Khuyến nghị)</SelectItem>
+                  <SelectItem disabled={checkUser} value="14">
+                    14 ngày
+                    {user?.cardNumber === null ? (
+                      <span className="text-red-500">
+                        (Yêu cầu thẻ thư viện)
+                      </span>
+                    ) : null}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
@@ -138,11 +170,29 @@ const BookDetailContent = ({
               </div>
             </CardDescription>
           </CardHeader>
-          <CardFooter>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </CardFooter>
+          {checkUser ? (
+            <CardFooter>
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+            </CardFooter>
+          ) : (
+            <CardFooter>
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={() => {
+                  fetchBookLoans();
+                }}
+              >
+                Borrow
+              </Button>
+            </CardFooter>
+          )}
         </Card>
       </div>
       <Separator className="my-5" />

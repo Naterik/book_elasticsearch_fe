@@ -16,7 +16,6 @@ const ProtectedRoute = () => {
   }, [location.pathname, isAuthenticated]);
   useEffect(() => {
     if (showUnauthorizedPage) {
-      // Countdown timer
       const countdownInterval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -60,7 +59,6 @@ const ProtectedRoute = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          {/* Animated Icon */}
           <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center justify-center animate-pulse">
               <ShieldAlert className="h-32 w-32 text-red-200" />

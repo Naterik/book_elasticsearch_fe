@@ -6,6 +6,10 @@ const axiosPayment = createInstanceAxios(
   import.meta.env.VITE_BACKEND_PAYMENT_URL
 );
 import qs from "qs";
+export const loginWithGoogleURL = () => {
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+  return `${backendURL}/api/v1/auth/google`;
+};
 const registerAPI = (
   username: string,
   password: string,
@@ -172,6 +176,10 @@ const updatePaymentMemberAPI = (paymentStatus: string, paymentRef: string) => {
   });
 };
 
+const getBookOnLoanAPI = (userId: number) => {
+  return axios.get<IBackendRes<ILoan>>(`"/api/v1/users/check-loan"/${userId}`);
+};
+
 const getSuggestAPI = (q: string, size = 5) => {
   const urlBackend = "/api/v1/suggest/elastic";
   return axios.get(urlBackend, { params: { q, size } });
@@ -196,4 +204,5 @@ export {
   getSuggestAPI,
   updatePaymentMemberAPI,
   getVNPayUrlAPI,
+  getBookOnLoanAPI,
 };

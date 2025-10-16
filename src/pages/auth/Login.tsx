@@ -1,12 +1,14 @@
+// src/pages/LoginPage.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { loginAPI } from "@/services/api";
+import { loginAPI, loginWithGoogleURL } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { User, Lock, Loader2 } from "lucide-react";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
@@ -34,6 +36,10 @@ const LoginPage = () => {
         duration: 1000,
       });
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = loginWithGoogleURL();
   };
 
   return (
@@ -80,7 +86,7 @@ const LoginPage = () => {
                 <button
                   type="button"
                   className="hover:opacity-80 transition cursor-pointer"
-                  onClick={() => {}}
+                  onClick={handleGoogleLogin}
                   aria-label="Sign in with Google"
                 >
                   <FcGoogle className="size-6" />

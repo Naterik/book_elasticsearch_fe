@@ -24,7 +24,6 @@ const HomePage: React.FC = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<IBook[]>([]);
   const [userLoans, setUserLoans] = useState<ILoan[]>([]);
   const [userReservations, setUserReservations] = useState<IReservation[]>([]);
-  console.log("isAuthenticated :>> ", isAuthenticated);
   useEffect(() => {
     fetchHomePageData();
   }, [isAuthenticated, user]);
@@ -79,15 +78,19 @@ const HomePage: React.FC = () => {
   };
 
   const handleLearnMore = () => {
-    navigate("/membership-info");
+    navigate("/member");
+  };
+
+  const handleMember = () => {
+    navigate("/member");
   };
 
   const handleViewLoans = () => {
-    navigate("/my-loans");
+    navigate("/loan");
   };
 
   const handleViewReservations = () => {
-    navigate("/my-reservations");
+    navigate("/");
   };
 
   return (
@@ -95,7 +98,7 @@ const HomePage: React.FC = () => {
       <HeroSection
         isLoggedIn={isAuthenticated}
         onSearch={handleSearch}
-        onRegister={handleRegister}
+        onMember={handleMember}
       />
 
       {isAuthenticated && (

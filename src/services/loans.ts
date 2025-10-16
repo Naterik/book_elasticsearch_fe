@@ -1,4 +1,7 @@
-import axios from "services/axios.customize";
+import createInstanceAxios from "services/axios.customize";
+
+const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
+
 const getLoanByUserIdAPI = (id: number) => {
   return axios.get<IBackendRes<ILoan[]>>(`/api/v1/loans/${id}`);
 };
@@ -29,6 +32,15 @@ const getRenewalLoanAPI = (loanId: number, userId: number) => {
   });
 };
 
+const postCreateLoanAPI = (userId: number, bookId: number, dueDate: string) => {
+  const urlBackend = "/api/v1/loans/create";
+  return axios.post<IBackendRes<ILoan>>(urlBackend, {
+    userId,
+    bookId,
+    dueDate,
+  });
+};
+
 export {
   getLoanByUserIdAPI,
   getRenewalLoanAPI,
@@ -36,4 +48,5 @@ export {
   getReturnedLoanByUserAPI,
   getReservationByUserAPI,
   putCancelReservationAPI,
+  postCreateLoanAPI,
 };

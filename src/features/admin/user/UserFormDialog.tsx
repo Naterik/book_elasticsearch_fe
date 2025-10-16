@@ -169,7 +169,10 @@ const UserFormDialog = ({
       }
       let response;
       if (isEditMode) {
-        response = await updateUserAPI(user.id, formData);
+        if (user?.id) {
+          formData.append("id", user.id.toString());
+        }
+        response = await updateUserAPI(formData);
       } else {
         response = await createUserAPI(formData);
       }
@@ -210,6 +213,23 @@ const UserFormDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username (Email) *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="user@example.com"
+                      type="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="username"

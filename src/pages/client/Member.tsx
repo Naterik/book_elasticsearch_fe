@@ -38,14 +38,13 @@ const DURATION_COST = {
 };
 
 export default function MemberPage() {
+  const { isAuthenticated } = useCurrentApp();
+  console.log("object :>> ", isAuthenticated);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useCurrentApp();
   const navigate = useNavigate();
   const paymentRef = uuidv4();
   const userId = user?.id;
-  if (!userId) {
-    toast.error("User not authenticated");
-  }
 
   const form = useForm<MemberRegistrationSchema>({
     resolver: zodResolver(memberRegistrationSchema),
