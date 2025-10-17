@@ -6,13 +6,6 @@ import {
 } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface PaginationProps {
   currentPage: number;
@@ -20,9 +13,6 @@ interface PaginationProps {
   pageSize: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange?: (size: number) => void;
-  pageSizeOptions?: number[];
-  showPageSizeSelector?: boolean;
   showPageInfo?: boolean;
 }
 
@@ -32,9 +22,6 @@ export function Pagination({
   pageSize,
   totalItems,
   onPageChange,
-  onPageSizeChange,
-  pageSizeOptions = [12, 24, 36, 48, 60],
-  showPageSizeSelector = true,
   showPageInfo = true,
 }: PaginationProps) {
   const handleFirstPage = () => onPageChange(1);
@@ -60,30 +47,6 @@ export function Pagination({
       )}
 
       <div className="flex items-center space-x-6 lg:space-x-8">
-        {showPageSizeSelector && onPageSizeChange && (
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
-            <Select
-              value={`${pageSize}`}
-              onValueChange={(value) => {
-                onPageSizeChange(Number(value));
-                onPageChange(1); // Reset to first page when changing page size
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {pageSizeOptions.map((size) => (
-                  <SelectItem key={size} value={`${size}`}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {currentPage} of {totalPages}
         </div>

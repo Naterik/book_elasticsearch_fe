@@ -13,15 +13,23 @@ import InfoPage from "@/pages/client/Info";
 import LoanPage from "@/pages/client/Loan";
 import MemberPage from "@/pages/client/Member";
 import ReturnPayment from "@/pages/client/ReturnPayment";
-import ProtectedRoute from "@/components/layout/ProtectedRoute";
+
 import ClientLayout from "@/layout/ClientLayout";
-import BookManagement from "@/pages/admin/Book";
+import BookManagement from "@/features/admin/book/pages/BookManagementPage";
 import AdminLayout from "@/layout/AdminLayout";
-import Dashboard from "@/pages/admin/Dashboard";
-import UserManagement from "@/pages/admin/User";
+import Dashboard from "@/pages/Dashboard";
+import UserManagement from "@/features/admin/user/pages/UserManagementPage";
 import ForbiddenPage from "@/pages/403";
 import NotFoundPage from "@/pages/404";
 import AuthCallback from "@/pages/auth/AuthCallback";
+import AuthorManagementPage from "@/features/admin/author/pages/AuthorManagementPage";
+import PublisherManagementPage from "@/features/admin/publisher/pages/PublisherManagementPage";
+import GenreManagementPage from "@/features/admin/genre/pages/GenreManagementPage";
+import BookCopyManagementPage from "@/features/admin/book-copy/pages/BookCopyManagementPage";
+import LoanManagementPage from "@/features/admin/loan/pages/LoanManagementPage";
+import ReservationManagementPage from "@/features/admin/reservation/pages/ReservationManagementPage";
+import FineManagementPage from "@/features/admin/fine/pages/FineManagementPage";
+import PaymentManagementPage from "@/features/admin/payment/pages/PaymentManagementPage";
 
 const router = createBrowserRouter([
   {
@@ -80,91 +88,35 @@ const router = createBrowserRouter([
           },
           {
             path: "book-copies",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Book Copies Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: BookCopyManagementPage,
           },
           {
             path: "authors",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Authors Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: AuthorManagementPage,
           },
           {
             path: "genres",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Genres Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: GenreManagementPage,
           },
           {
             path: "publishers",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Publishers Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: PublisherManagementPage,
           },
           {
             path: "loans",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Loans Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: LoanManagementPage,
           },
           {
             path: "fines",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Fines Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: FineManagementPage,
           },
           {
             path: "payments",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Payments Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: PaymentManagementPage,
           },
           {
             path: "reservations",
-            element: (
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Reservations Management
-                </h2>
-                <p className="text-gray-600 mt-2">Coming soon...</p>
-              </div>
-            ),
+            Component: ReservationManagementPage,
           },
         ],
       },

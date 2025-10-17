@@ -10,9 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+import { formatCurrency } from "@/helper";
 
 export const getBookColumns = (
   onEdit: (book: IBook) => void,
@@ -88,13 +86,9 @@ export const getBookColumns = (
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue("price"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(price);
-
-      return <div className="font-medium">{formatted}</div>;
+      return (
+        <div className="font-medium">{formatCurrency(row.original.price)}</div>
+      );
     },
   },
   {

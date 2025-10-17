@@ -17,3 +17,5 @@ export type ReservationStatus =
   | "NOTIFIED"
   | "COMPLETED"
   | "CANCELED";
+
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED";

@@ -37,7 +37,7 @@ declare global {
   interface IAuthor {
     id: number;
     name: string;
-    description: string;
+    bio: string | null;
   }
   interface IGenreBook {
     genres: IGenre;
@@ -120,7 +120,7 @@ declare global {
 
   interface IBookCopy {
     id: number;
-    yearPublished: number;
+    year_published: number;
     copyNumber: string;
     status: BookCopyStatus;
     location: string;
@@ -148,7 +148,16 @@ declare global {
     isPaid: boolean;
     loanId: number;
     userId: number;
+    user?: IUserInfo;
+    loan?: {
+      bookCopy: {
+        books: {
+          title: string;
+        };
+      };
+    };
   }
+
   interface IFineDetail extends IFine {
     user: IUserInfo;
   }
@@ -163,17 +172,16 @@ declare global {
     book: IBook;
   }
 
-  interface IFine {
+  interface IPayment {
     id: number;
     amount: number;
-    reason: string;
-    isPaid: boolean;
-    loan: {
-      bookCopy: {
-        books: {
-          title: string;
-        };
-      };
-    };
+    paymentDate: string;
+    paymentMethod: string;
+    transactionId: string;
+    status: PaymentStatus;
+    fineId: number;
+    userId: number;
+    user?: IUserInfo;
+    fine?: IFine;
   }
 }
