@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-invenio-ils.svg";
-
+// import mylogo from "@/assets/Gemini_Generated_Image_nakqk6nakqk6nakq.png";
 import {
   NavigationMenu,
   NavigationMenuItem,

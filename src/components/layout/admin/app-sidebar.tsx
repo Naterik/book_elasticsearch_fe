@@ -13,7 +13,6 @@ import {
   LayoutDashboard,
   Library,
   PenSquare,
-  Settings2,
   Users,
 } from "lucide-react";
 
@@ -36,64 +35,54 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Management",
-    items: [
-      {
-        title: "Users",
-        url: "/admin/users",
-        icon: Users,
-      },
-      {
-        title: "Books",
-        url: "/admin/books",
-        icon: Book,
-      },
-      {
-        title: "Book Copies",
-        url: "/admin/book-copies",
-        icon: Copy,
-      },
-      {
-        title: "Authors",
-        url: "/admin/authors",
-        icon: PenSquare,
-      },
-      {
-        title: "Genres",
-        url: "/admin/genres",
-        icon: Library,
-      },
-      {
-        title: "Publishers",
-        url: "/admin/publishers",
-        icon: Building,
-      },
-    ],
+    title: "Users",
+    url: "/admin/users",
+    icon: Users,
   },
   {
-    title: "Operations",
-    items: [
-      {
-        title: "Loans",
-        url: "/admin/loans",
-        icon: BookUp,
-      },
-      {
-        title: "Reservations",
-        url: "/admin/reservations",
-        icon: CalendarClock,
-      },
-      {
-        title: "Fines",
-        url: "/admin/fines",
-        icon: CircleDollarSign,
-      },
-      {
-        title: "Payments",
-        url: "/admin/payments",
-        icon: CreditCard,
-      },
-    ],
+    title: "Books",
+    url: "/admin/books",
+    icon: Book,
+  },
+  {
+    title: "Book Copies",
+    url: "/admin/book-copies",
+    icon: Copy,
+  },
+  {
+    title: "Authors",
+    url: "/admin/authors",
+    icon: PenSquare,
+  },
+  {
+    title: "Genres",
+    url: "/admin/genres",
+    icon: Library,
+  },
+  {
+    title: "Publishers",
+    url: "/admin/publishers",
+    icon: Building,
+  },
+  {
+    title: "Loans",
+    url: "/admin/loans",
+    icon: BookUp,
+  },
+  {
+    title: "Reservations",
+    url: "/admin/reservations",
+    icon: CalendarClock,
+  },
+  {
+    title: "Fines",
+    url: "/admin/fines",
+    icon: CircleDollarSign,
+  },
+  {
+    title: "Payments",
+    url: "/admin/payments",
+    icon: CreditCard,
   },
 ];
 
@@ -116,22 +105,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
 
   const processedNavItems = React.useMemo(() => {
-    return navItems.map((section) => {
-      if (section.items) {
-        return {
-          ...section,
-          url: section.url || "",
-          items: section.items.map((item) => ({
-            ...item,
-            isActive: location.pathname === item.url,
-          })),
-        };
-      }
-      return {
-        ...section,
-        isActive: location.pathname === section.url,
-      };
-    });
+    return navItems.map((item) => ({
+      ...item,
+      isActive: location.pathname === item.url,
+    }));
   }, [location.pathname]);
 
   return (

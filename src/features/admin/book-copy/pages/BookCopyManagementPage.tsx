@@ -13,6 +13,8 @@ import { PlusIcon } from "lucide-react";
 import BookCopyFormDialog from "@/features/admin/book-copy/components/BookCopyFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
 import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
+import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
 
 const BookCopyManagementPage = () => {
   const {
@@ -34,6 +36,9 @@ const BookCopyManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    handleSearchChange,
+    handleClearSearch,
+    searchQuery,
   } = useBookCopyManagement();
 
   return (
@@ -51,11 +56,30 @@ const BookCopyManagementPage = () => {
         </Button>
       </div>
 
+      {/* Custom Search Bar with Elasticsearch */}
+      <div className="mb-6 flex gap-2">
+        <div className="flex-1 relative">
+          <Input
+            placeholder="Search by location, copy number, title, ISBN... (n-gram search)"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="w-full"
+          />
+          {searchQuery && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+          )}
+        </div>
+      </div>
+
       <DataTable
         columns={columns}
         data={bookCopies}
-        searchKey="copyNumber"
-        searchPlaceholder="Search by copy number..."
+        searchKey={undefined}
         pageCount={totalPages}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
@@ -64,8 +88,12 @@ const BookCopyManagementPage = () => {
         pageSize={pageSize}
         showColumnToggle={true}
         showPagination={true}
-        showSearch={true}
-        emptyMessage="No book copies found. Add your first book copy to get started."
+        showSearch={false}
+        emptyMessage={
+          searchQuery
+            ? "No book copies found. Try a different search."
+            : "No book copies found. Add your first book copy to get started."
+        }
       />
 
       <BookCopyFormDialog

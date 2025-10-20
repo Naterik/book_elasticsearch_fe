@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllBookCopiesAdminAPI,
+  getFilterBookCopyElasticAPI,
   deleteBookCopyAPI,
 } from "@/features/admin/book-copy/services";
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
@@ -22,10 +23,22 @@ export const useBookCopyManagement = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchBookCopies();
-  }, [currentPage]);
+  // Search state
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
+  // Fetch data when page or search state changes
+  useEffect(() => {
+    if (isSearching && searchQuery.trim()) {
+      // Fetch with Elasticsearch search
+      fetchBookCopiesWithSearch();
+    } else {
+      // Fetch all book copies (regular pagination)
+      fetchBookCopies();
+    }
+  }, [currentPage, searchQuery, isSearching]);
+
+  // Fetch all book copies (regular pagination)
   const fetchBookCopies = async () => {
     showLoader();
     try {
@@ -44,6 +57,35 @@ export const useBookCopyManagement = () => {
     } catch (error) {
       console.error("Error fetching book copies:", error);
       toast.error("Failed to fetch book copies");
+    } finally {
+      hideLoader();
+    }
+  };
+
+  // Fetch book copies with Elasticsearch search
+  const fetchBookCopiesWithSearch = async () => {
+    showLoader();
+    try {
+      const response = await getFilterBookCopyElasticAPI(
+        currentPage,
+        searchQuery
+      );
+
+      if (response.data && response.data.result) {
+        setBookCopies(response.data.result);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalItems(response.data.pagination.totalItems);
+        setPageSize(response.data.pagination.pageSize);
+      } else if (response.error) {
+        toast.error(
+          Array.isArray(response.error) ? response.error[0] : response.error
+        );
+        setBookCopies([]);
+      }
+    } catch (error) {
+      console.error("Error searching book copies:", error);
+      toast.error("Failed to search book copies");
+      setBookCopies([]);
     } finally {
       hideLoader();
     }
@@ -105,6 +147,29 @@ export const useBookCopyManagement = () => {
     setCurrentPage(1);
   };
 
+  // Handle search input change - trigger Elasticsearch search
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+
+    if (query.trim()) {
+      // Start searching
+      setIsSearching(true);
+      setCurrentPage(1); // Reset to page 1 on new search
+    } else {
+      // Clear search - show all items
+      setIsSearching(false);
+      setCurrentPage(1);
+    }
+  };
+
+  // Clear search and show all
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setIsSearching(false);
+    setCurrentPage(1);
+    // useEffect will trigger and fetch all items
+  };
+
   const columns = useMemo(
     () => getBookCopyColumns(handleEditBookCopy, handleDeleteClick),
     []
@@ -131,5 +196,11 @@ export const useBookCopyManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+
+    // Search handlers
+    searchQuery,
+    handleSearchChange,
+    handleClearSearch,
+    isSearching,
   };
 };
