@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,17 +10,13 @@ import {
 import { Link, useNavigate } from "react-router";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import testimg from "@/assets/1.webp";
-import testsmall from "@/assets/Screenshot 2025-08-11 171331.png";
 import { Badge } from "@/components/ui/badge";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   Select,
   SelectContent,
@@ -28,12 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { postCreateLoanAPI } from "@/services/loans";
 import { toast } from "sonner";
+
 type Props = {
   borrowDuration: string;
   setBorrowDuration: (v: string) => void;
@@ -42,8 +38,8 @@ type Props = {
   user?: IUser | null;
   isAuthenticated?: boolean | null;
   dueDate: string;
-  count: any;
 };
+
 const BookDetailContent = ({
   borrowDuration,
   setBorrowDuration,
@@ -52,25 +48,45 @@ const BookDetailContent = ({
   dueDate,
   user,
   isAuthenticated,
-  count,
 }: Props) => {
   const checkUser = !isAuthenticated;
   const checkCard = user?.cardNumber === null;
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const calculateDueDate = (days: number) => {
+    return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }
+    );
+  };
+
   const fetchBookLoans = async () => {
-    if (!dataDetailBook) return;
-    setDueDate(borrowDuration);
-    navigate("/loan");
-    const res = await postCreateLoanAPI(user?.id!, dataDetailBook.id, dueDate!);
-    if (res.data) {
-      toast.success("Loan book success!");
-    } else {
-      toast.error(res.message);
+    if (!dataDetailBook || !user) return;
+    setIsLoading(true);
+    try {
+      setDueDate(borrowDuration);
+      const res = await postCreateLoanAPI(user.id, dataDetailBook.id, dueDate!);
+      if (res.data) {
+        toast.success("Book borrowed successfully!");
+        navigate("/loan");
+      } else {
+        toast.error(res.message || "Failed to borrow book");
+      }
+    } catch (error) {
+      toast.error("An error occurred while borrowing the book");
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <>
-      <Breadcrumb className="my-5">
+      <Breadcrumb className="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -80,7 +96,7 @@ const BookDetailContent = ({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/book">Book</Link>
+              <Link to="/book">Books</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -89,113 +105,164 @@ const BookDetailContent = ({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="grid grid-cols-1 space-y-3  md:grid-cols-3 ">
-        <div>
-          <Card className="w-full h-135 md:max-w-120 max-h-135 overflow-hidden rounded-xl bg-muted">
-            <div className="aspect-[5/4] md:aspect-[4/5]">
+
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        {/* Book Image */}
+        <div className="md:col-span-1">
+          <Card className="overflow-hidden border shadow-md">
+            <div className="aspect-[4/5] w-full bg-muted">
               <img
                 src={dataDetailBook?.image}
-                alt="Image"
-                className="rounded-md object-cover object-center size-full"
+                alt={dataDetailBook?.title}
+                className="h-full w-full object-cover object-center"
               />
             </div>
           </Card>
         </div>
-        <div className="w-full md: max-0 p-3 ">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl text-center md:text-left leading-snug">
-              {dataDetailBook?.title}
-            </CardTitle>
-            <div className="text-2xl text-center md:flex w-full flex-wrap gap-2">
-              {dataDetailBook?.genres?.map((g) => (
-                <Badge variant="secondary">{g.genres.name}</Badge>
-              ))}
-            </div>
 
-            <CardDescription className="font-medium text-center md:text-left w-auto">
+        {/* Book Info */}
+        <div className="md:col-span-1 space-y-6">
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {dataDetailBook?.title}
+            </h1>
+
+            <p className="text-lg text-muted-foreground">
               by{" "}
-              <span className="font-medium">
+              <span className="font-semibold text-foreground">
                 {dataDetailBook?.authors?.name}
               </span>
-            </CardDescription>
-            <p className="text-center   md:text-left text-xl text-muted-foreground ">
-              {dataDetailBook?.shortDesc}
             </p>
-          </CardHeader>
-        </div>
-        <Card className="h-full max-h-90">
-          <CardHeader>
-            <CardTitle>Borrow</CardTitle>
-            <div className="space-y-2">
-              <Select value={borrowDuration} onValueChange={setBorrowDuration}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">7 ngày</SelectItem>
-                  <SelectItem disabled={checkUser} value="14">
-                    14 ngày
-                    {user?.cardNumber === null ? (
-                      <span className="text-red-500">
-                        (Yêu cầu thẻ thư viện)
-                      </span>
-                    ) : null}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground">
-                Hạn trả:{" "}
-                {new Date(
-                  Date.now() +
-                    Number.parseInt(borrowDuration) * 24 * 60 * 60 * 1000
-                ).toLocaleDateString("vi-VN")}
-              </p>
-            </div>
-            <CardDescription>
-              <div
-                role="note"
-                aria-label="Điều khoản mượn sách"
-                className="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm"
-              >
-                <p className="flex items-start gap-2 text-blue-700 font-semibold">
-                  <CheckCircle className="h-5 w-5 mt-0.5 text-blue-600" />
-                  Điều khoản mượn sách:
-                </p>
 
-                <ul className="mt-3 ml-12 list-disc space-y-2 text-blue-700 marker:text-blue-500">
-                  <li>Trả sách đúng hạn để tránh phí phạt</li>
-                  <li>Giữ gìn sách trong tình trạng tốt</li>
-                  <li>Có thể gia hạn 1 lần nếu không có người đặt trước</li>
-                </ul>
+            {dataDetailBook?.genres && dataDetailBook.genres.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {dataDetailBook.genres.map((g, idx) => (
+                  <Badge key={idx} variant="secondary">
+                    {g.genres.name}
+                  </Badge>
+                ))}
               </div>
-            </CardDescription>
-          </CardHeader>
-          {checkUser ? (
+            )}
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+              Publisher
+            </h3>
+            <p className="text-base">{dataDetailBook?.publishers?.name}</p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+              ISBN
+            </h3>
+            <p className="text-base font-mono">{dataDetailBook?.isbn}</p>
+          </div>
+          <div className="space-y-2">
+            {dataDetailBook?.shortDesc && (
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-2">
+                  Summary
+                </h3>
+                <p className="text-base leading-relaxed text-foreground">
+                  {dataDetailBook.shortDesc}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Borrow Card */}
+        <div className="md:col-span-1">
+          <Card className="border shadow-md sticky top-20">
+            <CardHeader>
+              <CardTitle>Borrow This Book</CardTitle>
+              <CardDescription>Choose your borrow duration</CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Duration</label>
+                <Select
+                  value={borrowDuration}
+                  onValueChange={setBorrowDuration}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">7 Days</SelectItem>
+                    <SelectItem value="14" disabled={checkCard}>
+                      14 Days
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    Due Date:
+                  </span>{" "}
+                  {calculateDueDate(Number.parseInt(borrowDuration))}
+                </p>
+              </div>
+
+              {checkCard && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <div className="flex gap-2">
+                    <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-amber-700">
+                      <span className="font-semibold">Note:</span> 14-day borrow
+                      requires an active library card.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 pt-2">
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                  <p className="flex items-start gap-2 text-blue-700 font-semibold mb-2">
+                    <CheckCircle className="h-5 w-5 mt-0.5 text-blue-600 flex-shrink-0" />
+                    Borrowing Terms
+                  </p>
+                  <ul className="ml-7 space-y-2 text-blue-700 text-sm list-disc marker:text-blue-500">
+                    <li>Return books by due date to avoid late fees</li>
+                    <li>Keep books in good condition</li>
+                    <li>Renew once if no one has reserved it</li>
+                    <li>Pay any applicable fines before borrowing again</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+
             <CardFooter>
-              <Button
-                type="submit"
-                className="w-full"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </Button>
+              {checkUser ? (
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={() => navigate("/login")}
+                >
+                  Sign In to Borrow
+                </Button>
+              ) : (
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={fetchBookLoans}
+                  disabled={isLoading || !dataDetailBook}
+                >
+                  {isLoading ? "Processing..." : "Borrow Now"}
+                </Button>
+              )}
             </CardFooter>
-          ) : (
-            <CardFooter>
-              <Button
-                type="submit"
-                className="w-full"
-                onClick={() => {
-                  fetchBookLoans();
-                }}
-              >
-                Borrow
-              </Button>
-            </CardFooter>
-          )}
-        </Card>
+          </Card>
+        </div>
       </div>
-      <Separator className="my-5" />
+
+      <Separator className="my-8" />
     </>
   );
 };

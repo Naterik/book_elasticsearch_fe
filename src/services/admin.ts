@@ -1,79 +1,38 @@
 import createInstanceAxios from "services/axios.customize";
+import qs from "qs";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
+
+// Dashboard Stats APIs
+const getDashboardStatsAPI = () => {
+  const urlBackend = "/api/v1/dashboard/stats";
+  return axios.get<IBackendRes<IDashboardStats>>(urlBackend);
+};
 
 // Loan APIs
 const getAllLoanAPI = () => {
   const urlBackend = "/api/v1/loans";
-  return axios.get<IBackendRes<ILoan>>(urlBackend);
+  return axios.get<IBackendRes<ILoan[]>>(urlBackend);
 };
 
-// User Management APIs
-const getAllUsersAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/users?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<IAdminUser>>>(urlBackend);
-};
-
-const getUserByIdAPI = (id: number) => {
-  const urlBackend = `/api/v1/users/${id}`;
-  return axios.get<IBackendRes<IAdminUserDetail>>(urlBackend);
-};
-
-const createUserAPI = (formData: FormData) => {
-  const urlBackend = "/api/v1/users";
-  return axios.post<IBackendRes<IAdminUser>>(urlBackend, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-
-const updateUserAPI = (formData: FormData) => {
-  const urlBackend = `/api/v1/users`;
-  return axios.put<IBackendRes<IAdminUser>>(urlBackend, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-
-const deleteUserAPI = (id: number) => {
-  const urlBackend = `/api/v1/users/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
-};
-
-// Book Management APIs
-const getAllBooksAdminAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/books?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<IBook>>>(urlBackend);
-};
-
-const getBookByIdAdminAPI = (id: number) => {
-  const urlBackend = `/api/v1/books/${id}`;
-  return axios.get<IBackendRes<IBook>>(urlBackend);
-};
-
-const createBookAPI = (formData: FormData) => {
+// Book APIs
+const getAllBooksAPI = () => {
   const urlBackend = "/api/v1/books";
-  return axios.post<IBackendRes<IBook>>(urlBackend, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return axios.get<IBackendRes<IBook[]>>(urlBackend);
 };
 
-const updateBookAPI = (formData: FormData) => {
-  const urlBackend = `/api/v1/books`;
-  return axios.put<IBackendRes<IBook>>(urlBackend, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+// User APIs
+const getAllUsersAPI = () => {
+  const urlBackend = "/api/v1/users";
+  return axios.get<IBackendRes<IAdminUser[]>>(urlBackend);
 };
 
-const deleteBookAPI = (id: number) => {
-  const urlBackend = `/api/v1/books/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
+// Fine APIs - Get successful payments //
+const getSuccessfulPaymentsAPI = () => {
+  const urlBackend = "/api/v1/fines/successful-payments";
+  return axios.get<IBackendRes<{ totalAmount: number; count: number }>>(
+    urlBackend
+  );
 };
 
 // Author Management APIs
@@ -94,19 +53,29 @@ const getAllGenresAPI = () => {
   return axios.get<IBackendRes<IGenre[]>>(urlBackend);
 };
 
+// Book Copy Search APIs
+const getFilterBookCopyElasticAPI = (page: number = 1, search: string = "") => {
+  const urlBackend = "/api/v1/book-copies/elastic";
+  return axios.get<IBackendRes<IModelPaginate<IBookCopy>>>(urlBackend, {
+    params: { page, search },
+    paramsSerializer: {
+      serialize: (params) =>
+        qs.stringify(params, {
+          arrayFormat: "repeat",
+          skipNulls: true,
+        }),
+    },
+  });
+};
+
 export {
+  getDashboardStatsAPI,
   getAllLoanAPI,
+  getAllBooksAPI,
   getAllUsersAPI,
-  getUserByIdAPI,
-  createUserAPI,
-  updateUserAPI,
-  deleteUserAPI,
-  getAllBooksAdminAPI,
-  getBookByIdAdminAPI,
-  createBookAPI,
-  updateBookAPI,
-  deleteBookAPI,
+  getSuccessfulPaymentsAPI,
   getAllAuthorsAPI,
   getAllPublishersAPI,
   getAllGenresAPI,
+  getFilterBookCopyElasticAPI,
 };

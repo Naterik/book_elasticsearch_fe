@@ -63,7 +63,6 @@ export function DataTable<TData, TValue>({
   totalItems = 0,
   pageSize = 12,
   onPageChange,
-  onPageSizeChange,
   showColumnToggle = true,
   showPagination = true,
   showSearch = true,
@@ -219,8 +218,6 @@ export function DataTable<TData, TValue>({
           pageSize={pageSize}
           totalItems={totalItems}
           onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          showPageSizeSelector={!!onPageSizeChange}
         />
       )}
     </div>

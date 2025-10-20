@@ -4,8 +4,17 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Funnel } from "lucide-react";
+import {
+  Filter,
+  RotateCcw,
+  DollarSign,
+  Calendar,
+  BookOpen,
+  Globe,
+} from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/helper";
 
 type Props = {
   genresAll: IGenre[];
@@ -50,6 +59,7 @@ export default function BookFilter({
       Math.min(Math.max(v, priceBounds[0]), priceRange[1]),
       priceRange[1],
     ]);
+
   const updatePriceMax = (v: number) =>
     onPriceChange([
       priceRange[0],
@@ -61,28 +71,50 @@ export default function BookFilter({
       Math.min(Math.max(v, yearBounds[0]), yearRange[1]),
       yearRange[1],
     ]);
+
   const updateYearMax = (v: number) =>
     onYearChange([
       yearRange[0],
       Math.max(Math.min(v, yearBounds[1]), yearRange[0]),
     ]);
 
+  const hasActiveFilters =
+    genresSelected.length > 0 ||
+    selectedLanguage ||
+    priceRange[0] !== priceBounds[0] ||
+    priceRange[1] !== priceBounds[1] ||
+    yearRange[0] !== yearBounds[0] ||
+    yearRange[1] !== yearBounds[1];
+
   return (
     <Card
-      className={`w-full max-w-[320px] shrink-0 ${
+      className={`w-full max-w-[360px] shrink-0 border shadow-sm ${
         sticky ? "sticky top-24" : ""
       }`}
     >
-      <CardHeader>
-        <CardTitle className="text-2xl flex items-center gap-2">
-          <Funnel />
-          Filter by
-        </CardTitle>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Filters</CardTitle>
+          </div>
+          {hasActiveFilters && (
+            <Badge variant="secondary" className="text-xs">
+              Active
+            </Badge>
+          )}
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        <section>
-          <h3 className="text-xl font-semibold mb-3">Genres</h3>
+      <CardContent className="space-y-4">
+        {/* Genres Section */}
+        <section className="space-y-2">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+              Genres
+            </h3>
+          </div>
           <div className="grid grid-cols-2 gap-2">
             {genresAll.map((g) => {
               const checked = genresSelected.includes(g.name);
@@ -90,16 +122,21 @@ export default function BookFilter({
               return (
                 <label
                   key={g.id}
-                  className="flex items-center gap-3 cursor-pointer"
+                  className="flex items-center gap-2 cursor-pointer p-1.5 rounded-md hover:bg-slate-100 transition-colors"
                   htmlFor={id}
                 >
                   <Checkbox
                     id={id}
                     checked={checked}
-                    className="ring-1"
+                    className="h-4 w-4"
                     onCheckedChange={(c) => onToggleGenre(g.name, Boolean(c))}
                   />
-                  <Label htmlFor={id}>{g.name}</Label>
+                  <Label
+                    htmlFor={id}
+                    className="text-xs cursor-pointer font-medium leading-none"
+                  >
+                    {g.name}
+                  </Label>
                 </label>
               );
             })}
@@ -107,49 +144,84 @@ export default function BookFilter({
         </section>
 
         <Separator />
-        <section>
-          <h3 className="text-xl font-semibold mb-3">Languages</h3>
-          <RadioGroup
-            className="grid grid-cols-2 gap-2"
-            value={selectedLanguage ?? ""}
-            onValueChange={(v) => onChangeLanguage(v || null)}
-          >
-            <label
-              className="group flex w-full items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted"
-              htmlFor="lang-all"
+
+        {/* Genres and Languages in 2-Column Layout */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* Languages Section */}
+          <section className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+              <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+                Language
+              </h3>
+            </div>
+            <RadioGroup
+              className="grid grid-cols-2 gap-1.5"
+              value={selectedLanguage ?? ""}
+              onValueChange={(v) => onChangeLanguage(v || null)}
             >
-              <RadioGroupItem id="lang-all" value="" className="ring-1" />
-              <Label htmlFor="lang-all" className="leading-5">
-                All
-              </Label>
-            </label>
-
-            {languagesAll?.map((l) => {
-              const id = `lang-${l.key}`;
-              return (
-                <label
-                  key={id}
-                  htmlFor={id}
-                  className="group flex w-full items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted"
+              <label
+                className="group flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-100 transition-colors cursor-pointer col-span-2"
+                htmlFor="lang-all"
+              >
+                <RadioGroupItem
+                  id="lang-all"
+                  value=""
+                  className="h-3.5 w-3.5"
+                />
+                <Label
+                  htmlFor="lang-all"
+                  className="text-xs font-medium cursor-pointer leading-none"
                 >
-                  <RadioGroupItem id={id} value={l.key} className="ring-1" />
-                  <Label htmlFor={id} className="leading-5">
-                    {l.key}
-                  </Label>
-                  <span className="ml-auto min-w-[1.25rem] tabular-nums text-right text-xs leading-5 text-muted-foreground opacity-60 group-hover:opacity-100">
-                    {l.doc_count}
-                  </span>
-                </label>
-              );
-            })}
-          </RadioGroup>
-        </section>
+                  All
+                </Label>
+              </label>
 
-        <Separator />
+              {languagesAll?.map((l) => {
+                const id = `lang-${l.key}`;
+                return (
+                  <label
+                    key={id}
+                    htmlFor={id}
+                    className="group flex items-center gap-1.5 p-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    <RadioGroupItem id={id} value={l.key} className="h-3 w-3" />
+                    <div className="flex-1 min-w-0">
+                      <Label
+                        htmlFor={id}
+                        className="text-xs font-medium cursor-pointer leading-none truncate"
+                      >
+                        {l.key}
+                      </Label>
+                      <span className="text-xs text-muted-foreground">
+                        ({l.doc_count})
+                      </span>
+                    </div>
+                  </label>
+                );
+              })}
+            </RadioGroup>
+          </section>
 
-        <section>
-          <h3 className="text-xl font-semibold mb-3">Price</h3>
-          <div className="space-y-4">
+          <Separator />
+        </div>
+        <section className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+              Price
+            </h3>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-xs font-medium text-slate-600">
+                {formatCurrency(priceRange[0])}
+              </span>
+              <span className="text-xs text-muted-foreground">to</span>
+              <span className="text-xs font-medium text-slate-600">
+                {formatCurrency(priceRange[1])}
+              </span>
+            </div>
             <Slider
               min={priceBounds[0]}
               max={priceBounds[1]}
@@ -158,42 +230,49 @@ export default function BookFilter({
               onValueChange={(v) =>
                 onPriceChange([v[0] ?? priceBounds[0], v[1] ?? priceBounds[1]])
               }
+              className="w-full"
             />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="price-min" className="whitespace-nowrap">
-                  Min
-                </Label>
-                <input
-                  id="price-min"
-                  type="number"
-                  value={priceRange[0]}
-                  onChange={(e) => updatePriceMin(Number(e.target.value))}
-                  className="w-[100px] border rounded px-2 py-1"
-                />
-              </div>
-              <span className="text-muted-foreground">—</span>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="price-max" className="whitespace-nowrap">
-                  Max
-                </Label>
-                <input
-                  id="price-max"
-                  type="number"
-                  value={priceRange[1]}
-                  onChange={(e) => updatePriceMax(Number(e.target.value))}
-                  className="w-[100px] border rounded px-2 py-1"
-                />
-              </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                value={priceRange[0]}
+                onChange={(e) => updatePriceMin(Number(e.target.value))}
+                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                min={priceBounds[0]}
+                max={priceRange[1]}
+              />
+              <span className="text-xs text-muted-foreground">—</span>
+              <input
+                type="number"
+                value={priceRange[1]}
+                onChange={(e) => updatePriceMax(Number(e.target.value))}
+                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                min={priceRange[0]}
+                max={priceBounds[1]}
+              />
             </div>
           </div>
         </section>
-
         <Separator />
 
-        <section>
-          <h3 className="text-xl font-semibold mb-3">Publish</h3>
-          <div className="space-y-4">
+        {/* Publication Year Section */}
+        <section className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+              Publication Year
+            </h3>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-xs font-medium text-slate-600">
+                {yearRange[0]}
+              </span>
+              <span className="text-xs text-muted-foreground">to</span>
+              <span className="text-xs font-medium text-slate-600">
+                {yearRange[1]}
+              </span>
+            </div>
             <Slider
               min={yearBounds[0]}
               max={yearBounds[1]}
@@ -205,44 +284,48 @@ export default function BookFilter({
                   number
                 ])
               }
+              className="w-full"
             />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="year-min" className="whitespace-nowrap">
-                  From
-                </Label>
-                <input
-                  id="year-min"
-                  type="number"
-                  value={yearRange[0]}
-                  onChange={(e) => updateYearMin(Number(e.target.value))}
-                  className="w-[100px] border rounded px-2 py-1"
-                />
-              </div>
-              <span className="text-muted-foreground">—</span>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="year-max" className="whitespace-nowrap">
-                  To
-                </Label>
-                <input
-                  id="year-max"
-                  type="number"
-                  value={yearRange[1]}
-                  onChange={(e) => updateYearMax(Number(e.target.value))}
-                  className="w-[100px] border rounded px-2 py-1"
-                />
-              </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                value={yearRange[0]}
+                onChange={(e) => updateYearMin(Number(e.target.value))}
+                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                min={yearBounds[0]}
+                max={yearRange[1]}
+              />
+              <span className="text-xs text-muted-foreground">—</span>
+              <input
+                type="number"
+                value={yearRange[1]}
+                onChange={(e) => updateYearMax(Number(e.target.value))}
+                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                min={yearRange[0]}
+                max={yearBounds[1]}
+              />
             </div>
           </div>
         </section>
 
         <Separator />
 
-        <div className="flex gap-2">
-          <Button className="flex-1" onClick={onApply}>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <Button
+            onClick={onApply}
+            className="h-8 bg-blue-600 hover:bg-blue-700 text-sm"
+            size="sm"
+          >
             Apply
           </Button>
-          <Button variant="outline" className="flex-1" onClick={onReset}>
+          <Button
+            variant="outline"
+            className="h-8 text-sm"
+            onClick={onReset}
+            size="sm"
+          >
+            <RotateCcw className="h-3 w-3 mr-1.5" />
             Reset
           </Button>
         </div>

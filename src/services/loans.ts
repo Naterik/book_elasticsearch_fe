@@ -33,7 +33,7 @@ const getRenewalLoanAPI = (loanId: number, userId: number) => {
 };
 
 const postCreateLoanAPI = (userId: number, bookId: number, dueDate: string) => {
-  const urlBackend = "/api/v1/loans/create";
+  const urlBackend = "/api/v1/loans";
   return axios.post<IBackendRes<ILoan>>(urlBackend, {
     userId,
     bookId,
