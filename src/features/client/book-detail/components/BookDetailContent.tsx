@@ -29,23 +29,20 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { postCreateLoanAPI } from "@/services/loans";
 import { toast } from "sonner";
+import { calculateDueDate } from "@/helper";
 
 type Props = {
   borrowDuration: string;
   setBorrowDuration: (v: string) => void;
   dataDetailBook: IBook | null;
-  setDueDate: (v: string) => void;
   user?: IUser | null;
   isAuthenticated?: boolean | null;
-  dueDate: string;
 };
 
 const BookDetailContent = ({
   borrowDuration,
   setBorrowDuration,
   dataDetailBook,
-  setDueDate,
-  dueDate,
   user,
   isAuthenticated,
 }: Props) => {
@@ -54,23 +51,15 @@ const BookDetailContent = ({
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const calculateDueDate = (days: number) => {
-    return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toLocaleDateString(
-      "en-US",
-      {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }
-    );
-  };
-
   const fetchBookLoans = async () => {
     if (!dataDetailBook || !user) return;
     setIsLoading(true);
     try {
-      setDueDate(borrowDuration);
-      const res = await postCreateLoanAPI(user.id, dataDetailBook.id, dueDate!);
+      const res = await postCreateLoanAPI(
+        user.id,
+        dataDetailBook.id,
+        borrowDuration
+      );
       if (res.data) {
         toast.success("Book borrowed successfully!");
         navigate("/loan");
@@ -107,7 +96,6 @@ const BookDetailContent = ({
       </Breadcrumb>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {/* Book Image */}
         <div className="md:col-span-1">
           <Card className="overflow-hidden border shadow-md">
             <div className="aspect-[4/5] w-full bg-muted">
@@ -119,21 +107,17 @@ const BookDetailContent = ({
             </div>
           </Card>
         </div>
-
-        {/* Book Info */}
         <div className="md:col-span-1 space-y-6">
           <div className="space-y-3">
             <h1 className="text-3xl font-bold tracking-tight">
               {dataDetailBook?.title}
             </h1>
-
             <p className="text-lg text-muted-foreground">
-              by{" "}
+              by
               <span className="font-semibold text-foreground">
                 {dataDetailBook?.authors?.name}
               </span>
             </p>
-
             {dataDetailBook?.genres && dataDetailBook.genres.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-2">
                 {dataDetailBook.genres.map((g, idx) => (
@@ -144,16 +128,13 @@ const BookDetailContent = ({
               </div>
             )}
           </div>
-
           <Separator />
-
           <div className="space-y-2">
             <h3 className="font-semibold text-sm text-muted-foreground uppercase">
               Publisher
             </h3>
             <p className="text-base">{dataDetailBook?.publishers?.name}</p>
           </div>
-
           <div className="space-y-2">
             <h3 className="font-semibold text-sm text-muted-foreground uppercase">
               ISBN
@@ -173,15 +154,12 @@ const BookDetailContent = ({
             )}
           </div>
         </div>
-
-        {/* Borrow Card */}
         <div className="md:col-span-1">
           <Card className="border shadow-md sticky top-20">
             <CardHeader>
               <CardTitle>Borrow This Book</CardTitle>
               <CardDescription>Choose your borrow duration</CardDescription>
             </CardHeader>
-
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Duration</label>

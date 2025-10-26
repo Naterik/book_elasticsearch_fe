@@ -15,7 +15,6 @@ export const getStatusBadge = (status: string) => {
 };
 
 export const getStatusVariant = (status: ReservationStatus) => {
-  console.log("status :>> ", status);
   switch (status) {
     case "NOTIFIED":
       return "default";
@@ -25,5 +24,18 @@ export const getStatusVariant = (status: ReservationStatus) => {
       return "destructive";
     default:
       return "outline";
+  }
+};
+
+export const getStatusBadgeUser = (status: string) => {
+  switch (status) {
+    case "ACTIVE":
+      return <Badge className="bg-green-500">{status}</Badge>;
+    case "INACTIVE":
+      return <Badge className="bg-orange-400">{status}</Badge>;
+    case "SUSPENDED":
+      return <Badge className="bg-red-500">{status}</Badge>;
+    default:
+      return <Badge>{status}</Badge>;
   }
 };

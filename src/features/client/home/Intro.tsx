@@ -1,9 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { features, stats } from "@/features/seed";
-import { useCurrentApp } from "@/app/providers/app.context";
 
-const IntroPage = ({ user }: { user: IUser | null }) => {
+const IntroPage = ({
+  user,
+  isHaveCard,
+}: {
+  user: IUser | null;
+  isHaveCard: boolean | null;
+}) => {
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Hero Section */}
@@ -59,7 +64,7 @@ const IntroPage = ({ user }: { user: IUser | null }) => {
           </p>
         )}
 
-        {user?.status === "ACTIVE" && (
+        {!isHaveCard && (
           <a
             href="/member"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"

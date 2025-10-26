@@ -1,5 +1,5 @@
 import { useCurrentApp } from "@/app/providers/app.context";
-import { updatePaymentMemberAPI } from "@/services/api";
+import { updatePaymentMemberAPI, updatePaymentFineAPI } from "@/services/api";
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+type PaymentType = "membership" | "fine";
+
 const ReturnPayment = () => {
   const [searchParams] = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(true);
@@ -23,7 +25,9 @@ const ReturnPayment = () => {
 
   const paymentRef = searchParams?.get("vnp_TxnRef") ?? "";
   const responseCode = searchParams?.get("vnp_ResponseCode") ?? "";
-  const { showLoader, hideLoader, setUser, user } = useCurrentApp();
+  const paymentType = (searchParams?.get("paymentType") ??
+    "membership") as PaymentType;
+  const { showLoader, hideLoader, setUser } = useCurrentApp();
 
   useEffect(() => {
     if (paymentRef) {
@@ -32,22 +36,27 @@ const ReturnPayment = () => {
         setIsProcessing(true);
 
         try {
-          setPaymentStatus(
-            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED"
-          );
-          const res = await updatePaymentMemberAPI(
-            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED",
-            paymentRef
-          );
+          const status =
+            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED";
+          setPaymentStatus(status);
 
-          if (res.data) {
-            toast.success("Payment status updated successfully");
-            setUser(res.data);
-
-            console.log("object :>> ", user);
-          } else {
-            toast.error("Failed to update payment status");
-            setPaymentStatus("PAYMENT_FAILED");
+          if (paymentType === "membership") {
+            const res = await updatePaymentMemberAPI(status, paymentRef);
+            if (res.data) {
+              toast.success("Payment status updated successfully");
+              setUser(res.data);
+            } else {
+              toast.error("Failed to update payment status");
+              setPaymentStatus("PAYMENT_FAILED");
+            }
+          } else if (paymentType === "fine") {
+            const res = await updatePaymentFineAPI(status, paymentRef);
+            if (res.data) {
+              toast.success("Fine payment processed successfully");
+            } else {
+              toast.error("Failed to process fine payment");
+              setPaymentStatus("PAYMENT_FAILED");
+            }
           }
         } catch (error) {
           toast.error("An error occurred while processing payment");
@@ -63,7 +72,7 @@ const ReturnPayment = () => {
       setIsProcessing(false);
       setPaymentStatus("PAYMENT_FAILED");
     }
-  }, [paymentRef, responseCode]);
+  }, [paymentRef, responseCode, paymentType]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
@@ -100,7 +109,9 @@ const ReturnPayment = () => {
                   Payment Successful! 🎉
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
-                  Your membership has been successfully activated
+                  {paymentType === "membership"
+                    ? "Your membership has been successfully activated"
+                    : "Your fine has been paid successfully"}
                 </p>
               </div>
 
@@ -136,9 +147,9 @@ const ReturnPayment = () => {
                   size="lg"
                   className="flex-1 gap-2"
                 >
-                  <Link to="/info">
+                  <Link to={paymentType === "membership" ? "/info" : "/loan"}>
                     <History className="h-4 w-4" />
-                    View Info
+                    {paymentType === "membership" ? "View Info" : "View Loans"}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -207,7 +218,7 @@ const ReturnPayment = () => {
                   size="lg"
                   className="flex-1 gap-2"
                 >
-                  <Link to="/member">
+                  <Link to={paymentType === "membership" ? "/member" : "/loan"}>
                     Try Again
                     <ArrowRight className="h-4 w-4" />
                   </Link>

@@ -151,9 +151,7 @@ declare global {
     user?: IUserInfo;
     loan?: {
       bookCopy: {
-        books: {
-          title: string;
-        };
+        books: IBook;
       };
     };
   }
@@ -183,6 +181,17 @@ declare global {
     userId: number;
     user?: IUserInfo;
     fine?: IFine;
+    paymentRef: string | null;
+    type?: string;
+  }
+
+  interface INotification {
+    id: number;
+    sentAt: string;
+    type: string;
+    content: string;
+    isRead: boolean;
+    userId: number;
   }
 
   interface IDashboardStats {

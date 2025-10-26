@@ -20,7 +20,7 @@ const putCancelReservationAPI = (id: number) => {
   return axios.put<IBackendRes<IReservation[]>>(`/api/v1/reservations/${id}`);
 };
 
-const getFineByLoanIdAPI = (id: number) => {
+const getOnLoanByIdAPI = (id: number) => {
   return axios.get<IBackendRes<IFineDetail>>(`/api/v1/loans/${id}`);
 };
 
@@ -41,12 +41,29 @@ const postCreateLoanAPI = (userId: number, bookId: number, dueDate: string) => {
   });
 };
 
+const getFineByUserIdAPI = (id: number) => {
+  return axios.get<IBackendRes<IFine[]>>(`/api/v1/fines/${id}`);
+};
+
+const postCreateFinePaymentAPI = (fineId: number, paymentRef: string) => {
+  const urlBackend = "/api/v1/users/fine";
+  return axios.post<IBackendRes<{ payment: IPayment; fine: IFine }>>(
+    urlBackend,
+    {
+      fineId,
+      paymentRef,
+    }
+  );
+};
+
 export {
   getLoanByUserIdAPI,
   getRenewalLoanAPI,
-  getFineByLoanIdAPI,
+  getOnLoanByIdAPI,
+  getFineByUserIdAPI,
   getReturnedLoanByUserAPI,
   getReservationByUserAPI,
   putCancelReservationAPI,
   postCreateLoanAPI,
+  postCreateFinePaymentAPI,
 };

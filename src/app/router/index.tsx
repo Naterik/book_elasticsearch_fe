@@ -13,6 +13,7 @@ import InfoPage from "@/pages/client/Info";
 import LoanPage from "@/pages/client/Loan";
 import MemberPage from "@/pages/client/Member";
 import ReturnPayment from "@/pages/client/ReturnPayment";
+import NotificationsPage from "@/pages/client/Notifications";
 
 import ClientLayout from "@/layout/ClientLayout";
 import BookManagement from "@/features/admin/book/pages/BookManagementPage";
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       },
       { path: "info", Component: InfoPage },
       { path: "loan", Component: LoanPage },
+      { path: "notifications", Component: NotificationsPage },
       {
         path: "vnpay/return-url",
         Component: ReturnPayment,

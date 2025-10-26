@@ -84,7 +84,8 @@ export default function MemberPage() {
         const r = await getVNPayUrlAPI(
           res.data.amount,
           "vn",
-          res.data.paymentRef
+          res.data.paymentRef,
+          "membership"
         );
         if (r.data) {
           window.location.href = r.data.url;

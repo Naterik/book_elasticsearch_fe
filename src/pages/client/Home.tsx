@@ -22,8 +22,8 @@ const HomePage: React.FC = () => {
   const [newArrivals, setNewArrivals] = useState<IBook[] | undefined>([]);
   const [mostBorrowedBooks, setMostBorrowedBooks] = useState<IBook[]>([]);
   const [recommendedBooks, setRecommendedBooks] = useState<IBook[]>([]);
-  const [userLoans, setUserLoans] = useState<ILoan[]>([]);
-  const [userReservations, setUserReservations] = useState<IReservation[]>([]);
+  const checkCard = user?.status === "ACTIVE";
+
   useEffect(() => {
     fetchHomePageData();
   }, [isAuthenticated, user]);
@@ -96,49 +96,52 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <HeroSection
-        isLoggedIn={isAuthenticated}
+        isHaveCard={checkCard}
         onSearch={handleSearch}
         onMember={handleMember}
       />
 
       {isAuthenticated && (
         <ActionableAlerts
-          loans={userLoans}
-          reservations={userReservations}
+          loans={[]}
+          reservations={[]}
           onViewLoans={handleViewLoans}
           onViewReservations={handleViewReservations}
         />
       )}
       <div className="container mx-auto">
-        <IntroPage user={user} />
+        <IntroPage user={user} isHaveCard={checkCard} />
       </div>
       {!isAuthenticated && <FeaturesSection />}
-
-      <BookCarousel
-        title="New Arrivals"
-        books={newArrivals}
-        onBookClick={handleBookClick}
-      />
-
-      <BookCarousel
-        title="Most Borrowed"
-        books={mostBorrowedBooks}
-        onBookClick={handleBookClick}
-      />
-
-      {isAuthenticated ? (
+      <div className="container mx-auto">
         <BookCarousel
-          title="Recommended for You"
-          books={recommendedBooks}
+          title="New Arrivals"
+          books={newArrivals}
           onBookClick={handleBookClick}
         />
-      ) : (
+      </div>
+      <div className="container mx-auto">
         <BookCarousel
-          title="Trending Now"
-          books={trendingBooks}
+          title="Most Borrowed"
+          books={mostBorrowedBooks}
           onBookClick={handleBookClick}
         />
-      )}
+      </div>
+      <div className="container mx-auto">
+        {isAuthenticated ? (
+          <BookCarousel
+            title="Recommended for You"
+            books={recommendedBooks}
+            onBookClick={handleBookClick}
+          />
+        ) : (
+          <BookCarousel
+            title="Trending Now"
+            books={trendingBooks}
+            onBookClick={handleBookClick}
+          />
+        )}
+      </div>
 
       {!isAuthenticated && (
         <MembershipCTA

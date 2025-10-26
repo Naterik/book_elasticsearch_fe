@@ -26,6 +26,7 @@ import {
 import { Bell, Info, LogOut, User, History } from "lucide-react";
 import Notifications from "../../Notification";
 import MobileSheet from "../MobileSheet";
+import NotificationBadge from "../../NotificationBadge";
 import { useCurrentApp } from "@/app/providers/app.context";
 
 const NAV_ITEMS = [
@@ -82,10 +83,10 @@ export default function AppHeader() {
                 variant="ghost"
                 size="icon"
                 aria-label="Open notifications"
+                className="relative"
               >
-                <span className="relative">
-                  <Bell className="size-5.5" />
-                </span>
+                <Bell className="size-5.5" />
+                <NotificationBadge />
               </Button>
             </PopoverTrigger>
 
@@ -115,6 +116,12 @@ export default function AppHeader() {
                 <Link to="/loan" className="flex items-center gap-2 ">
                   <History className="mr-2 h-4 w-4 text text-green-500" />
                   Loan
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="hover:bg-gray-500/10">
+                <Link to="/notifications" className="flex items-center gap-2 ">
+                  <Bell className="mr-2 h-4 w-4 text text-blue-500" />
+                  Notifications
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="hover:bg-gray-500/10">

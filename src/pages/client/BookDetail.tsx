@@ -9,7 +9,6 @@ const DetailPage = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useCurrentApp();
   const [dataDetailBook, setDataDetailBook] = useState<IBook | null>(null);
-  const [dueDate, setDueDate] = useState<string>("");
   const [borrowDuration, setBorrowDuration] = useState("7");
 
   const fetchBookById = async () => {
@@ -29,10 +28,8 @@ const DetailPage = () => {
         borrowDuration={borrowDuration}
         setBorrowDuration={setBorrowDuration}
         dataDetailBook={dataDetailBook}
-        setDueDate={setDueDate}
         user={user}
         isAuthenticated={isAuthenticated}
-        dueDate={dueDate}
       />
       <BookDetailInfo item={dataDetailBook} />
     </main>

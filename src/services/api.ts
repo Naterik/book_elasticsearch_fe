@@ -159,18 +159,32 @@ const postCreateMemberCardAPI = (data: any) => {
   return axios.post<IBackendRes<any>>(urlBackend, data);
 };
 
-const getVNPayUrlAPI = (amount: number, locale: string, paymentRef: string) => {
+const getVNPayUrlAPI = (
+  amount: number,
+  locale: string,
+  paymentRef: string,
+  paymentType: string = "membership"
+) => {
   const urlBackend = "/vnpay/payment-url";
   return axiosPayment.post<IBackendRes<{ url: string }>>(urlBackend, {
     amount,
     locale,
     paymentRef,
+    paymentType,
   });
 };
 
 const updatePaymentMemberAPI = (paymentStatus: string, paymentRef: string) => {
   const urlBackend = "/api/v1/users/member/update-status";
   return axios.post<IBackendRes<IUser>>(urlBackend, {
+    paymentStatus,
+    paymentRef,
+  });
+};
+
+const updatePaymentFineAPI = (paymentStatus: string, paymentRef: string) => {
+  const urlBackend = "/api/v1/users/fine/update-status";
+  return axios.post<IBackendRes<{ message: string }>>(urlBackend, {
     paymentStatus,
     paymentRef,
   });
@@ -183,6 +197,32 @@ const getBookOnLoanAPI = (userId: number) => {
 const getSuggestAPI = (q: string, size = 5) => {
   const urlBackend = "/api/v1/suggest/elastic";
   return axios.get(urlBackend, { params: { q, size } });
+};
+
+const getNotificationByUserAPI = (userId: number) => {
+  return axios.get<IBackendRes<INotification[]>>(
+    `/api/v1/notifications/${userId}`
+  );
+};
+
+const getUserProfileAPI = (userId: number) => {
+  return axios.get<IBackendRes<IUserInfo>>(`/api/v1/users/${userId}`);
+};
+
+const getNotificationsByUserIdAPI = (userId: number) => {
+  return axios.get<IBackendRes<INotification[]>>(
+    `/api/v1/notifications/${userId}`
+  );
+};
+
+const putSingleNotificationAPI = (id: number) => {
+  return axios.put<IBackendRes<INotification>>(`/api/v1/notifications/${id}`);
+};
+
+const putBulkNotificationAPI = (userId: number) => {
+  return axios.put<IBackendRes<{ count: number }>>(
+    `/api/v1/notifications/bulk/${userId}`
+  );
 };
 
 export {
@@ -203,6 +243,12 @@ export {
   postCreateMemberCardAPI,
   getSuggestAPI,
   updatePaymentMemberAPI,
+  updatePaymentFineAPI,
   getVNPayUrlAPI,
   getBookOnLoanAPI,
+  getNotificationByUserAPI,
+  getUserProfileAPI,
+    getNotificationsByUserIdAPI,
+  putSingleNotificationAPI,
+  putBulkNotificationAPI,
 };

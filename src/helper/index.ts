@@ -52,3 +52,14 @@ export const formatDate = (isoDateString: string | Date): string => {
     return "N/A";
   }
 };
+
+export const calculateDueDate = (days: number) => {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
+};

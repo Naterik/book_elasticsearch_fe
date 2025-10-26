@@ -4,10 +4,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoanCurrent from "@/features/client/loan/LoanCurrent";
+import LoanFine from "@/features/client/loan/LoanFine";
 import LoanHistory from "@/features/client/loan/LoanHistory";
 import LoanReservation from "@/features/client/loan/LoanReservation";
 import { getCountDate } from "@/helper";
 import {
+  getFineByUserIdAPI,
   getLoanByUserIdAPI,
   getRenewalLoanAPI,
   getReservationByUserAPI,
@@ -22,9 +24,10 @@ const LoanPage = () => {
   const [dataLoanReturn, setDataLoanReturn] = useState<ILoan[]>([]);
   const [dataOnLoan, setDataOnLoan] = useState<ILoan[]>([]);
   const [dataReservation, setReservation] = useState<IReservation[]>([]);
+  const [fine, setFine] = useState<IFine[] | null>(null);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
   const [renewingId, setRenewingId] = useState<number | null>(null);
-  const userId = user?.id;
+  const userId = user?.id ?? 0;
   const checkStatus = user?.status === "ACTIVE";
   const stats = useMemo(() => {
     let upcomingDue = 0;
@@ -68,7 +71,7 @@ const LoanPage = () => {
   };
 
   const fetchAllLoans = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || userId === 0) return;
     showLoader();
     try {
       const res: any = await getLoanByUserIdAPI(userId);
@@ -83,7 +86,7 @@ const LoanPage = () => {
   }, [userId, showLoader, hideLoader]);
 
   const fetchReturnedLoan = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || userId === 0) return;
     showLoader();
     try {
       const res = await getReturnedLoanByUserAPI(userId);
@@ -99,7 +102,7 @@ const LoanPage = () => {
   }, [userId, showLoader, hideLoader]);
 
   const fetchReservation = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || userId === 0) return;
     showLoader();
     try {
       const res = await getReservationByUserAPI(userId);
@@ -113,8 +116,25 @@ const LoanPage = () => {
       hideLoader();
     }
   }, [userId, showLoader, hideLoader]);
+
+  const fetchFineByUserId = useCallback(async () => {
+    if (!userId || userId === 0) return;
+    showLoader();
+    try {
+      const res = await getFineByUserIdAPI(userId);
+      if (res.data) {
+        setFine(res.data);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch fine");
+      console.error(error);
+    } finally {
+      hideLoader();
+    }
+  }, [userId, showLoader, hideLoader]);
+
   const handleRenewLoan = async (loanId: number) => {
-    if (!userId) return;
+    if (!userId || userId === 0) return;
     setRenewingId(loanId);
     try {
       await getRenewalLoanAPI(loanId, userId);
@@ -129,10 +149,11 @@ const LoanPage = () => {
   useEffect(() => {
     fetchAllLoans();
     fetchReturnedLoan();
+    fetchFineByUserId();
     if (checkStatus) {
       fetchReservation();
     }
-  }, [fetchAllLoans, fetchReturnedLoan, fetchReservation]);
+  }, [fetchAllLoans, fetchReturnedLoan, fetchReservation, fetchFineByUserId]);
 
   return (
     <div className="container mx-auto py-8">
@@ -150,7 +171,7 @@ const LoanPage = () => {
           </Alert>
         )}
         <Tabs defaultValue="current">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4">
             <TabsTrigger value="current">
               Loan
               <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
@@ -158,14 +179,26 @@ const LoanPage = () => {
                 <span className="sr-only"> books on loan</span>
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="history">
-              History
-              <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
-                {dataLoanReturn.length}
-                <span className="sr-only"> books in history</span>
-              </Badge>
-            </TabsTrigger>
-            {checkStatus && (
+            {dataLoanReturn.length > 0 && (
+              <TabsTrigger value="history">
+                History
+                <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
+                  {dataLoanReturn.length}
+                  <span className="sr-only"> books in history</span>
+                </Badge>
+              </TabsTrigger>
+            )}
+            {fine && fine.length > 0 && (
+              <TabsTrigger value="fine">
+                Fine
+                <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
+                  {fine?.length}
+                  <span className="sr-only"> books in fine</span>
+                </Badge>
+              </TabsTrigger>
+            )}
+
+            {checkStatus && dataReservation.length > 0 && (
               <TabsTrigger value="reservations">
                 Reservation
                 <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
@@ -184,6 +217,9 @@ const LoanPage = () => {
           </TabsContent>
           <TabsContent value="history">
             <LoanHistory loanHistory={dataLoanReturn} />
+          </TabsContent>
+          <TabsContent value="fine">
+            <LoanFine loanFine={fine} onFinePaid={fetchFineByUserId} />
           </TabsContent>
           <TabsContent value="reservations">
             <LoanReservation

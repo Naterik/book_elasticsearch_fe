@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
 import { getStatusBadge } from "@/components/Statusbook";
 import { LoanActionDialogs } from "./LoanDialog";
-import { getFineByLoanIdAPI } from "@/services/loans";
+import { getOnLoanByIdAPI } from "@/services/loans";
 
 interface LoanItemProps {
   loan: ILoan;
@@ -26,14 +26,14 @@ export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
   const canRenew = loan.renewalCount < 2 && loan.status !== "RETURNED";
 
   useEffect(() => {
-    const fetchFineByLoanId = async () => {
-      const res = await getFineByLoanIdAPI(loan.id);
+    const fetchOnLoanById = async () => {
+      const res = await getOnLoanByIdAPI(loan.id);
       if (res.data) {
         setDataFine(res.data);
       }
     };
     if (checkCard) {
-      fetchFineByLoanId();
+      fetchOnLoanById();
     }
   }, [loan.id, checkCard]);
 

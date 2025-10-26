@@ -2,12 +2,12 @@ import SearchBar from "@/components/Search";
 import { Button } from "@/components/ui/button";
 
 type Props = {
-  isLoggedIn: boolean | null;
+  isHaveCard: boolean | null;
   onSearch: (query: string) => void;
   onMember: () => void;
 };
 
-const HeroSection = ({ isLoggedIn, onSearch, onMember }: Props) => {
+const HeroSection = ({ isHaveCard, onSearch, onMember }: Props) => {
   return (
     <section
       className=" relative py-24 bg-cover bg-center bg-no-repeat"
@@ -28,7 +28,7 @@ const HeroSection = ({ isLoggedIn, onSearch, onMember }: Props) => {
 
         <SearchBar onSearch={onSearch} />
 
-        {isLoggedIn && (
+        {!isHaveCard && (
           <Button
             variant="outline"
             size="lg"
