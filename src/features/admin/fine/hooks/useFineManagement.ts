@@ -8,7 +8,7 @@ import {
 import { getFineColumns } from "@/features/admin/fine/fine-columns";
 
 export const useFineManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [fines, setFines] = useState<IFine[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -25,7 +25,7 @@ export const useFineManagement = () => {
   }, [currentPage]);
 
   const fetchFines = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllFinesAdminAPI(currentPage);
 
@@ -43,7 +43,7 @@ export const useFineManagement = () => {
       console.error("Error fetching fines:", error);
       toast.error("Failed to fetch fines");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -64,7 +64,7 @@ export const useFineManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!fineToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteFineAPI(fineToDelete);
 
@@ -80,7 +80,7 @@ export const useFineManagement = () => {
       console.error("Error deleting fine:", error);
       toast.error("Failed to delete fine");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setFineToDelete(null);
     }

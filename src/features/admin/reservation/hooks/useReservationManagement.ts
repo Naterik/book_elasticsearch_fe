@@ -9,7 +9,7 @@ import {
 import { getReservationColumns } from "@/features/admin/reservation/reservation-columns";
 
 export const useReservationManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [reservations, setReservations] = useState<IReservation[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -29,7 +29,7 @@ export const useReservationManagement = () => {
   }, [currentPage]);
 
   const fetchReservations = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllReservationsAdminAPI(currentPage);
 
@@ -47,7 +47,7 @@ export const useReservationManagement = () => {
       console.error("Error fetching reservations:", error);
       toast.error("Failed to fetch reservations");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -68,7 +68,7 @@ export const useReservationManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!reservationToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteReservationAPI(reservationToDelete);
 
@@ -84,7 +84,7 @@ export const useReservationManagement = () => {
       console.error("Error deleting reservation:", error);
       toast.error("Failed to delete reservation");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setReservationToDelete(null);
     }
@@ -94,7 +94,7 @@ export const useReservationManagement = () => {
     reservationId: number,
     newStatus: string
   ) => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await updateReservationStatusAPI(
         reservationId,
@@ -113,7 +113,7 @@ export const useReservationManagement = () => {
       console.error("Error updating reservation status:", error);
       toast.error("Failed to update reservation status");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

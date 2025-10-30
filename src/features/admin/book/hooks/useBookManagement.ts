@@ -7,7 +7,7 @@ import {
 } from "@/features/admin/book/services";
 import { getBookColumns } from "@/features/admin/book/book-columns";
 export const useBookManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -26,7 +26,7 @@ export const useBookManagement = () => {
   }, [currentPage]);
 
   const fetchBooks = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllBooksAdminAPI(currentPage);
 
@@ -44,7 +44,7 @@ export const useBookManagement = () => {
       console.error("Error fetching books:", error);
       toast.error("Failed to fetch books");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -70,7 +70,7 @@ export const useBookManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!bookToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteBookAPI(bookToDelete);
 
@@ -86,7 +86,7 @@ export const useBookManagement = () => {
       console.error("Error deleting book:", error);
       toast.error("Failed to delete book");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setBookToDelete(null);
     }

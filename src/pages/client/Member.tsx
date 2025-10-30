@@ -1,8 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,89 +17,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  memberRegistrationSchema,
-  type MemberRegistrationSchema,
-} from "@/lib/validators/member";
 import { formatCurrency } from "@/helper";
-import { getVNPayUrlAPI, postCreateMemberCardAPI } from "@/services/api";
-import { useCurrentApp } from "@/app/providers/app.context";
-import { useNavigate } from "react-router";
-import { v4 as uuidv4 } from "uuid";
-// Define costs in a constant
-const DURATION_COST = {
-  "6": 50000,
-  "12": 100000,
-  COD: 0,
-};
+import { useMemberRegistration, DURATION_COST } from "@/features/client/info";
 
 export default function MemberPage() {
-  const { isAuthenticated } = useCurrentApp();
-  console.log("object :>> ", isAuthenticated);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useCurrentApp();
-  const navigate = useNavigate();
-  const paymentRef = uuidv4();
-  const userId = user?.id;
-
-  const form = useForm<MemberRegistrationSchema>({
-    resolver: zodResolver(memberRegistrationSchema),
-    defaultValues: {
-      fullName: "",
-      phone: "",
-      address: "",
-    },
-  });
-
-  const selectedDuration = form.watch("duration");
-
-  async function onSubmit(values: MemberRegistrationSchema) {
-    setIsSubmitting(true);
-    let res = null;
-    try {
-      if (user?.status === "ACTIVE") {
-        toast.message("You are already a member.");
-        navigate("/");
-        return;
-      }
-      if (values.duration === "COD" || !paymentRef) {
-        res = await postCreateMemberCardAPI({ ...values, userId });
-        if (res.data) {
-          toast.success("Registration successful! Please wait for approval.");
-          navigate("/");
-        }
-      } else {
-        res = await postCreateMemberCardAPI({
-          ...values,
-          userId,
-          paymentRef,
-        });
-      }
-
-      if (res.data) {
-        const r = await getVNPayUrlAPI(
-          res.data.amount,
-          "vn",
-          res.data.paymentRef,
-          "membership"
-        );
-        if (r.data) {
-          window.location.href = r.data.url;
-        } else {
-          toast.error("Failed to get payment URL");
-        }
-      }
-      if (!res.data) {
-        throw new Error(res.message || "An unexpected error occurred.");
-      }
-      toast.success("Registration successful! Please wait for approval.");
-      navigate("/");
-    } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  const { form, isSubmitting, selectedDuration, onSubmit } =
+    useMemberRegistration();
 
   return (
     <div className="container mx-auto py-12">

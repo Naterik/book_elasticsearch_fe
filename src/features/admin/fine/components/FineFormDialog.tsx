@@ -55,7 +55,7 @@ const FineFormDialog = ({
   fine,
   onSuccess,
 }: FineFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!fine;
 
   const form = useForm<FineFormValues>({
@@ -92,7 +92,7 @@ const FineFormDialog = ({
   }, [open, fine, form]);
 
   const onSubmit = async (values: FineFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       const submitData = {
@@ -129,7 +129,7 @@ const FineFormDialog = ({
       console.error("Error submitting fine:", error);
       toast.error("Failed to submit fine");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

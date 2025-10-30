@@ -53,9 +53,7 @@ export const BookCopySearchComponent: React.FC<
 
   return (
     <div className="w-full space-y-6 p-4">
-      {/* Search and Filters Section */}
       <div className="space-y-4">
-        {/* Search Input - Search by Location/Copy Number/Title/ISBN */}
         <div>
           <label className="text-sm font-medium">Search</label>
           <Input
@@ -68,31 +66,22 @@ export const BookCopySearchComponent: React.FC<
             Example: "floor1", "BC874", "BRIDGE"
           </p>
         </div>
-
-        {/* Action Buttons */}
         <div className="flex gap-2">
           <Button onClick={resetFilters} variant="outline">
             Reset Search
           </Button>
         </div>
       </div>
-
-      {/* Results Section */}
       <div className="space-y-4">
-        {/* Result Count */}
         <div className="text-sm text-gray-600">
           Found {totalItems} book copy(ies) - Page {currentPage} of {totalPages}
         </div>
-
-        {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             <span>Loading book copies...</span>
           </div>
         )}
-
-        {/* Error State */}
         {error && !isLoading && (
           <div className="bg-red-50 p-4 rounded-md">
             <p className="text-sm text-red-700">
@@ -100,15 +89,11 @@ export const BookCopySearchComponent: React.FC<
             </p>
           </div>
         )}
-
-        {/* No Results */}
         {!isLoading && !error && dataBookCopies.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">No book copies found</p>
           </div>
         )}
-
-        {/* Book Copies List */}
         {!isLoading && !error && dataBookCopies.length > 0 && (
           <div className="space-y-3">
             {dataBookCopies.map((bookCopy) => (
@@ -119,12 +104,9 @@ export const BookCopySearchComponent: React.FC<
                   onSelectBookCopy ? "cursor-pointer" : ""
                 }`}
               >
-                {/* Book Title */}
                 <div className="font-semibold text-lg mb-2">
                   {bookCopy.books?.title || "Unknown Title"}
                 </div>
-
-                {/* Book Details Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 text-sm">
                   <div>
                     <span className="text-gray-600">Copy Number:</span>
@@ -147,8 +129,6 @@ export const BookCopySearchComponent: React.FC<
                     <span className="ml-2">#{bookCopy.bookId}</span>
                   </div>
                 </div>
-
-                {/* Status and Location */}
                 <div className="flex flex-wrap gap-3 mb-3 items-center">
                   <div>
                     <Badge
@@ -162,15 +142,11 @@ export const BookCopySearchComponent: React.FC<
                     📍 {bookCopy.location}
                   </div>
                 </div>
-
-                {/* Book Description */}
                 {bookCopy.books?.shortDesc && (
                   <p className="text-sm text-gray-600 line-clamp-2">
                     {bookCopy.books.shortDesc}
                   </p>
                 )}
-
-                {/* Held by info */}
                 {bookCopy.heldByUserId && (
                   <div className="mt-2 text-xs bg-blue-50 p-2 rounded text-blue-700">
                     Currently held by user #{bookCopy.heldByUserId}

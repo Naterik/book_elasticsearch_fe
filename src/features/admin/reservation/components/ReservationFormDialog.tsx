@@ -54,7 +54,7 @@ const ReservationFormDialog = ({
   reservation,
   onSuccess,
 }: ReservationFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
   const isEditMode = !!reservation;
 
@@ -96,7 +96,7 @@ const ReservationFormDialog = ({
   };
 
   const onSubmit = async (values: ReservationFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       let response;
@@ -133,7 +133,7 @@ const ReservationFormDialog = ({
           : "Failed to create reservation"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

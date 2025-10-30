@@ -1,8 +1,4 @@
-import { useCurrentApp } from "@/app/providers/app.context";
-import { updatePaymentMemberAPI, updatePaymentFineAPI } from "@/services/api";
-import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,66 +9,11 @@ import {
   History,
   ArrowRight,
 } from "lucide-react";
-
-type PaymentType = "membership" | "fine";
+import { usePaymentReturn } from "@/features/client/fine";
 
 const ReturnPayment = () => {
-  const [searchParams] = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(true);
-  const [paymentStatus, setPaymentStatus] = useState<
-    "PAYMENT_SUCCEED" | "PAYMENT_FAILED" | "processing"
-  >("processing");
-
-  const paymentRef = searchParams?.get("vnp_TxnRef") ?? "";
-  const responseCode = searchParams?.get("vnp_ResponseCode") ?? "";
-  const paymentType = (searchParams?.get("paymentType") ??
-    "membership") as PaymentType;
-  const { showLoader, hideLoader, setUser } = useCurrentApp();
-
-  useEffect(() => {
-    if (paymentRef) {
-      const changeStatusPayment = async () => {
-        showLoader();
-        setIsProcessing(true);
-
-        try {
-          const status =
-            responseCode === "00" ? "PAYMENT_SUCCEED" : "PAYMENT_FAILED";
-          setPaymentStatus(status);
-
-          if (paymentType === "membership") {
-            const res = await updatePaymentMemberAPI(status, paymentRef);
-            if (res.data) {
-              toast.success("Payment status updated successfully");
-              setUser(res.data);
-            } else {
-              toast.error("Failed to update payment status");
-              setPaymentStatus("PAYMENT_FAILED");
-            }
-          } else if (paymentType === "fine") {
-            const res = await updatePaymentFineAPI(status, paymentRef);
-            if (res.data) {
-              toast.success("Fine payment processed successfully");
-            } else {
-              toast.error("Failed to process fine payment");
-              setPaymentStatus("PAYMENT_FAILED");
-            }
-          }
-        } catch (error) {
-          toast.error("An error occurred while processing payment");
-          setPaymentStatus("PAYMENT_FAILED");
-        } finally {
-          hideLoader();
-          setIsProcessing(false);
-        }
-      };
-
-      changeStatusPayment();
-    } else {
-      setIsProcessing(false);
-      setPaymentStatus("PAYMENT_FAILED");
-    }
-  }, [paymentRef, responseCode, paymentType]);
+  const { isProcessing, paymentStatus, paymentRef, paymentType } =
+    usePaymentReturn();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">

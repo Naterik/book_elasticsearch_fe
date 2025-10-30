@@ -1,11 +1,10 @@
-import React from "react";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { DotLoader } from "react-spinners";
 
 export const GlobalLoader = () => {
-  const { loadingCount } = useCurrentApp();
+  const { isLoading } = useCurrentApp();
 
-  if (loadingCount === 0) {
+  if (!isLoading) {
     return null;
   }
 

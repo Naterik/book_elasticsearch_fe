@@ -45,7 +45,7 @@ const AuthorFormDialog = ({
   author,
   onSuccess,
 }: AuthorFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!author;
 
   const form = useForm<AuthorFormValues>({
@@ -73,7 +73,7 @@ const AuthorFormDialog = ({
   }, [open, author, form]);
 
   const onSubmit = async (values: AuthorFormValues) => {
-    showLoader();
+    setIsLoading(true);
     try {
       let response;
       if (isEditMode && author) {
@@ -101,7 +101,7 @@ const AuthorFormDialog = ({
         isEditMode ? "Failed to update author" : "Failed to create author"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

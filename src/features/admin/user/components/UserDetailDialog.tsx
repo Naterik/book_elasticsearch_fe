@@ -45,7 +45,7 @@ const UserDetailDialog = ({
   onOpenChange,
   userId,
 }: UserDetailDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [user, setUser] = useState<IAdminUser | null>(null);
   useEffect(() => {
     if (open && userId) {
@@ -56,7 +56,7 @@ const UserDetailDialog = ({
   }, [open, userId]);
   const fetchUserDetails = async () => {
     if (!userId) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getUserByIdAPI(userId);
 
@@ -73,7 +73,7 @@ const UserDetailDialog = ({
       toast.error("Failed to fetch user details");
       onOpenChange(false);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

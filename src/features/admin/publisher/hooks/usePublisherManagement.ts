@@ -5,7 +5,7 @@ import { getPublishersAPI, deletePublisherAPI } from "../services";
 import { getPublisherColumns } from "../publisher-columns";
 
 export const usePublisherManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [publishers, setPublishers] = useState<IPublisher[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -22,7 +22,7 @@ export const usePublisherManagement = () => {
   }, [currentPage]);
 
   const fetchPublishers = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const res = await getPublishersAPI({ page: currentPage });
       if (res.data && res.data.result) {
@@ -37,7 +37,7 @@ export const usePublisherManagement = () => {
       toast.error("Failed to fetch publishers.");
       console.error(err);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -58,7 +58,7 @@ export const usePublisherManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedPublisher) return;
-    showLoader();
+    setIsLoading(true);
     try {
       await deletePublisherAPI(selectedPublisher.id);
       toast.success("Publisher deleted successfully.");
@@ -67,7 +67,7 @@ export const usePublisherManagement = () => {
       toast.error("Failed to delete publisher.");
       console.error(error);
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setSelectedPublisher(null);
     }

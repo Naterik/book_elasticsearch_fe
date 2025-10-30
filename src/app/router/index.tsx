@@ -31,24 +31,9 @@ import LoanManagementPage from "@/features/admin/loan/pages/LoanManagementPage";
 import ReservationManagementPage from "@/features/admin/reservation/pages/ReservationManagementPage";
 import FineManagementPage from "@/features/admin/fine/pages/FineManagementPage";
 import PaymentManagementPage from "@/features/admin/payment/pages/PaymentManagementPage";
+import { ProtectedRoute, AdminRoute } from "@/app/guards";
 
 const router = createBrowserRouter([
-  {
-    path: "/403",
-    Component: ForbiddenPage,
-  },
-  {
-    path: "/404",
-    Component: NotFoundPage,
-  },
-  {
-    path: "*",
-    Component: NotFoundPage,
-  },
-  {
-    path: "/auth/callback",
-    element: <AuthCallback />,
-  },
   {
     path: "/",
     element: <ClientLayout />,
@@ -61,26 +46,31 @@ const router = createBrowserRouter([
         Component: DetailPage,
       },
       {
-        path: "member",
-        Component: MemberPage,
-      },
-      { path: "info", Component: InfoPage },
-      { path: "loan", Component: LoanPage },
-      { path: "notifications", Component: NotificationsPage },
-      {
-        path: "vnpay/return-url",
-        Component: ReturnPayment,
+        Component: ProtectedRoute,
+        children: [
+          {
+            path: "member",
+            Component: MemberPage,
+          },
+          { path: "info", Component: InfoPage },
+          { path: "loan", Component: LoanPage },
+          { path: "fine", Component: LoanPage },
+          { path: "notifications", Component: NotificationsPage },
+          {
+            path: "vnpay/return-url",
+            Component: ReturnPayment,
+          },
+        ],
       },
     ],
   },
 
-  { path: "login", Component: LoginPage },
-  { path: "register", Component: RegisterPage },
   {
     path: "/admin",
     Component: AdminLayout,
     children: [
       {
+        Component: AdminRoute,
         children: [
           { index: true, Component: Dashboard },
           { path: "users", Component: UserManagement },
@@ -123,6 +113,27 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+
+  {
+    path: "/403",
+    Component: ForbiddenPage,
+  },
+  {
+    path: "/404",
+    Component: NotFoundPage,
+  },
+
+  {
+    path: "/auth/callback",
+    element: <AuthCallback />,
+  },
+  { path: "/login", Component: LoginPage },
+  { path: "/register", Component: RegisterPage },
+
+  {
+    path: "*",
+    Component: NotFoundPage,
   },
 ]);
 export function AppRouter() {

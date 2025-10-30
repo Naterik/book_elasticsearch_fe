@@ -43,7 +43,7 @@ const PublisherFormDialog = ({
   publisher,
   onSuccess,
 }: PublisherFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!publisher;
 
   const form = useForm<PublisherFormValues>({
@@ -68,7 +68,7 @@ const PublisherFormDialog = ({
   }, [open, publisher, form]);
 
   const onSubmit = async (values: PublisherFormValues) => {
-    showLoader();
+    setIsLoading(true);
     try {
       let response;
       if (isEditMode && publisher) {
@@ -96,7 +96,7 @@ const PublisherFormDialog = ({
         isEditMode ? "Failed to update publisher" : "Failed to create publisher"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

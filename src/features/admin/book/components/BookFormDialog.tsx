@@ -52,13 +52,13 @@ const BookFormDialog = ({
   book,
   onSuccess,
 }: BookFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [authors, setAuthors] = useState<IAuthor[]>([]);
   const [publishers, setPublishers] = useState<IPublisher[]>([]);
   const [genres, setGenres] = useState<IGenre[]>([]);
   const isEditMode = !!book;
-  //error update picture to database
+
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
@@ -173,7 +173,7 @@ const BookFormDialog = ({
   };
 
   const onSubmit = async (values: BookFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -231,7 +231,7 @@ const BookFormDialog = ({
         isEditMode ? "Failed to update book" : "Failed to create book"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

@@ -5,7 +5,7 @@ import { getAuthorsAPI, deleteAuthorAPI } from "../services";
 import { getAuthorColumns } from "../author-columns";
 
 export const useAuthorManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
 
   // Data state
   const [authors, setAuthors] = useState<IAuthor[]>([]);
@@ -25,7 +25,7 @@ export const useAuthorManagement = () => {
   }, [currentPage]);
 
   const fetchAuthors = async (page: number) => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAuthorsAPI(page);
 
@@ -43,7 +43,7 @@ export const useAuthorManagement = () => {
       console.error("Error fetching authors:", error);
       toast.error("Failed to fetch authors");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -65,7 +65,7 @@ export const useAuthorManagement = () => {
   const handleConfirmDelete = async () => {
     if (!authorToDelete) return;
 
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteAuthorAPI(authorToDelete);
       if (response.error) {
@@ -80,7 +80,7 @@ export const useAuthorManagement = () => {
       console.error("Error deleting author:", error);
       toast.error("Failed to delete author");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setAuthorToDelete(null);
     }

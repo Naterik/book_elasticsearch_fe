@@ -43,7 +43,7 @@ const GenreFormDialog = ({
   genre,
   onSuccess,
 }: GenreFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!genre;
 
   const form = useForm<GenreFormValues>({
@@ -68,7 +68,7 @@ const GenreFormDialog = ({
   }, [open, genre, form]);
 
   const onSubmit = async (values: GenreFormValues) => {
-    showLoader();
+    setIsLoading(true);
     try {
       let response;
       if (isEditMode && genre) {
@@ -96,7 +96,7 @@ const GenreFormDialog = ({
         isEditMode ? "Failed to update genre" : "Failed to create genre"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

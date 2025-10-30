@@ -9,7 +9,7 @@ import { getUserColumns } from "../user-columns";
  * Handles all business logic for user management page
  */
 export const useUserManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
 
   // Data state
   const [users, setUsers] = useState<IAdminUser[]>([]);
@@ -35,7 +35,7 @@ export const useUserManagement = () => {
    * Fetch users from API
    */
   const fetchUsers = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllUsersAPI(currentPage);
 
@@ -53,7 +53,7 @@ export const useUserManagement = () => {
       console.error("Error fetching users:", error);
       toast.error("Failed to fetch users");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -95,7 +95,7 @@ export const useUserManagement = () => {
   const handleConfirmDelete = async () => {
     if (!userToDelete) return;
 
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteUserAPI(userToDelete);
 
@@ -111,7 +111,7 @@ export const useUserManagement = () => {
       console.error("Error deleting user:", error);
       toast.error("Failed to delete user");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
     }

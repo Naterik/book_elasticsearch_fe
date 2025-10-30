@@ -12,9 +12,8 @@ interface IAppContext {
   user: IUser | null;
   setIsAuthenticated: (v: boolean) => void;
   setUser: (v: IUser | null) => void;
-  loadingCount: number;
-  showLoader: () => void;
-  hideLoader: () => void;
+  isLoading: boolean;
+  setIsLoading: (v: boolean) => void;
   logout: () => void;
 }
 
@@ -25,17 +24,9 @@ type TProps = {
 };
 
 export const AppProvider = (props: TProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<IUser | null>(null);
-  const [loadingCount, setLoadingCount] = useState(0);
-
-  const showLoader = useCallback(() => {
-    setLoadingCount((prevCount) => prevCount + 1);
-  }, []);
-
-  const hideLoader = useCallback(() => {
-    setLoadingCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
 
   const logout = useCallback(() => {
     localStorage.removeItem("access_token");
@@ -57,13 +48,13 @@ export const AppProvider = (props: TProps) => {
           setUser(response.data);
           setIsAuthenticated(true);
         } else {
-          // Token is invalid or expired
           logout();
         }
       } catch (error) {
         console.error("Auth check failed:", error);
         logout();
       }
+      setIsLoading(false);
     };
 
     checkAuth();
@@ -76,9 +67,8 @@ export const AppProvider = (props: TProps) => {
         user,
         setIsAuthenticated,
         setUser,
-        loadingCount,
-        showLoader,
-        hideLoader,
+        isLoading,
+        setIsLoading,
         logout,
       }}
     >

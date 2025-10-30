@@ -5,7 +5,7 @@ import { getGenresAPI, deleteGenreAPI } from "../services";
 import { getGenreColumns } from "../genre-columns";
 
 export const useGenreManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -20,7 +20,7 @@ export const useGenreManagement = () => {
   }, [currentPage]);
 
   const fetchGenres = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const res = await getGenresAPI({ page: currentPage });
       if (res.data && res.data.result) {
@@ -35,7 +35,7 @@ export const useGenreManagement = () => {
       toast.error("Failed to fetch genres.");
       console.error(err);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +56,7 @@ export const useGenreManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedGenre) return;
-    showLoader();
+    setIsLoading(true);
     try {
       await deleteGenreAPI(selectedGenre.id);
       toast.success("Genre deleted successfully.");
@@ -65,7 +65,7 @@ export const useGenreManagement = () => {
       toast.error("Failed to delete genre.");
       console.error(error);
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setSelectedGenre(null);
     }

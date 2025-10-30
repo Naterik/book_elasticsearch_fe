@@ -58,7 +58,7 @@ const BookCopyFormDialog = ({
   bookCopy,
   onSuccess,
 }: BookCopyFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
 
   const isEditMode = !!bookCopy;
@@ -110,7 +110,7 @@ const BookCopyFormDialog = ({
   };
 
   const onSubmit = async (values: BookCopyFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       const submitData = {
@@ -147,7 +147,7 @@ const BookCopyFormDialog = ({
         isEditMode ? "Failed to update book copy" : "Failed to create book copy"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

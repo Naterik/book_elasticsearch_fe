@@ -54,7 +54,7 @@ const LoanFormDialog = ({
   loan,
   onSuccess,
 }: LoanFormDialogProps) => {
-  const { showLoader, hideLoader, user } = useCurrentApp();
+  const { setIsLoading, user } = useCurrentApp();
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const isEditMode = !!loan;
 
@@ -103,7 +103,7 @@ const LoanFormDialog = ({
   };
 
   const onSubmit = async (values: LoanFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       let response;
@@ -139,7 +139,7 @@ const LoanFormDialog = ({
         isEditMode ? "Failed to update loan" : "Failed to create loan"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

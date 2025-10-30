@@ -8,7 +8,7 @@ import {
 import { getLoanColumns } from "@/features/admin/loan/loan-columns";
 
 export const useLoanManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [loans, setLoans] = useState<ILoan[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -25,7 +25,7 @@ export const useLoanManagement = () => {
   }, [currentPage]);
 
   const fetchLoans = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllLoansAdminAPI(currentPage);
 
@@ -43,7 +43,7 @@ export const useLoanManagement = () => {
       console.error("Error fetching loans:", error);
       toast.error("Failed to fetch loans");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -64,7 +64,7 @@ export const useLoanManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!loanToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteLoanAPI(loanToDelete);
 
@@ -80,7 +80,7 @@ export const useLoanManagement = () => {
       console.error("Error deleting loan:", error);
       toast.error("Failed to delete loan");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setLoanToDelete(null);
     }

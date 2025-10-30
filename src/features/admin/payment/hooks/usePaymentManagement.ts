@@ -8,7 +8,7 @@ import {
 import { getPaymentColumns } from "@/features/admin/payment/payment-columns";
 
 export const usePaymentManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [payments, setPayments] = useState<IPayment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -23,7 +23,7 @@ export const usePaymentManagement = () => {
   }, [currentPage]);
 
   const fetchPayments = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllPaymentsAdminAPI(currentPage);
 
@@ -41,7 +41,7 @@ export const usePaymentManagement = () => {
       console.error("Error fetching payments:", error);
       toast.error("Failed to fetch payments");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -52,7 +52,7 @@ export const usePaymentManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!paymentToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deletePaymentAPI(paymentToDelete);
 
@@ -68,7 +68,7 @@ export const usePaymentManagement = () => {
       console.error("Error deleting payment:", error);
       toast.error("Failed to delete payment");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setPaymentToDelete(null);
     }

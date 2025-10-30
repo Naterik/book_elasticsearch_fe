@@ -35,18 +35,17 @@ const NAV_ITEMS = [
 ];
 
 export default function AppHeader() {
-  const { setUser, setIsAuthenticated, showLoader, hideLoader } =
-    useCurrentApp();
+  const { setUser, setIsAuthenticated, setIsLoading } = useCurrentApp();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     setUser(null);
     setIsAuthenticated(false);
-    showLoader();
+    setIsLoading(true);
     navigate("/");
     setTimeout(() => {
-      hideLoader();
+      setIsLoading(false);
     }, 1000);
   };
 

@@ -63,7 +63,7 @@ const UserFormDialog = ({
   user,
   onSuccess,
 }: UserFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const isEditMode = !!user;
 
@@ -141,7 +141,7 @@ const UserFormDialog = ({
   };
 
   const onSubmit = async (values: UserFormValues) => {
-    showLoader();
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -152,7 +152,7 @@ const UserFormDialog = ({
         formData.append("password", values.password);
       } else if (!isEditMode) {
         toast.error("Password is required for new users");
-        hideLoader();
+        setIsLoading(false);
         return;
       }
       if (values.address) {
@@ -193,7 +193,7 @@ const UserFormDialog = ({
         isEditMode ? "Failed to update user" : "Failed to create user"
       );
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
