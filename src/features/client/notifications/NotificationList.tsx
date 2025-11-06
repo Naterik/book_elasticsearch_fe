@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Loader2, MailCheck } from "lucide-react";
 import {
   getNotificationsByUserIdAPI,
-  putBulkNotificationAPI,
-  putSingleNotificationAPI,
-} from "@/services/notifications";
+  putBulkNotificationAsReadAPI,
+  putSingleNotificationAsReadAPI,
+} from "@/services/api";
 
 export default function NotificationList() {
   const { user } = useCurrentApp();
@@ -41,7 +41,7 @@ export default function NotificationList() {
   const handleMarkAsRead = async (id: number) => {
     if (!user?.id) return;
     try {
-      await putSingleNotificationAPI(user.id, id);
+      await putSingleNotificationAsReadAPI(user.id, id);
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, isRead: true } : notif
@@ -58,7 +58,7 @@ export default function NotificationList() {
 
     setIsMarkingAll(true);
     try {
-      await putBulkNotificationAPI(user.id);
+      await putBulkNotificationAsReadAPI(user.id);
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, isRead: true }))
       );

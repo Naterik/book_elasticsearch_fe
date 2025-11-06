@@ -93,7 +93,6 @@ const RegisterPage = () => {
                 name="fullName"
                 value={formValues.fullName}
                 onChange={handleInputChange}
-                required
               />
             </div>
 

@@ -4,9 +4,10 @@
 
 export interface INotification {
   id: number;
-  sentAt: string;
-  type: string;
+  title: string;
   content: string;
-  isRead: boolean;
-  userId: number;
+  type: string;
+  priority: "LOW" | "NORMAL" | "HIGH";
+  sentAt: string;
+  isRead?: boolean;
 }

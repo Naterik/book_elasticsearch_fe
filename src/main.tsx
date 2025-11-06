@@ -4,6 +4,7 @@ import "./index.css";
 import { AppProvider } from "@/app/providers/app.context";
 import { Toaster } from "sonner";
 import { AppRouter } from "./app/router";
+import { NotificationProvider } from "@/app/providers/notification.context";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -16,7 +17,9 @@ createRoot(document.getElementById("root")!).render(
       theme="system"
     />
     <AppProvider>
-      <AppRouter />
+      <NotificationProvider>
+        <AppRouter />
+      </NotificationProvider>
     </AppProvider>
   </StrictMode>
 );

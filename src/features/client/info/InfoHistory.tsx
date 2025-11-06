@@ -19,7 +19,7 @@ import {
   getReturnedLoanByUserAPI,
   getReservationByUserAPI,
   getFineByUserIdAPI,
-} from "@/services/loans";
+} from "@/services/api";
 import { useCurrentApp } from "@/app/providers/app.context";
 
 type Activity = {

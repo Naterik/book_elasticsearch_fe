@@ -9,17 +9,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-type NotificationType =
-  | "MEMBERSHIP_ACTIVATED"
-  | "MEMBERSHIP_INACTIVE"
-  | "LOAN_CREATED"
-  | "LOAN_RENEWED"
-  | "RESERVATION_CREATED"
-  | "SUCCESS_RETURNED"
-  | "FINE_CREATED"
-  | "PAYMENT_RECEIVED";
+// type NotificationType =
+//   | "MEMBERSHIP_ACTIVATED"
+//   | "MEMBERSHIP_INACTIVE"
+//   | "LOAN_CREATED"
+//   | "LOAN_RENEWED"
+//   | "RESERVATION_CREATED"
+//   | "SUCCESS_RETURNED"
+//   | "FINE_CREATED"
+//   | "PAYMENT_RECEIVED";
 
-export const getNotificationIcon = (type: NotificationType): LucideIcon => {
+export const getNotificationIcon = (type: string): LucideIcon => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
       return CheckCircle2;
@@ -42,7 +42,7 @@ export const getNotificationIcon = (type: NotificationType): LucideIcon => {
   }
 };
 
-export const getNotificationIconColor = (type: NotificationType): string => {
+export const getNotificationIconColor = (type: string): string => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
       return "text-green-600";
@@ -65,7 +65,7 @@ export const getNotificationIconColor = (type: NotificationType): string => {
   }
 };
 
-export const getNotificationColor = (type: NotificationType): string => {
+export const getNotificationColor = (type: string): string => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
       return "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800";
@@ -88,7 +88,7 @@ export const getNotificationColor = (type: NotificationType): string => {
   }
 };
 
-export const getNotificationTitle = (type: NotificationType): string => {
+export const getNotificationTitle = (type: string): string => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
       return "Membership Activated";
@@ -131,7 +131,7 @@ export const formatTimeAgo = (date: string): string => {
   return past.toLocaleDateString();
 };
 
-export const getNotificationPath = (type: NotificationType): string | null => {
+export const getNotificationPath = (type: string): string | null => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
     case "MEMBERSHIP_INACTIVE":
@@ -143,7 +143,7 @@ export const getNotificationPath = (type: NotificationType): string | null => {
     case "PAYMENT_RECEIVED":
       return "/fine";
     case "RESERVATION_CREATED":
-      return "/book";
+      return "/loan";
     case "SUCCESS_RETURNED":
       return "/loan";
     default:

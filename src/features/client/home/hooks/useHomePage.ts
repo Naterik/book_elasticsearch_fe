@@ -16,7 +16,7 @@ export const useHomePage = () => {
   const [newArrivals, setNewArrivals] = useState<IBook[] | undefined>([]);
   const [mostBorrowedBooks, setMostBorrowedBooks] = useState<IBook[]>([]);
   const [recommendedBooks, setRecommendedBooks] = useState<IBook[]>([]);
-  const checkCard = user?.status === "ACTIVE";
+  const checkCard = user?.status !== "ACTIVE" && isAuthenticated === true;
 
   useEffect(() => {
     fetchHomePageData();

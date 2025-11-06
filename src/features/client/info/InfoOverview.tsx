@@ -11,14 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, BookOpen, Bell as BellIcon } from "lucide-react";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { getLoanByUserIdAPI, getFineByUserIdAPI } from "@/services/loans";
-import { getNotificationsByUserIdAPI } from "@/services/notifications";
+import {
+  getLoanByUserIdAPI,
+  getFineByUserIdAPI,
+  getNotificationsByUserIdAPI,
+} from "@/services/api";
 import {
   getNotificationIcon,
   getNotificationIconColor,
   getNotificationTitle,
   formatNotificationContent,
-} from "@/features/client/notifications/notificationUtils";
+} from "@/helper/notificationUtils";
 
 export default function InfoOverview() {
   const { user } = useCurrentApp();

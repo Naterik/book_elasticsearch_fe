@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
 import { getStatusBadge } from "@/components/Statusbook";
 import { LoanActionDialogs } from "./LoanDialog";
-import { getOnLoanByIdAPI } from "@/services/loans";
+import { getOnLoanByIdAPI } from "@/services/api";
 
 interface LoanItemProps {
   loan: ILoan;

@@ -9,7 +9,7 @@ import {
   getReservationByUserAPI,
   getReturnedLoanByUserAPI,
   putCancelReservationAPI,
-} from "@/services/loans";
+} from "@/services/api";
 
 export const useLoanPage = () => {
   const { user, setIsLoading } = useCurrentApp();

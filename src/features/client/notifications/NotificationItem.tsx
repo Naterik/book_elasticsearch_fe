@@ -9,7 +9,7 @@ import {
   formatNotificationContent,
   formatTimeAgo,
   getNotificationPath,
-} from "./notificationUtils";
+} from "@/helper/notificationUtils";
 
 interface NotificationItemProps {
   notification: INotification;
@@ -25,10 +25,10 @@ export default function NotificationItem({
   onClick,
 }: NotificationItemProps) {
   const navigate = useNavigate();
-  const Icon = getNotificationIcon(notification.type as any);
-  const iconColor = getNotificationIconColor(notification.type as any);
-  const bgColor = getNotificationColor(notification.type as any);
-  const title = getNotificationTitle(notification.type as any);
+  const Icon = getNotificationIcon(notification.type);
+  const iconColor = getNotificationIconColor(notification.type);
+  const bgColor = getNotificationColor(notification.type);
+  const title = getNotificationTitle(notification.type);
   const content = formatNotificationContent(notification.content);
   const timeAgo = formatTimeAgo(notification.sentAt);
 
@@ -38,7 +38,7 @@ export default function NotificationItem({
       onMarkAsRead(notification.id);
     }
 
-    const path = getNotificationPath(notification.type as any);
+    const path = getNotificationPath(notification.type);
     if (path) {
       navigate(path);
     }
@@ -59,12 +59,10 @@ export default function NotificationItem({
       }}
     >
       <div className="flex gap-3">
-        {/* Icon */}
         <div className="flex-shrink-0 mt-1">
           <Icon className={`h-5 w-5 ${iconColor}`} />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -75,7 +73,6 @@ export default function NotificationItem({
               <p className="text-xs text-muted-foreground mt-2">{timeAgo}</p>
             </div>
 
-            {/* Actions */}
             <div className="flex-shrink-0 flex gap-1">
               {!notification.isRead && onMarkAsRead && (
                 <Button

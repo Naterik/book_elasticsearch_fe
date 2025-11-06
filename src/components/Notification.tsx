@@ -1,17 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { CheckCheck, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { useCurrentApp } from "@/app/providers/app.context";
 import { toast } from "sonner";
-import {
-  getNotificationsByUserIdAPI,
-  putBulkNotificationAPI,
-  putSingleNotificationAPI,
-} from "@/services/notifications";
+import { useNotificationRealtime } from "@/features/client/notification/hooks/useNotificationRealtime";
 import {
   getNotificationIcon,
   getNotificationIconColor,
@@ -19,59 +14,23 @@ import {
   formatNotificationContent,
   formatTimeAgo,
   getNotificationPath,
-} from "@/features/client/notifications/notificationUtils";
+} from "@/helper/notificationUtils";
 
 export default function Notifications() {
-  const { user } = useCurrentApp();
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<INotification[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { notifications, markAsRead, markAllAsRead } =
+    useNotificationRealtime();
   const [isMarkingAll, setIsMarkingAll] = useState(false);
-
-  const fetchNotifications = useCallback(async () => {
-    if (!user?.id) return;
-
-    try {
-      const res: any = await getNotificationsByUserIdAPI(user.id);
-      if (res?.data && Array.isArray(res.data)) {
-        setNotifications(res.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    }
-  }, [user?.id]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    fetchNotifications().finally(() => setIsLoading(false));
-  }, [fetchNotifications]);
 
   const handleMarkAsRead = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user?.id) return;
-
-    try {
-      await putSingleNotificationAPI(user.id, id);
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
-    } catch (error) {
-      console.error("Failed to mark notification as read:", error);
-      toast.error("Failed to mark as read");
-    }
+    markAsRead(id);
   };
 
   const handleMarkAllAsRead = async () => {
-    if (!user?.id || isMarkingAll) return;
-
     setIsMarkingAll(true);
     try {
-      await putBulkNotificationAPI(user.id);
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
+      markAllAsRead();
       toast.success("All notifications marked as read");
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
@@ -99,12 +58,6 @@ export default function Notifications() {
       <div className="flex items-center justify-between px-4 py-3">
         <div className="font-medium text-sm">
           Notifications
-          {notifications.length > 0 && (
-            <span className="text-muted-foreground">
-              {" "}
-              ({notifications.length})
-            </span>
-          )}
           {unreadCount > 0 && (
             <Badge variant="destructive" className="ml-2">
               {unreadCount}
@@ -137,12 +90,7 @@ export default function Notifications() {
       </div>
       <Separator />
 
-      {isLoading ? (
-        <div className="p-4 text-center">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground mt-2">Loading...</p>
-        </div>
-      ) : notifications.length === 0 ? (
+      {notifications.length === 0 ? (
         <div className="p-4 text-sm text-muted-foreground text-center">
           No notifications
         </div>

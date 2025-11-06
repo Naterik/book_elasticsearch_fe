@@ -39,6 +39,7 @@ export const AppProvider = (props: TProps) => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         setIsAuthenticated(false);
+        setIsLoading(false);
         return;
       }
 
@@ -58,7 +59,7 @@ export const AppProvider = (props: TProps) => {
     };
 
     checkAuth();
-  }, [logout]);
+  }, []); // ← Empty dependency array: chỉ chạy 1 lần khi mount
 
   return (
     <CurrentAppContext.Provider
