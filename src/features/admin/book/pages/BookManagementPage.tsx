@@ -13,6 +13,7 @@ import { PlusIcon } from "lucide-react";
 import BookFormDialog from "@/features/admin/book/components/BookFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
 import BookDetailDialog from "@/features/admin/book/components/BookDetailDialog";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useBookManagement } from "@/features/admin/book/hooks/useBookManagement";
 
 const BookManagement = () => {
@@ -23,6 +24,7 @@ const BookManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -55,22 +57,26 @@ const BookManagement = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={books}
-        searchKey="title"
-        searchPlaceholder="Search by book title..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No books found. Add your first book to get started."
-      />
+      {isInitialLoading ? (
+        <TableSkeletonLoader rows={12} columns={6} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={books}
+          searchKey="title"
+          searchPlaceholder="Search by book title..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No books found. Add your first book to get started."
+        />
+      )}
 
       <BookFormDialog
         open={isFormDialogOpen}

@@ -12,6 +12,7 @@ import {
 import { PlusIcon } from "lucide-react";
 import ReservationFormDialog from "@/features/admin/reservation/components/ReservationFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useReservationManagement } from "@/features/admin/reservation/hooks/useReservationManagement";
 
 const ReservationManagementPage = () => {
@@ -22,6 +23,7 @@ const ReservationManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -51,22 +53,26 @@ const ReservationManagementPage = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={reservations}
-        searchKey="user.fullName"
-        searchPlaceholder="Search by member name..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No reservations found. Create your first reservation to get started."
-      />
+      {isInitialLoading ? (
+        <TableSkeletonLoader rows={12} columns={5} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={reservations}
+          searchKey="user.fullName"
+          searchPlaceholder="Search by member name..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No reservations found. Create your first reservation to get started."
+        />
+      )}
 
       <ReservationFormDialog
         open={isFormDialogOpen}

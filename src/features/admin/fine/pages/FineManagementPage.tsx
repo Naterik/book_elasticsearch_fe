@@ -12,6 +12,7 @@ import {
 import { PlusIcon } from "lucide-react";
 import FineFormDialog from "@/features/admin/fine/components/FineFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useFineManagement } from "@/features/admin/fine/hooks/useFineManagement";
 
 const FineManagementPage = () => {
@@ -22,6 +23,7 @@ const FineManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -51,22 +53,26 @@ const FineManagementPage = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={fines}
-        searchKey="reason"
-        searchPlaceholder="Search by reason..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No fines found. Create your first fine to get started."
-      />
+      {isInitialLoading ? (
+        <TableSkeletonLoader rows={12} columns={5} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={fines}
+          searchKey="reason"
+          searchPlaceholder="Search by reason..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No fines found. Create your first fine to get started."
+        />
+      )}
 
       <FineFormDialog
         open={isFormDialogOpen}

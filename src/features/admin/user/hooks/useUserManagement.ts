@@ -1,15 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import { getAllUsersAPI, deleteUserAPI } from "@/features/admin/user/services";
 import { getUserColumns } from "../user-columns";
 
-/**
- * Custom hook for managing user CRUD operations
- * Handles all business logic for user management page
- */
 export const useUserManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
 
   // Data state
   const [users, setUsers] = useState<IAdminUser[]>([]);
@@ -35,7 +33,6 @@ export const useUserManagement = () => {
    * Fetch users from API
    */
   const fetchUsers = async () => {
-    setIsLoading(true);
     try {
       const response = await getAllUsersAPI(currentPage);
 
@@ -54,6 +51,7 @@ export const useUserManagement = () => {
       toast.error("Failed to fetch users");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -179,5 +177,6 @@ export const useUserManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

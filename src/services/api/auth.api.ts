@@ -40,9 +40,5 @@ export const loginAPI = (username: string, password: string) => {
 
 export const fetchAPI = () => {
   const urlBackend = "/api/v1/account";
-  return axios.get<IBackendRes<IUser>>(urlBackend, {
-    headers: {
-      delay: 3000,
-    },
-  });
+  return axios.get<IBackendRes<IUser>>(urlBackend);
 };

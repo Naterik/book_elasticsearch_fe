@@ -1,10 +1,11 @@
-import { useCurrentApp } from "@/app/providers/app.context";
 import { DotLoader } from "react-spinners";
 
-export const GlobalLoader = () => {
-  const { isLoading } = useCurrentApp();
+interface ILoaderProps {
+  isVisible: boolean;
+}
 
-  if (!isLoading) {
+export const GlobalLoader = ({ isVisible }: ILoaderProps) => {
+  if (!isVisible) {
     return null;
   }
 

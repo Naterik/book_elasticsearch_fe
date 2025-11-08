@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllBooksAdminAPI,
   deleteBookAPI,
@@ -8,6 +9,7 @@ import {
 import { getBookColumns } from "@/features/admin/book/book-columns";
 export const useBookManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [books, setBooks] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -45,6 +47,7 @@ export const useBookManagement = () => {
       toast.error("Failed to fetch books");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -139,5 +142,6 @@ export const useBookManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

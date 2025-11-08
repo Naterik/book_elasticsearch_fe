@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
@@ -10,6 +11,7 @@ import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns
 
 export const useBookCopyManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -52,6 +54,7 @@ export const useBookCopyManagement = () => {
       toast.error("Failed to fetch book copies");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
   const fetchBookCopiesWithSearch = async () => {
@@ -173,6 +176,7 @@ export const useBookCopyManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,

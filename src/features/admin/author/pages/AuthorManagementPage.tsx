@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/layout/admin/data-table";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useAuthorManagement } from "../hooks/useAuthorManagement";
 import AuthorFormDialog from "../components/AuthorFormDialog";
 
@@ -32,6 +33,7 @@ const AuthorManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   } = useAuthorManagement();
 
   return (
@@ -49,22 +51,26 @@ const AuthorManagementPage = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={authors}
-        searchKey="name"
-        searchPlaceholder="Search by author name..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No authors found. Add your first author to get started."
-      />
+      {isInitialLoading ? (
+        <TableSkeletonLoader rows={12} columns={4} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={authors}
+          searchKey="name"
+          searchPlaceholder="Search by author name..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No authors found. Add your first author to get started."
+        />
+      )}
 
       <AuthorFormDialog
         open={isFormDialogOpen}

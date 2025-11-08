@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllLoansAdminAPI,
   deleteLoanAPI,
@@ -9,6 +10,7 @@ import { getLoanColumns } from "@/features/admin/loan/loan-columns";
 
 export const useLoanManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [loans, setLoans] = useState<ILoan[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -44,6 +46,7 @@ export const useLoanManagement = () => {
       toast.error("Failed to fetch loans");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -129,5 +132,6 @@ export const useLoanManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

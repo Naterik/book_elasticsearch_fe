@@ -13,11 +13,8 @@ import { Search, UserCircle } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import { features, stats } from "@/features/client/seed";
-import { useCurrentApp } from "@/app/providers/app.context";
 
 const AboutPage = () => {
-  const { setIsLoading } = useCurrentApp();
-
   return (
     <div className="container max-w-6xl mx-auto px-4 py-16">
       <div className="relative text-center mb-24">

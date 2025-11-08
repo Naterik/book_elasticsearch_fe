@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllPaymentsAdminAPI,
   deletePaymentAPI,
@@ -9,6 +10,7 @@ import { getPaymentColumns } from "@/features/admin/payment/payment-columns";
 
 export const usePaymentManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [payments, setPayments] = useState<IPayment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -42,6 +44,7 @@ export const usePaymentManagement = () => {
       toast.error("Failed to fetch payments");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -94,6 +97,7 @@ export const usePaymentManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,

@@ -19,14 +19,15 @@ export interface IBook {
 }
 
 export interface IAuthor {
-  id: number;
+  id: string;
   name: string;
   bio: string | null;
 }
 
 export interface IGenre {
-  id: number;
+  id: string;
   name: string;
+  description?: string;
 }
 
 export interface IGenreBook {
@@ -34,8 +35,9 @@ export interface IGenreBook {
 }
 
 export interface IPublisher {
-  id: number;
+  id: string;
   name: string;
+  description?: string;
 }
 
 export interface ILanguages {

@@ -14,13 +14,13 @@ export const useGenreManagement = () => {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<IGenre | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchGenres();
   }, [currentPage]);
 
   const fetchGenres = async () => {
-    setIsLoading(true);
     try {
       const res = await getGenresAPI({ page: currentPage });
       if (res.data && res.data.result) {
@@ -35,7 +35,7 @@ export const useGenreManagement = () => {
       toast.error("Failed to fetch genres.");
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -58,7 +58,7 @@ export const useGenreManagement = () => {
     if (!selectedGenre) return;
     setIsLoading(true);
     try {
-      await deleteGenreAPI(selectedGenre.id);
+      await deleteGenreAPI(+selectedGenre.id);
       toast.success("Genre deleted successfully.");
       fetchGenres();
     } catch (error) {
@@ -109,5 +109,6 @@ export const useGenreManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

@@ -12,6 +12,7 @@ import {
 import { PlusIcon } from "lucide-react";
 import LoanFormDialog from "@/features/admin/loan/components/LoanFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useLoanManagement } from "@/features/admin/loan/hooks/useLoanManagement";
 
 const LoanManagementPage = () => {
@@ -22,6 +23,7 @@ const LoanManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -51,22 +53,26 @@ const LoanManagementPage = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={loans}
-        searchKey="user.fullName"
-        searchPlaceholder="Search by user name..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No loans found. Create your first loan to get started."
-      />
+      {isInitialLoading ? (
+        <TableSkeletonLoader rows={12} columns={5} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={loans}
+          searchKey="user.fullName"
+          searchPlaceholder="Search by user name..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No loans found. Create your first loan to get started."
+        />
+      )}
 
       <LoanFormDialog
         open={isFormDialogOpen}

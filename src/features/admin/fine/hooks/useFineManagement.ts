@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllFinesAdminAPI,
   deleteFineAPI,
@@ -9,6 +10,7 @@ import { getFineColumns } from "@/features/admin/fine/fine-columns";
 
 export const useFineManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [fines, setFines] = useState<IFine[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -44,6 +46,7 @@ export const useFineManagement = () => {
       toast.error("Failed to fetch fines");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -129,5 +132,6 @@ export const useFineManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllReservationsAdminAPI,
   deleteReservationAPI,
@@ -10,6 +11,7 @@ import { getReservationColumns } from "@/features/admin/reservation/reservation-
 
 export const useReservationManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [reservations, setReservations] = useState<IReservation[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -48,6 +50,7 @@ export const useReservationManagement = () => {
       toast.error("Failed to fetch reservations");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -166,5 +169,6 @@ export const useReservationManagement = () => {
     handleStatusChange,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

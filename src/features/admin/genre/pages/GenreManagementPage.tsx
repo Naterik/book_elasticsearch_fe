@@ -13,6 +13,7 @@ import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/layout/admin/data-table";
 import { useGenreManagement } from "../hooks/useGenreManagement";
 import GenreFormDialog from "../components/GenreFormDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GenreManagementPage = () => {
   const {
@@ -32,6 +33,7 @@ const GenreManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   } = useGenreManagement();
 
   return (
@@ -49,22 +51,30 @@ const GenreManagementPage = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={genres}
-        searchKey="name"
-        searchPlaceholder="Search by genre name..."
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        showColumnToggle={true}
-        showPagination={true}
-        showSearch={true}
-        emptyMessage="No genres found. Add your first genre to get started."
-      />
+      {isInitialLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={genres}
+          searchKey="name"
+          searchPlaceholder="Search by genre name..."
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          showColumnToggle={true}
+          showPagination={true}
+          showSearch={true}
+          emptyMessage="No genres found. Add your first genre to get started."
+        />
+      )}
 
       <GenreFormDialog
         open={isFormDialogOpen}

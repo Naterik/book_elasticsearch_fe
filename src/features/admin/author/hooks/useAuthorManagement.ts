@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import { getAuthorsAPI, deleteAuthorAPI } from "../services";
 import { getAuthorColumns } from "../author-columns";
 
 export const useAuthorManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
 
   // Data state
   const [authors, setAuthors] = useState<IAuthor[]>([]);
@@ -44,6 +46,7 @@ export const useAuthorManagement = () => {
       toast.error("Failed to fetch authors");
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -125,5 +128,6 @@ export const useAuthorManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };

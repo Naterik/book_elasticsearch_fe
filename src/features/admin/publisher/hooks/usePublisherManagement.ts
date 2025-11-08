@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { useTableLoadingState } from "@/hooks/use-table-loading";
 import { getPublishersAPI, deletePublisherAPI } from "../services";
 import { getPublisherColumns } from "../publisher-columns";
 
 export const usePublisherManagement = () => {
   const { setIsLoading } = useCurrentApp();
+  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
   const [publishers, setPublishers] = useState<IPublisher[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -38,6 +40,7 @@ export const usePublisherManagement = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -60,7 +63,7 @@ export const usePublisherManagement = () => {
     if (!selectedPublisher) return;
     setIsLoading(true);
     try {
-      await deletePublisherAPI(selectedPublisher.id);
+      await deletePublisherAPI(+selectedPublisher.id);
       toast.success("Publisher deleted successfully.");
       fetchPublishers();
     } catch (error) {
@@ -111,5 +114,6 @@ export const usePublisherManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isInitialLoading,
   };
 };
