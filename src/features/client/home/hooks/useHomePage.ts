@@ -72,20 +72,16 @@ export const useHomePage = () => {
     navigate("/register");
   };
 
-  const handleLearnMore = () => {
-    navigate("/member");
-  };
-
   const handleMember = () => {
-    navigate("/member");
+    navigate("/user/member");
   };
 
   const handleViewLoans = () => {
-    navigate("/loan");
+    navigate("/user/loan");
   };
 
   const handleViewReservations = () => {
-    navigate("/");
+    navigate("/user/loan");
   };
 
   return {
@@ -99,7 +95,6 @@ export const useHomePage = () => {
     handleSearch,
     handleBookClick,
     handleRegister,
-    handleLearnMore,
     handleMember,
     handleViewLoans,
     handleViewReservations,

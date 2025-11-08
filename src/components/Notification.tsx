@@ -152,7 +152,7 @@ export default function Notifications() {
 
       <Separator />
       <div className="p-2">
-        <Link to="/notifications" className="w-full block">
+        <Link to="/user/notifications" className="w-full block">
           <Button variant="outline" className="w-full text-xs">
             View all {notifications.length > 0 && `(${notifications.length})`}
           </Button>

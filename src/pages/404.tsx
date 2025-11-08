@@ -43,12 +43,12 @@ const NotFoundPage = () => {
                 transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
               }}
             >
-              <SearchX className="w-32 h-32 mx-auto text-blue-500 dark:text-blue-400 animate-bounce" />
-              <Compass className="w-12 h-12 absolute -bottom-2 -right-2 text-purple-500 dark:text-purple-400 animate-spin-slow" />
+              <SearchX className="w-20 h-20 md:w-32 md:h-32 mx-auto text-blue-500 dark:text-blue-400 animate-bounce" />
+              <Compass className="w-8 h-8 md:w-12 md:h-12 absolute -bottom-2 -right-2 text-purple-500 dark:text-purple-400 animate-spin-slow" />
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-8xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 relative">
+            <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 relative">
               404
               <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500 opacity-70 animate-glitch-1">
                 404
@@ -57,7 +57,7 @@ const NotFoundPage = () => {
                 404
               </span>
             </h1>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
               Page Not Found
             </h2>
           </div>
@@ -71,8 +71,8 @@ const NotFoundPage = () => {
             </p>
           </div>
           <div className="relative py-8">
-            <div className="flex justify-center items-center gap-8">
-              <MapPin className="w-8 h-8 text-red-500 dark:text-red-400 animate-bounce" />
+            <div className="flex justify-center items-center gap-6 md:gap-8">
+              <MapPin className="w-6 h-6 md:w-8 md:h-8 text-red-500 dark:text-red-400 animate-bounce" />
               <div className="flex space-x-2">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -85,10 +85,10 @@ const NotFoundPage = () => {
                   />
                 ))}
               </div>
-              <MapPin className="w-8 h-8 text-green-500 dark:text-green-400 animate-bounce delay-300" />
+              <MapPin className="w-6 h-6 md:w-8 md:h-8 text-green-500 dark:text-green-400 animate-bounce delay-300" />
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center ">
             <Button
               size="lg"
               onClick={handleGoBack}
@@ -107,16 +107,11 @@ const NotFoundPage = () => {
               Back to Home
             </Button>
           </div>
-          <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-              💡 Fun fact: The first 404 error was at CERN in 1992!
-            </p>
-          </div>
         </div>
       </div>
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute top-20 left-10 w-72 h-72 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse"
+          className="absolute top-20 left-10 w-40 h-40 md:w-72 md:h-72 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse"
           style={{
             transform: `translate(${mousePosition.x * 0.5}px, ${
               mousePosition.y * 0.5
@@ -124,7 +119,7 @@ const NotFoundPage = () => {
           }}
         ></div>
         <div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse"
+          className="absolute bottom-20 right-10 w-48 h-48 md:w-96 md:h-96 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse"
           style={{
             transform: `translate(${-mousePosition.x * 0.3}px, ${
               -mousePosition.y * 0.3
@@ -133,7 +128,7 @@ const NotFoundPage = () => {
           }}
         ></div>
         <div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-300/10 dark:bg-indigo-500/5 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-96 md:h-96 bg-indigo-300/10 dark:bg-indigo-500/5 rounded-full blur-3xl animate-pulse"
           style={{
             transform: `translate(calc(-50% + ${
               mousePosition.x * 0.2

@@ -5,6 +5,9 @@ import {
   CreditCard,
   BookCopy,
   Shield,
+  Library,
+  BookOpen,
+  Users,
 } from "lucide-react";
 
 export const features = [
@@ -102,5 +105,26 @@ export const stats = [
     number: "Full",
     label: "Features",
     description: "Complete library management solution",
+  },
+];
+
+export const featuresForHome = [
+  {
+    icon: Library,
+    title: "Diverse Collection",
+    description:
+      "Over 10,000 books from various genres: literature, science, economics, arts and much more.",
+  },
+  {
+    icon: BookOpen,
+    title: "Easy Borrowing",
+    description:
+      "Fast and convenient online borrowing system. Reserve books and pick them up the same day.",
+  },
+  {
+    icon: Users,
+    title: "Reader Community",
+    description:
+      "Connect with thousands of other readers, share reviews and discover great books.",
   },
 ];

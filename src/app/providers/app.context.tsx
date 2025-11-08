@@ -59,7 +59,7 @@ export const AppProvider = (props: TProps) => {
     };
 
     checkAuth();
-  }, []); // ← Empty dependency array: chỉ chạy 1 lần khi mount
+  }, []);
 
   return (
     <CurrentAppContext.Provider

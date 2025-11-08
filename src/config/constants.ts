@@ -73,3 +73,6 @@ export const STORAGE_KEYS = {
   THEME: "theme",
   LANGUAGE: "language",
 } as const;
+
+export const placeholderImage =
+  "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop";

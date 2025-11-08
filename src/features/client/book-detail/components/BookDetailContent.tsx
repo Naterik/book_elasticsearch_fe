@@ -114,14 +114,14 @@ const BookDetailContent = ({
             </h1>
             <p className="text-lg text-muted-foreground">
               by
-              <span className="font-semibold text-foreground">
+              <span className="font-semibold text-foreground px-2">
                 {dataDetailBook?.authors?.name}
               </span>
             </p>
             {dataDetailBook?.genres && dataDetailBook.genres.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-2">
                 {dataDetailBook.genres.map((g, idx) => (
-                  <Badge key={idx} variant="secondary">
+                  <Badge key={idx} variant="default">
                     {g.genres.name}
                   </Badge>
                 ))}

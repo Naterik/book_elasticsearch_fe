@@ -9,16 +9,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-// type NotificationType =
-//   | "MEMBERSHIP_ACTIVATED"
-//   | "MEMBERSHIP_INACTIVE"
-//   | "LOAN_CREATED"
-//   | "LOAN_RENEWED"
-//   | "RESERVATION_CREATED"
-//   | "SUCCESS_RETURNED"
-//   | "FINE_CREATED"
-//   | "PAYMENT_RECEIVED";
-
 export const getNotificationIcon = (type: string): LucideIcon => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":

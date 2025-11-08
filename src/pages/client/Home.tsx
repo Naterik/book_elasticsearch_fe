@@ -21,7 +21,6 @@ const HomePage: React.FC = () => {
     handleSearch,
     handleBookClick,
     handleRegister,
-    handleLearnMore,
     handleMember,
     handleViewLoans,
     handleViewReservations,
@@ -77,12 +76,7 @@ const HomePage: React.FC = () => {
         )}
       </div>
 
-      {!isAuthenticated && (
-        <MembershipCTA
-          onRegister={handleRegister}
-          onLearnMore={handleLearnMore}
-        />
-      )}
+      {!isAuthenticated && <MembershipCTA onRegister={handleRegister} />}
     </div>
   );
 };

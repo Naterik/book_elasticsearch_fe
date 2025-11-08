@@ -1,8 +1,3 @@
-/**
- * User Related Models
- */
-
-// Base User Properties
 export interface IUserBase {
   id: number;
   username: string;
@@ -25,14 +20,12 @@ export interface IUser {
   cardNumber: string | null;
 }
 
-// User Info (detailed)
 export interface IUserInfo extends IUserBase {
   cardNumber: string | null;
   membershipStart: string | null;
   membershipEnd: string | null;
 }
 
-// Admin User View
 export interface IAdminUser extends IUserBase {
   fullName: string;
   type: string;
@@ -45,8 +38,6 @@ export interface IAdminUser extends IUserBase {
     name: string;
   };
 }
-
-// Admin User Detail
 export interface IAdminUserDetail extends IAdminUser {
   createdAt?: string;
   updatedAt?: string;

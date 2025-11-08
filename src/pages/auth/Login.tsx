@@ -1,6 +1,7 @@
 // src/pages/LoginPage.tsx
 
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { loginAPI, loginWithGoogleURL } from "@/services/api";
@@ -13,17 +14,19 @@ import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { setUser, setIsAuthenticated } = useCurrentApp();
 
-  const onFinish = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onFinish = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmit(true);
-    const res = await loginAPI(username, password);
+    const res = await loginAPI(
+      usernameRef.current?.value || "",
+      passwordRef.current?.value || ""
+    );
     setIsSubmit(false);
-
     if (res.data) {
       setUser(res.data.user);
       setIsAuthenticated(true);
@@ -33,7 +36,7 @@ const LoginPage = () => {
     } else {
       toast.error("Have error", {
         description: res.message,
-        duration: 1000,
+        duration: 2000,
       });
     }
   };
@@ -54,9 +57,7 @@ const LoginPage = () => {
               <Input
                 placeholder="Username"
                 className="pl-9"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                ref={usernameRef}
               />
             </div>
           </div>
@@ -64,8 +65,7 @@ const LoginPage = () => {
             <div className="relative">
               <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                ref={passwordRef}
                 type="password"
                 placeholder="Password"
                 className="pl-9"

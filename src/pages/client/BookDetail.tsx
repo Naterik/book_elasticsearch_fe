@@ -3,8 +3,11 @@ import {
   BookDetailInfo,
   useBookDetail,
 } from "@/features/client/book-detail";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const DetailPage = () => {
+  useScrollToTop();
+
   const {
     dataDetailBook,
     borrowDuration,
@@ -14,7 +17,7 @@ const DetailPage = () => {
   } = useBookDetail();
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto  py-8">
       <BookDetailContent
         borrowDuration={borrowDuration}
         setBorrowDuration={setBorrowDuration}

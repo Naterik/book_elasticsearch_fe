@@ -114,7 +114,7 @@ export default function InfoOverview() {
             </div>
           )}
 
-          <Link to="/loan" className="block mt-4">
+          <Link to="/user/loan" className="block mt-4">
             <Button
               variant="outline"
               className="w-full justify-between"
@@ -201,12 +201,12 @@ export default function InfoOverview() {
           )}
 
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Link to="/loan" className="block">
+            <Link to="/user/loan" className="block">
               <Button variant="outline" className="w-full" size="sm">
                 View loans
               </Button>
             </Link>
-            <Link to="/notifications" className="block">
+            <Link to="/user/notifications" className="block">
               <Button variant="outline" className="w-full" size="sm">
                 View alerts
               </Button>

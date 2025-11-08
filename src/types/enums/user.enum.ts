@@ -14,10 +14,3 @@ export const UserAccountType = {
 
 export type UserAccountType =
   (typeof UserAccountType)[keyof typeof UserAccountType];
-
-export const UserRole = {
-  USER: "USER",
-  ADMIN: "ADMIN",
-} as const;
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];

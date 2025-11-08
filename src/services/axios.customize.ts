@@ -14,7 +14,12 @@ const createInstanceAxios = (baseURL: string) => {
       const auth = token ? `Bearer ${token}` : "";
       config.headers["Authorization"] = auth;
 
-      return config;
+      // Add 2 second delay before sending request (for loader display)
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(config);
+        }, 1000);
+      });
     },
     function (error) {
       // Do something with request error

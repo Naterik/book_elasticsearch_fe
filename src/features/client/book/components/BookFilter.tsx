@@ -15,6 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/helper";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   genresAll: IGenre[];
@@ -35,6 +36,7 @@ type Props = {
   onApply: () => void;
   onReset: () => void;
   sticky?: boolean;
+  isCompact?: boolean;
 };
 
 export default function BookFilter({
@@ -53,7 +55,10 @@ export default function BookFilter({
   onApply,
   onReset,
   sticky = true,
+  isCompact = false,
 }: Props) {
+  const isMobile = useIsMobile();
+
   const updatePriceMin = (v: number) =>
     onPriceChange([
       Math.min(Math.max(v, priceBounds[0]), priceRange[1]),
@@ -88,41 +93,67 @@ export default function BookFilter({
 
   return (
     <Card
-      className={`w-full max-w-[360px] shrink-0 border shadow-sm ${
-        sticky ? "sticky top-24" : ""
-      }`}
+      className={`w-full border shadow-sm ${
+        isCompact ? "border-0 shadow-none" : ""
+      } ${sticky && !isMobile ? "lg:sticky lg:top-24" : ""}`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={`${isCompact ? "pb-2" : "pb-2 sm:pb-3"}`}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Filters</CardTitle>
+            <Filter
+              className={`text-muted-foreground ${
+                isCompact ? "h-3.5 w-3.5" : "h-4 w-4 sm:h-5 sm:w-5"
+              }`}
+            />
+            <CardTitle
+              className={isCompact ? "text-sm" : "text-base sm:text-lg"}
+            >
+              Filters
+            </CardTitle>
           </div>
           {hasActiveFilters && (
             <Badge variant="secondary" className="text-xs">
-              Active
+              {[genresSelected.length, selectedLanguage ? 1 : 0].reduce(
+                (a, b) => a + b,
+                0
+              )}{" "}
+              active
             </Badge>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent
+        className={`${isCompact ? "space-y-2" : "space-y-3 sm:space-y-4"}`}
+      >
         {/* Genres Section */}
-        <section className="space-y-2">
+        <section className={isCompact ? "space-y-1" : "space-y-2"}>
           <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+            <BookOpen
+              className={`text-muted-foreground ${
+                isCompact ? "h-3.5 w-3.5" : "h-4 w-4"
+              }`}
+            />
+            <h3
+              className={`font-semibold uppercase text-muted-foreground ${
+                isCompact ? "text-xs" : "text-xs"
+              }`}
+            >
               Genres
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div
+            className={`grid grid-cols-2 ${isCompact ? "gap-1.5" : "gap-2"}`}
+          >
             {genresAll.map((g) => {
               const checked = genresSelected.includes(g.name);
               const id = `genre-${g.id}`;
               return (
                 <label
                   key={g.id}
-                  className="flex items-center gap-2 cursor-pointer p-1.5 rounded-md hover:bg-slate-100 transition-colors"
+                  className={`flex items-center gap-2 cursor-pointer rounded-md hover:bg-slate-100 transition-colors ${
+                    isCompact ? "p-1" : "p-1.5"
+                  }`}
                   htmlFor={id}
                 >
                   <Checkbox
@@ -133,7 +164,9 @@ export default function BookFilter({
                   />
                   <Label
                     htmlFor={id}
-                    className="text-xs cursor-pointer font-medium leading-none"
+                    className={`cursor-pointer font-medium leading-none ${
+                      isCompact ? "text-xs" : "text-xs"
+                    }`}
                   >
                     {g.name}
                   </Label>
@@ -311,21 +344,33 @@ export default function BookFilter({
         <Separator />
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div
+          className={`grid grid-cols-2 gap-2 sm:gap-3 ${
+            isCompact ? "pt-1" : "pt-2"
+          }`}
+        >
           <Button
             onClick={onApply}
-            className="h-8 bg-blue-600 hover:bg-blue-700 text-sm"
+            className={`bg-blue-600 hover:bg-blue-700 font-medium ${
+              isCompact ? "h-7 text-xs" : "h-8 sm:h-9 text-xs sm:text-sm"
+            }`}
             size="sm"
           >
             Apply
           </Button>
           <Button
             variant="outline"
-            className="h-8 text-sm"
+            className={`${
+              isCompact ? "h-7 text-xs" : "h-8 sm:h-9 text-xs sm:text-sm"
+            }`}
             onClick={onReset}
             size="sm"
           >
-            <RotateCcw className="h-3 w-3 mr-1.5" />
+            <RotateCcw
+              className={`${
+                isCompact ? "h-3 w-3" : "h-3 w-3 sm:h-4 sm:w-4"
+              } mr-1`}
+            />
             Reset
           </Button>
         </div>

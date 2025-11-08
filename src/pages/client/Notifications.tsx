@@ -1,4 +1,4 @@
-import { NotificationList } from "@/features/client/notifications";
+import { NotificationList } from "@/features/client/notification";
 
 export default function NotificationsPage() {
   return (

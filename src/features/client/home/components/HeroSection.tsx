@@ -28,7 +28,7 @@ const HeroSection = ({ isHaveCard, onSearch, onMember }: Props) => {
 
         <SearchBar onSearch={onSearch} />
 
-        {!isHaveCard && (
+        {isHaveCard && (
           <Button
             variant="outline"
             size="lg"

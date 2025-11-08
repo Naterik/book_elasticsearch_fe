@@ -8,6 +8,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { List, LayoutGrid } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
@@ -32,9 +33,52 @@ export default function BookToolbar({
   countFilter,
   total,
 }: Props) {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="grid grid-cols-2 items-center mb-4">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
+      {/* Top Row - Results */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          {countFilter > 0 && (
+            <>
+              <Badge variant="default" className="text-xs sm:text-sm">
+                {total}
+              </Badge>
+              <span className="text-xs sm:text-sm text-muted-foreground">
+                results found
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Sort Dropdown */}
+        <div className="flex items-center gap-2 text-xs sm:text-sm">
+          <span className="text-muted-foreground hidden sm:inline">
+            Sort by
+          </span>
+          <Select value={sortBy} onValueChange={onChangeSort}>
+            <SelectTrigger className="h-8 w-full sm:w-[150px] text-xs sm:text-sm">
+              <SelectValue placeholder="Sort..." />
+            </SelectTrigger>
+            <SelectContent align={isMobile ? "center" : "end"}>
+              {SORT_OPTIONS.map((opt) => (
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="text-xs sm:text-sm"
+                >
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Bottom Row - View Toggle (Full Width on Mobile) */}
+      <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0">
+        <span className="text-xs text-muted-foreground mr-auto">View</span>
         <ToggleGroup
           type="single"
           value={view}
@@ -44,42 +88,18 @@ export default function BookToolbar({
           <ToggleGroupItem
             value="List"
             aria-label="List view"
-            className="px-2 hover:bg-gray-400 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
+            className="px-2 py-1.5 sm:py-2 text-xs sm:text-base hover:bg-gray-100 data-[state=on]:bg-gray-800 data-[state=on]:text-white transition-colors"
           >
-            <List className="h-5 w-5" />
+            <List className="h-4 w-4 sm:h-5 sm:w-5" />
           </ToggleGroupItem>
           <ToggleGroupItem
             value="Kanban"
-            aria-label="Kanban view"
-            className="px-2 hover:bg-gray-400 data-[state=on]:bg-gray-800 data-[state=on]:text-white"
+            aria-label="Grid view"
+            className="px-2 py-1.5 sm:py-2 text-xs sm:text-base hover:bg-gray-100 data-[state=on]:bg-gray-800 data-[state=on]:text-white transition-colors"
           >
-            <LayoutGrid className="h-5 w-5" />
+            <LayoutGrid className="h-4 w-4 sm:h-5 sm:w-5" />
           </ToggleGroupItem>
         </ToggleGroup>
-        {countFilter > 0 ? (
-          <div className="flex items-center gap-2">
-            <Badge className="rounded-md px-2 py-1 text-base">{total}</Badge>
-            <span className="text-sm text-muted-foreground">results found</span>
-          </div>
-        ) : (
-          <div></div>
-        )}
-      </div>
-
-      <div className="flex items-center justify-end gap-2">
-        <span className="text-sm text-muted-foreground">Sort by</span>
-        <Select value={sortBy} onValueChange={onChangeSort}>
-          <SelectTrigger className="h-8 w-[160px]">
-            <SelectValue placeholder="Most relevant" />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
