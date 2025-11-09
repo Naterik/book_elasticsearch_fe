@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
@@ -24,13 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createAuthorAPI, updateAuthorAPI } from "../services";
-
-const authorFormSchema = z.object({
-  name: z.string().min(1, "Author name is required"),
-  bio: z.string().optional(),
-});
-
-type AuthorFormValues = z.infer<typeof authorFormSchema>;
+import {
+  authorFormSchema,
+  type AuthorFormValues,
+} from "@/lib/validators/author";
 
 interface AuthorFormDialogProps {
   open: boolean;
@@ -77,16 +73,13 @@ const AuthorFormDialog = ({
     try {
       let response;
       if (isEditMode && author) {
-        response = await updateAuthorAPI(author.id, values);
+        response = await updateAuthorAPI(+author.id, values);
       } else {
         response = await createAuthorAPI(values);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode

@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/layout/admin/data-table";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useGenreManagement } from "../hooks/useGenreManagement";
 import GenreFormDialog from "../components/GenreFormDialog";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const GenreManagementPage = () => {
   const {
@@ -52,11 +52,7 @@ const GenreManagementPage = () => {
       </div>
 
       {isInitialLoading ? (
-        <div className="space-y-3">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
+        <TableSkeletonLoader rows={12} columns={4} />
       ) : (
         <DataTable
           columns={columns}

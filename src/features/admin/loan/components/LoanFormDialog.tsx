@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
@@ -31,15 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createLoanAPI, updateLoanAPI } from "@/features/admin/loan/services";
 import { getAllBookCopiesAdminAPI } from "@/features/admin/book-copy/services";
-import { User } from "lucide-react";
-
-const loanFormSchema = z.object({
-  bookcopyId: z.string().min(1, "Book copy is required"),
-  dueDate: z.string().min(1, "Due date is required"),
-  status: z.string().min(1, "Status is required"),
-});
-
-type LoanFormValues = z.infer<typeof loanFormSchema>;
+import { loanFormSchema, type LoanFormValues } from "@/lib/validators/loan";
 
 interface LoanFormDialogProps {
   open: boolean;
@@ -113,8 +104,6 @@ const LoanFormDialog = ({
           status: values.status,
         });
       } else {
-        // For create, we need userId - this is a limitation that should be handled by the backend
-        // or we need to add a user selection field
         response = await createLoanAPI({
           bookcopyId: parseInt(values.bookcopyId),
           userId: user?.id || 1,
@@ -122,11 +111,8 @@ const LoanFormDialog = ({
         });
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "Loan updated successfully" : "Loan created successfully"

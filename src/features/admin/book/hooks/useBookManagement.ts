@@ -1,15 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllBooksAdminAPI,
   deleteBookAPI,
 } from "@/features/admin/book/services";
 import { getBookColumns } from "@/features/admin/book/book-columns";
 export const useBookManagement = () => {
-  const { setIsLoading } = useCurrentApp();
-  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
+  const { isLoading, setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -22,6 +20,11 @@ export const useBookManagement = () => {
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookToDelete, setBookToDelete] = useState<number | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+  }, []);
 
   useEffect(() => {
     fetchBooks();
@@ -37,10 +40,8 @@ export const useBookManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else if (response.message) {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching books:", error);
@@ -77,10 +78,8 @@ export const useBookManagement = () => {
     try {
       const response = await deleteBookAPI(bookToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Book deleted successfully");
         fetchBooks();
@@ -142,6 +141,7 @@ export const useBookManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
     isInitialLoading,
   };
 };

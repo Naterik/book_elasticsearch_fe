@@ -18,7 +18,6 @@ import { useUserManagement } from "@/features/admin/user/hooks/useUserManagement
 
 const UserManagement = () => {
   const {
-    // Data
     users,
     currentPage,
     totalPages,
@@ -27,7 +26,6 @@ const UserManagement = () => {
     columns,
     isInitialLoading,
 
-    // UI State
     isFormDialogOpen,
     setIsFormDialogOpen,
     isDetailDialogOpen,
@@ -37,7 +35,6 @@ const UserManagement = () => {
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
-    // Handlers
     handleCreateUser,
     handleConfirmDelete,
     handleFormSuccess,

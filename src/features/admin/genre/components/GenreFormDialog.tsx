@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import {
@@ -24,13 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createGenreAPI, updateGenreAPI } from "../services";
-
-const genreFormSchema = z.object({
-  name: z.string().min(1, "Genre name is required"),
-  description: z.string(),
-});
-
-type GenreFormValues = z.infer<typeof genreFormSchema>;
+import { genreFormSchema, type GenreFormValues } from "@/lib/validators/genre";
 
 interface GenreFormDialogProps {
   open: boolean;
@@ -77,9 +70,16 @@ const GenreFormDialog = ({
     try {
       let response;
       if (isEditMode && genre) {
-        response = await updateGenreAPI({ ...values, id: `${genre.id}` });
+        response = await updateGenreAPI({
+          name: values.name,
+          description: values.description || "",
+          id: `${genre.id}`,
+        });
       } else {
-        response = await createGenreAPI(values);
+        response = await createGenreAPI({
+          name: values.name,
+          description: values.description || "",
+        });
       }
       if (response?.message) {
         toast.error(response.message);

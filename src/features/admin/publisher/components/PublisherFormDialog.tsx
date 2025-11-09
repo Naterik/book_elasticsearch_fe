@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
@@ -23,12 +22,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createPublisherAPI, updatePublisherAPI } from "../services";
-
-const publisherFormSchema = z.object({
-  name: z.string().min(1, "Publisher name is required"),
-});
-
-type PublisherFormValues = z.infer<typeof publisherFormSchema>;
+import {
+  publisherFormSchema,
+  type PublisherFormValues,
+} from "@/lib/validators/publisher";
 
 interface PublisherFormDialogProps {
   open: boolean;
@@ -72,16 +69,13 @@ const PublisherFormDialog = ({
     try {
       let response;
       if (isEditMode && publisher) {
-        response = await updatePublisherAPI(publisher.id, values);
+        response = await updatePublisherAPI(+publisher.id, values);
       } else {
         response = await createPublisherAPI(values);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode

@@ -90,7 +90,7 @@ const UserFormDialog = ({
           address: user.address || "",
           phone: user.phone || "",
           roleId: user.roleId.toString(),
-          status: user.status,
+          status: user.status as UserStatusType,
           avatar: undefined,
         });
         if (user.avatar) {
@@ -176,11 +176,8 @@ const UserFormDialog = ({
       } else {
         response = await createUserAPI(formData);
       }
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "User updated successfully" : "User created successfully"

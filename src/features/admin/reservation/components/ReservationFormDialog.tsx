@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
@@ -33,13 +32,10 @@ import {
   updateReservationAPI,
 } from "@/features/admin/reservation/services";
 import { getAllBooksAdminAPI } from "@/features/admin/book/services";
-
-const reservationFormSchema = z.object({
-  bookId: z.string().min(1, "Book is required"),
-  userId: z.string().min(1, "User ID is required"),
-});
-
-type ReservationFormValues = z.infer<typeof reservationFormSchema>;
+import {
+  reservationFormSchema,
+  type ReservationFormValues,
+} from "@/lib/validators/reservation";
 
 interface ReservationFormDialogProps {
   open: boolean;
@@ -112,11 +108,8 @@ const ReservationFormDialog = ({
         });
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode

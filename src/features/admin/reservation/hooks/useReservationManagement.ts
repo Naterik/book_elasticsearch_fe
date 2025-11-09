@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllReservationsAdminAPI,
   deleteReservationAPI,
@@ -10,8 +9,7 @@ import {
 import { getReservationColumns } from "@/features/admin/reservation/reservation-columns";
 
 export const useReservationManagement = () => {
-  const { setIsLoading } = useCurrentApp();
-  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
+  const { isLoading, setIsLoading } = useCurrentApp();
   const [reservations, setReservations] = useState<IReservation[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -25,6 +23,11 @@ export const useReservationManagement = () => {
   const [reservationToDelete, setReservationToDelete] = useState<number | null>(
     null
   );
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+  }, []);
 
   useEffect(() => {
     fetchReservations();
@@ -40,10 +43,8 @@ export const useReservationManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching reservations:", error);
@@ -75,10 +76,8 @@ export const useReservationManagement = () => {
     try {
       const response = await deleteReservationAPI(reservationToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Reservation deleted successfully");
         fetchReservations();
@@ -104,10 +103,8 @@ export const useReservationManagement = () => {
         newStatus
       );
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Reservation status updated successfully");
         fetchReservations();
@@ -169,6 +166,7 @@ export const useReservationManagement = () => {
     handleStatusChange,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
     isInitialLoading,
   };
 };

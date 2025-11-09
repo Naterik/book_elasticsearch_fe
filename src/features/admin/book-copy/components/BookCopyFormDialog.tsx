@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
@@ -34,16 +33,10 @@ import {
   updateBookCopyAPI,
 } from "@/features/admin/book-copy/services";
 import { getAllBooksAdminAPI } from "@/features/admin/book/services";
-
-const bookCopyFormSchema = z.object({
-  copyNumber: z.string().min(1, "Copy number is required"),
-  yearPublished: z.string().min(4, "Year published is required"),
-  status: z.string().min(1, "Status is required"),
-  location: z.string().min(1, "Location is required"),
-  bookId: z.string().min(1, "Book is required"),
-});
-
-type BookCopyFormValues = z.infer<typeof bookCopyFormSchema>;
+import {
+  bookCopyFormSchema,
+  type BookCopyFormValues,
+} from "@/lib/validators/book-copy";
 
 interface BookCopyFormDialogProps {
   open: boolean;
@@ -128,11 +121,8 @@ const BookCopyFormDialog = ({
         response = await createBookCopyAPI(submitData);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode

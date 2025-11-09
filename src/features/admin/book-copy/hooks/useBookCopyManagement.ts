@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { useTableLoadingState } from "@/hooks/use-table-loading";
 import {
   getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
@@ -10,8 +9,7 @@ import {
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
 
 export const useBookCopyManagement = () => {
-  const { setIsLoading } = useCurrentApp();
-  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
+  const { isLoading, setIsLoading } = useCurrentApp();
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -25,6 +23,11 @@ export const useBookCopyManagement = () => {
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+  }, []);
 
   useEffect(() => {
     if (isSearching && searchQuery.trim()) {
@@ -44,10 +47,8 @@ export const useBookCopyManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching book copies:", error);
@@ -70,10 +71,8 @@ export const useBookCopyManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
         setBookCopies([]);
       }
     } catch (error) {
@@ -82,6 +81,7 @@ export const useBookCopyManagement = () => {
       setBookCopies([]);
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -106,10 +106,8 @@ export const useBookCopyManagement = () => {
     try {
       const response = await deleteBookCopyAPI(bookCopyToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Book copy deleted successfully");
         fetchBookCopies();
@@ -176,6 +174,7 @@ export const useBookCopyManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
     isInitialLoading,
 
     isFormDialogOpen,

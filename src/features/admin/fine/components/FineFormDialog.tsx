@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
@@ -31,16 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createFineAPI, updateFineAPI } from "@/features/admin/fine/services";
-
-const fineFormSchema = z.object({
-  amount: z.string().min(1, "Amount is required"),
-  reason: z.string().min(1, "Reason is required"),
-  isPaid: z.string(),
-  loanId: z.string().min(1, "Loan ID is required"),
-  userId: z.string().min(1, "User ID is required"),
-});
-
-type FineFormValues = z.infer<typeof fineFormSchema>;
+import { fineFormSchema, type FineFormValues } from "@/lib/validators/fine";
 
 interface FineFormDialogProps {
   open: boolean;
@@ -115,10 +105,8 @@ const FineFormDialog = ({
         response = await createFineAPI(submitData);
       }
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "Fine updated successfully" : "Fine created successfully"

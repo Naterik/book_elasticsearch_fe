@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminDashboardStats from "@/components/layout/admin/AdminDashboardStats";
 import AdminDashboardCharts from "@/components/layout/admin/AdminDashboardCharts";
+import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import {
   getDashboardStatsAPI,
   getAllBooksAPI,
@@ -109,12 +110,17 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      {stats && (
+      {isLoading ? (
+        <>
+          <TableSkeletonLoader type="stats" cards={4} />
+          <TableSkeletonLoader type="charts" />
+        </>
+      ) : stats ? (
         <>
           <AdminDashboardStats stats={stats} isLoading={isLoading} />
           <AdminDashboardCharts />
         </>
-      )}
+      ) : null}
     </div>
   );
 };

@@ -14,14 +14,12 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/helper";
 import { StatusBadgeUser } from "./StatusUser";
-
 interface UserDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userId: number | null;
 }
 
-type UserAccountType = "SYSTEM" | "GOOGLE";
 const getTypeBadge = (type: UserAccountType) => {
   return type === "SYSTEM" ? (
     <Badge variant="default">System</Badge>
@@ -105,8 +103,8 @@ const UserDetailDialog = ({
                 </h3>
                 <p className="text-muted-foreground">{user.username}</p>
                 <div className="flex gap-2 pt-2 flex-wrap">
-                  {StatusBadgeUser(user.status)}
-                  {getTypeBadge(user.type)}
+                  {StatusBadgeUser(user.status as UserStatus)}
+                  {getTypeBadge(user.type as UserAccountType)}
                   <Badge variant="outline">{user.role.name}</Badge>
                 </div>
               </div>

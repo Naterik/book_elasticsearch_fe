@@ -5,7 +5,7 @@ import { getGenresAPI, deleteGenreAPI } from "../services";
 import { getGenreColumns } from "../genre-columns";
 
 export const useGenreManagement = () => {
-  const { setIsLoading } = useCurrentApp();
+  const { isLoading, setIsLoading } = useCurrentApp();
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -14,27 +14,33 @@ export const useGenreManagement = () => {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<IGenre | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+  }, []);
 
   useEffect(() => {
     fetchGenres();
   }, [currentPage]);
 
   const fetchGenres = async () => {
+    setIsLoading(true);
     try {
-      const res = await getGenresAPI({ page: currentPage });
-      if (res.data && res.data.result) {
-        setGenres(res.data.result);
-        setTotalPages(res.data.pagination.totalPages);
-        setTotalItems(res.data.pagination.totalItems);
-        setPageSize(res.data.pagination.pageSize);
-      } else if (res.error) {
-        toast.error(Array.isArray(res.error) ? res.error[0] : res.error);
+      const response = await getGenresAPI({ page: currentPage });
+      if (response.data && response.data.result) {
+        setGenres(response.data.result);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalItems(response.data.pagination.totalItems);
+        setPageSize(response.data.pagination.pageSize);
+      } else {
+        toast.error(response.message);
       }
     } catch (err) {
       toast.error("Failed to fetch genres.");
       console.error(err);
     } finally {
+      setIsLoading(false);
       setIsInitialLoading(false);
     }
   };
@@ -58,9 +64,13 @@ export const useGenreManagement = () => {
     if (!selectedGenre) return;
     setIsLoading(true);
     try {
-      await deleteGenreAPI(+selectedGenre.id);
-      toast.success("Genre deleted successfully.");
-      fetchGenres();
+      const response = await deleteGenreAPI(+selectedGenre.id);
+      if (response.message) {
+        toast.error(response.message);
+      } else {
+        toast.success("Genre deleted successfully.");
+        fetchGenres();
+      }
     } catch (error) {
       toast.error("Failed to delete genre.");
       console.error(error);
@@ -109,6 +119,7 @@ export const useGenreManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
     isInitialLoading,
   };
 };

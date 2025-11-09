@@ -1,30 +1,30 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { useTableLoadingState } from "@/hooks/use-table-loading";
 import { getAuthorsAPI, deleteAuthorAPI } from "../services";
 import { getAuthorColumns } from "../author-columns";
 
 export const useAuthorManagement = () => {
-  const { setIsLoading } = useCurrentApp();
-  const { isInitialLoading, setIsInitialLoading } = useTableLoadingState();
+  const { isLoading, setIsLoading } = useCurrentApp();
 
-  // Data state
   const [authors, setAuthors] = useState<IAuthor[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
 
-  // UI state
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
   const [selectedAuthor, setSelectedAuthor] = useState<IAuthor | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [authorToDelete, setAuthorToDelete] = useState<number | null>(null);
-
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
   useEffect(() => {
     fetchAuthors(currentPage);
   }, [currentPage]);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+  }, []);
 
   const fetchAuthors = async (page: number) => {
     setIsLoading(true);
@@ -36,10 +36,8 @@ export const useAuthorManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching authors:", error);
@@ -71,16 +69,13 @@ export const useAuthorManagement = () => {
     setIsLoading(true);
     try {
       const response = await deleteAuthorAPI(authorToDelete);
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Author deleted successfully");
         fetchAuthors(currentPage);
       }
     } catch (error) {
-      console.error("Error deleting author:", error);
       toast.error("Failed to delete author");
     } finally {
       setIsLoading(false);
@@ -128,6 +123,7 @@ export const useAuthorManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
     isInitialLoading,
   };
 };

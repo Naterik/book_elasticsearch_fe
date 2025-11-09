@@ -214,11 +214,8 @@ const BookFormDialog = ({
         response = await createBookAPI(formData);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "Book updated successfully" : "Book created successfully"
