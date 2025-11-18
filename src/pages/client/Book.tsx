@@ -2,9 +2,9 @@ import BookToolbar from "@/features/client/book/components/BookToolbar";
 import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
+import SelectedFilters from "@/features/client/book/components/SelectedFilters";
 import { useBookSearch } from "@/features/client/book/hooks/useBookSearch";
 import SearchBar from "@/components/Search";
-import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -41,16 +41,12 @@ const BookPage = () => {
     sortBy,
     setSortBy,
     countFilter,
-    applyFilters,
     resetFilters,
     isFilterOpen,
     setIsFilterOpen,
+    removeGenreFromSelected,
+    removeLanguageFromSelected,
   } = useBookSearch();
-
-  const handleApplyFilters = () => {
-    applyFilters();
-    setIsFilterOpen(false);
-  };
 
   const handleResetFilters = () => {
     resetFilters();
@@ -59,9 +55,8 @@ const BookPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      {/* Search Bar - Full Width */}
       <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 sm:py-6">
+        <div className="container mx-auto p-2 sm:py-6">
           <SearchBar
             initialQuery={searchInput}
             onSearch={setSearchInput}
@@ -70,9 +65,7 @@ const BookPage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-4 sm:py-8">
-        {/* Mobile & Tablet Filter Button - Hidden on Desktop (lg+) */}
+      <div className="container mx-auto px-8 py-2 sm:py-8">
         <div className="lg:hidden mb-4 flex gap-2">
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
@@ -113,7 +106,6 @@ const BookPage = () => {
                   yearRange={yearRange}
                   yearBounds={YEAR_BOUNDS}
                   onYearChange={setYearRange}
-                  onApply={handleApplyFilters}
                   onReset={handleResetFilters}
                   sticky={false}
                   isCompact={true}
@@ -123,9 +115,7 @@ const BookPage = () => {
           </Sheet>
         </div>
 
-        {/* Desktop + Mobile Layout */}
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-          {/* Desktop Sidebar Filter - Only on lg (1024px+) */}
           <aside className="hidden lg:block w-full lg:w-[280px] lg:shrink-0">
             <div className="lg:sticky lg:top-24">
               <BookFilter
@@ -141,7 +131,6 @@ const BookPage = () => {
                 yearRange={yearRange}
                 yearBounds={YEAR_BOUNDS}
                 onYearChange={setYearRange}
-                onApply={applyFilters}
                 onReset={resetFilters}
                 sticky={true}
                 isCompact={false}
@@ -149,8 +138,14 @@ const BookPage = () => {
             </div>
           </aside>
 
-          {/* Main Content Area */}
           <div className="flex-1 min-w-0">
+            <SelectedFilters
+              selectedGenres={selectedGenres}
+              selectedLanguage={selectedLanguage}
+              onRemoveGenre={removeGenreFromSelected}
+              onRemoveLanguage={removeLanguageFromSelected}
+              onClearAll={resetFilters}
+            />
             <BookToolbar
               view={view}
               onChangeView={setView}

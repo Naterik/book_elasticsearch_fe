@@ -42,13 +42,11 @@ const BookDetailDialog = ({
 
       if (response.data) {
         setBook(response.data);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      }
+      if (response?.message) {
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching book details:", error);
       toast.error("Failed to fetch book details");
     } finally {
       setIsLoading(false);

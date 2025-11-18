@@ -44,7 +44,6 @@ export const useBookManagement = () => {
         toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching books:", error);
       toast.error("Failed to fetch books");
     } finally {
       setIsLoading(false);

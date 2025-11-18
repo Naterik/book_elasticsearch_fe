@@ -1,5 +1,11 @@
-import { set } from "zod";
-import { useState, useEffect, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useTransition,
+  useRef,
+} from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import {
@@ -18,6 +24,7 @@ export const useBookSearch = () => {
   const { setIsLoading } = useCurrentApp();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
+  const [isPending] = useTransition();
 
   const [dataBook, setDataBook] = useState<IBook[]>([]);
 
@@ -55,7 +62,18 @@ export const useBookSearch = () => {
 
   const [view, setView] = useState<"List" | "Kanban">("Kanban");
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [countFilter, setCountFilter] = useState<number>(0);
+
+  // Debounce timers cho price/year
+  const priceDebounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const yearDebounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (priceDebounceTimer.current) clearTimeout(priceDebounceTimer.current);
+      if (yearDebounceTimer.current) clearTimeout(yearDebounceTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     const keyword = searchParams.get("q") || "";
@@ -77,7 +95,6 @@ export const useBookSearch = () => {
           toast.error("Failed to fetch initial data");
         }
       } catch (err) {
-        console.error(err);
         toast.error("Error loading initial data");
       } finally {
         setIsLoading(false);
@@ -87,12 +104,39 @@ export const useBookSearch = () => {
     loadInitialData();
   }, []);
 
+  const isFilterPriceApplied = useMemo(() => {
+    const priceChanged =
+      appliedPrice[0] !== PRICE_BOUNDS[0] ||
+      appliedPrice[1] !== PRICE_BOUNDS[1];
+    return priceChanged;
+  }, [appliedPrice]);
+
+  const isFilterYearApplied = useMemo(() => {
+    const yearChanged =
+      appliedYear[0] !== YEAR_BOUNDS[0] || appliedYear[1] !== YEAR_BOUNDS[1];
+    return yearChanged;
+  }, [appliedYear]);
+
+  const countFilter = useMemo(() => {
+    let count = 0;
+    if (appliedGenres.length > 0) count += appliedGenres.length;
+    if (appliedLanguage) count += 1;
+    if (isFilterPriceApplied) count += 1;
+    if (isFilterYearApplied) count += 1;
+    return count;
+  }, [
+    appliedGenres,
+    appliedLanguage,
+    isFilterPriceApplied,
+    isFilterYearApplied,
+  ]);
+
   const fetchAllFilterBook = useCallback(async () => {
     try {
       const res = await getFilterBookElasticAPI(
         currentPage,
-        appliedYear,
-        appliedPrice,
+        isFilterYearApplied ? appliedYear : null,
+        isFilterPriceApplied ? appliedPrice : null,
         searchInput,
         sortBy,
         appliedGenres,
@@ -118,6 +162,8 @@ export const useBookSearch = () => {
     sortBy,
     appliedGenres,
     appliedLanguage,
+    isFilterYearApplied,
+    isFilterPriceApplied,
   ]);
 
   useEffect(() => {
@@ -139,17 +185,7 @@ export const useBookSearch = () => {
     );
   }, []);
 
-  const applyFilters = useCallback(() => {
-    setAppliedGenres(selectedGenres);
-    setAppliedLanguage(selectedLanguage);
-    setAppliedPrice(priceRange);
-    setAppliedYear(yearRange);
-    setCountFilter(1);
-    setCurrentPage(1);
-  }, [selectedGenres, selectedLanguage, priceRange, yearRange]);
-
   const resetFilters = useCallback(() => {
-    setCountFilter(0);
     setSearchInput("");
     setSelectedGenres([]);
     navigate("/book");
@@ -169,15 +205,57 @@ export const useBookSearch = () => {
 
   const handlePriceChange = useCallback((range: [number, number]) => {
     setPriceRange(range);
+
+    // Clear previous timer
+    if (priceDebounceTimer.current) {
+      clearTimeout(priceDebounceTimer.current);
+    }
+
+    // Set new timer - gọi API sau 500ms khi user dừng drag
+    priceDebounceTimer.current = setTimeout(() => {
+      setAppliedPrice(range);
+      setCurrentPage(1);
+    }, 300);
   }, []);
 
   const handleYearChange = useCallback((range: [number, number]) => {
     setYearRange(range);
+
+    // Clear previous timer
+    if (yearDebounceTimer.current) {
+      clearTimeout(yearDebounceTimer.current);
+    }
+
+    // Set new timer - gọi API sau 500ms khi user dừng drag
+    yearDebounceTimer.current = setTimeout(() => {
+      setAppliedYear(range);
+      setCurrentPage(1);
+    }, 300);
   }, []);
 
   const handleLanguageChange = useCallback((lang: string | null) => {
     setSelectedLanguage(lang);
   }, []);
+
+  const removeGenreFromSelected = useCallback((genre: string) => {
+    setSelectedGenres((prev) => prev.filter((g) => g !== genre));
+  }, []);
+
+  const removeLanguageFromSelected = useCallback(() => {
+    setSelectedLanguage(null);
+  }, []);
+
+  // Auto-fetch when genres change
+  useEffect(() => {
+    setAppliedGenres(selectedGenres);
+    setCurrentPage(1);
+  }, [selectedGenres]);
+
+  // Auto-fetch when language changes
+  useEffect(() => {
+    setAppliedLanguage(selectedLanguage);
+    setCurrentPage(1);
+  }, [selectedLanguage]);
 
   return {
     dataBook,
@@ -208,9 +286,11 @@ export const useBookSearch = () => {
     sortBy,
     setSortBy,
     countFilter,
-    applyFilters,
     resetFilters,
     isFilterOpen,
     setIsFilterOpen,
+    removeGenreFromSelected,
+    removeLanguageFromSelected,
+    isPending,
   };
 };

@@ -1,7 +1,3 @@
-/**
- * Loan Related Models
- */
-
 import type { IBookCopy } from "./book.model";
 import type { IUserInfo } from "./user.model";
 
@@ -25,5 +21,5 @@ export interface IReservation {
   bookId: number;
   userId: number;
   user: IUserInfo;
-  book: any; // IBook from book.model
+  book: any;
 }

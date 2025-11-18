@@ -18,7 +18,7 @@ export default function BookGrid({ items, view }: Props) {
     if (isMobile) {
       return "grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3";
     }
-    return "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 lg:gap-6";
+    return "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6";
   };
 
   if (items?.length === 0) {

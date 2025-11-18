@@ -61,8 +61,8 @@ export const getFilterBookAPI = (
 
 export const getFilterBookElasticAPI = (
   page: number,
-  yearRange: number[],
-  priceRange: number[],
+  yearRange: number[] | null,
+  priceRange: number[] | null,
   search: string,
   order: string,
   genres: string[],
@@ -70,7 +70,15 @@ export const getFilterBookElasticAPI = (
 ) => {
   const urlBackend = "/api/v1/filter/elastic";
   return axios.get(urlBackend, {
-    params: { page, yearRange, priceRange, search, order, genres, language },
+    params: {
+      page,
+      yearRange,
+      priceRange,
+      search,
+      order,
+      genres,
+      language,
+    },
     paramsSerializer: {
       serialize: (params) =>
         qs.stringify(params, {

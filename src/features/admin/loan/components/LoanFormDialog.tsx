@@ -22,7 +22,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -52,7 +54,7 @@ const LoanFormDialog = ({
   const form = useForm<LoanFormValues>({
     resolver: zodResolver(loanFormSchema),
     defaultValues: {
-      bookcopyId: "",
+      bookId: "",
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
@@ -65,13 +67,12 @@ const LoanFormDialog = ({
       fetchBookCopies();
       if (loan) {
         form.reset({
-          bookcopyId: String(loan.bookcopyId),
+          bookId: String(loan.bookCopy.bookId),
           dueDate: loan.dueDate.split("T")[0],
-          status: loan.status,
         });
       } else {
         form.reset({
-          bookcopyId: "",
+          bookId: "",
           dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
             .toISOString()
             .split("T")[0],
@@ -105,7 +106,7 @@ const LoanFormDialog = ({
         });
       } else {
         response = await createLoanAPI({
-          bookcopyId: parseInt(values.bookcopyId),
+          bookId: parseInt(values.bookId),
           userId: user?.id || 1,
           dueDate: values.dueDate,
         });
@@ -147,10 +148,10 @@ const LoanFormDialog = ({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="bookcopyId"
+              name="bookId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Book Copy *</FormLabel>
+                  <FormLabel>Book Copy</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -182,7 +183,7 @@ const LoanFormDialog = ({
               name="dueDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date *</FormLabel>
+                  <FormLabel>Due Date </FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -196,21 +197,24 @@ const LoanFormDialog = ({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status *</FormLabel>
+                  <FormLabel>Status </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select a status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="RETURNED">Returned</SelectItem>
-                      <SelectItem value="LOST">Lost</SelectItem>
-                      <SelectItem value="OVERDUE">Overdue</SelectItem>
-                      <SelectItem value="ON_LOAN">On Loan</SelectItem>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value="RETURNED">Returned</SelectItem>
+                        <SelectItem value="LOST">Lost</SelectItem>
+                        <SelectItem value="OVERDUE">Overdue</SelectItem>
+                        <SelectItem value="ON_LOAN">On Loan</SelectItem>
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                   <FormMessage />
