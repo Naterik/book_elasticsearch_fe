@@ -7,7 +7,6 @@ import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const DetailPage = () => {
   useScrollToTop();
-
   const {
     dataDetailBook,
     borrowDuration,

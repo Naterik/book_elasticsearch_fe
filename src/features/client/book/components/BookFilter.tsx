@@ -15,48 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/helper";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-
-// Language flag mapping - mapping cho tất cả language codes
-const LANGUAGE_FLAGS: Record<string, string> = {
-  EN: "🇺🇸",
-  VI: "🇻🇳",
-  FR: "🇫🇷",
-  DE: "🇩🇪",
-  ES: "🇪🇸",
-  IT: "🇮🇹",
-  PT: "🇵🇹",
-  RU: "🇷🇺",
-  ZH: "🇨🇳",
-  JA: "🇯🇵",
-  KO: "🇰🇷",
-  TH: "🇹🇭",
-  PL: "🇵🇱",
-  TR: "🇹🇷",
-  AR: "🇸🇦",
-  HI: "🇮🇳",
-  CHI: "🇨🇳",
-  ENG: "🇺🇸",
-  FRE: "🇫🇷",
-  GER: "🇩🇪",
-  SPA: "🇪🇸",
-  UND: "🌐",
-  DUT: "🇳🇱",
-  POR: "🇧🇷",
-  POL: "🇵🇱",
-  CAT: "🇪🇸",
-  BAQ: "🇪🇸",
-  HIN: "🇮🇳",
-  HUN: "🇭🇺",
-  ANG: "🇬🇧",
-  BAM: "🇲🇱",
-  ENM: "🇬🇧",
-  KOR: "🇰🇷",
-  LAT: "🇻🇦",
-  PER: "🇮🇷",
-  SRP: "🇷🇸",
-  YID: "🇵🇱",
-};
+import { memo, useState } from "react";
+import { LANGUAGE_FLAGS } from "@/helper/icon";
+import { ITEMS_PER_SHOW } from "@/types";
 
 type Props = {
   genresAll: IGenre[];
@@ -66,12 +27,12 @@ type Props = {
   onChangeLanguage: (value: string | null) => void;
   languagesAll: ILanguages[] | undefined;
 
-  priceRange: [number, number];
-  priceBounds: [number, number];
+  priceRange: readonly [number, number];
+  priceBounds: readonly [number, number];
   onPriceChange: (range: [number, number]) => void;
 
-  yearRange: [number, number];
-  yearBounds: [number, number];
+  yearRange: readonly [number, number];
+  yearBounds: readonly [number, number];
   onYearChange: (range: [number, number]) => void;
 
   onReset: () => void;
@@ -79,7 +40,7 @@ type Props = {
   isCompact?: boolean;
 };
 
-export default function BookFilter({
+const BookFilter = ({
   genresAll,
   genresSelected,
   onToggleGenre,
@@ -95,38 +56,34 @@ export default function BookFilter({
   onReset,
   sticky = true,
   isCompact = false,
-}: Props) {
+}: Props) => {
   const isMobile = useIsMobile();
   const [visibleGenresCount, setVisibleGenresCount] = useState(10);
   const [visibleLanguagesCount, setVisibleLanguagesCount] = useState(10);
 
-  const ITEMS_PER_PAGE = 10;
-
-  // Get visible genres based on current count
   const visibleGenres = genresAll.slice(0, visibleGenresCount);
   const hasMoreGenres = visibleGenresCount < genresAll.length;
   const isAllGenresShown = visibleGenresCount >= genresAll.length;
 
-  // Get visible languages based on current count
   const visibleLanguages = languagesAll?.slice(0, visibleLanguagesCount) ?? [];
   const hasMoreLanguages = visibleLanguagesCount < (languagesAll?.length ?? 0);
   const isAllLanguagesShown =
     visibleLanguagesCount >= (languagesAll?.length ?? 0);
 
   const handleShowMoreGenres = () => {
-    setVisibleGenresCount((prev) => prev + ITEMS_PER_PAGE);
+    setVisibleGenresCount((prev) => prev + ITEMS_PER_SHOW);
   };
 
   const handleShowLessGenres = () => {
-    setVisibleGenresCount(ITEMS_PER_PAGE);
+    setVisibleGenresCount(ITEMS_PER_SHOW);
   };
 
   const handleShowMoreLanguages = () => {
-    setVisibleLanguagesCount((prev) => prev + ITEMS_PER_PAGE);
+    setVisibleLanguagesCount((prev) => prev + ITEMS_PER_SHOW);
   };
 
   const handleShowLessLanguages = () => {
-    setVisibleLanguagesCount(ITEMS_PER_PAGE);
+    setVisibleLanguagesCount(ITEMS_PER_SHOW);
   };
 
   const hasActiveFilters =
@@ -158,7 +115,10 @@ export default function BookFilter({
             </CardTitle>
           </div>
           {hasActiveFilters && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge
+              variant="secondary"
+              className="bg-blue-500 text-white dark:bg-blue-600 text-xs"
+            >
               {[genresSelected.length, selectedLanguage ? 1 : 0].reduce(
                 (a, b) => a + b,
                 0
@@ -326,7 +286,7 @@ export default function BookFilter({
               min={priceBounds[0]}
               max={priceBounds[1]}
               step={10_000}
-              value={priceRange}
+              value={priceRange as [number, number]}
               onValueChange={(v) =>
                 onPriceChange([v[0] ?? priceBounds[0], v[1] ?? priceBounds[1]])
               }
@@ -357,7 +317,7 @@ export default function BookFilter({
               min={yearBounds[0]}
               max={yearBounds[1]}
               step={1}
-              value={yearRange}
+              value={yearRange as [number, number]}
               onValueChange={(v) =>
                 onYearChange([v[0] ?? yearBounds[0], v[1] ?? yearBounds[1]] as [
                   number,
@@ -394,4 +354,6 @@ export default function BookFilter({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default memo(BookFilter);

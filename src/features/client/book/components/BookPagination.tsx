@@ -8,6 +8,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { getCompactItems } from "@/helper";
+import { memo } from "react";
 
 type Props = {
   currentPage: number;
@@ -16,12 +17,12 @@ type Props = {
   siblingCount?: number; // mặc định 1
 };
 
-export default function BookPagination({
+const BookPagination = ({
   currentPage,
   totalPages,
   onPageChange,
   siblingCount = 1,
-}: Props) {
+}: Props) => {
   const goPrev = () => currentPage > 1 && onPageChange(currentPage - 1);
   const goNext = () =>
     currentPage < totalPages && onPageChange(currentPage + 1);
@@ -31,7 +32,6 @@ export default function BookPagination({
 
   return (
     <div className="my-6 sm:my-8 flex justify-center">
-      {/* Mobile Simple Pagination */}
       <div className="flex w-full items-center justify-between sm:hidden px-2">
         <button
           onClick={goPrev}
@@ -52,7 +52,6 @@ export default function BookPagination({
         </button>
       </div>
 
-      {/* Desktop Full Pagination */}
       <Pagination className="hidden sm:flex">
         <PaginationContent className="gap-1">
           <PaginationItem>
@@ -109,4 +108,6 @@ export default function BookPagination({
       </Pagination>
     </div>
   );
-}
+};
+
+export default memo(BookPagination);

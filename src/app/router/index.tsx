@@ -48,7 +48,6 @@ const router = createBrowserRouter([
             <Outlet />
           </ProtectedRoute>
         ),
-
         children: [
           {
             path: "member",

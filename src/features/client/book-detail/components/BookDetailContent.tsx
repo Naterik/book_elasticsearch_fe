@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,6 +29,7 @@ import { Separator } from "@/components/ui/separator";
 import { postCreateLoanAPI } from "@/services/api";
 import { toast } from "sonner";
 import { calculateDueDate } from "@/helper";
+import { useCurrentApp } from "@/app/providers/app.context";
 
 type Props = {
   borrowDuration: string;
@@ -48,9 +48,9 @@ const BookDetailContent = ({
 }: Props) => {
   const checkUser = !isAuthenticated;
   const checkCard = user?.cardNumber === null;
+  const checkStatusBook = dataDetailBook?.quantity === 0 || checkUser;
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { setIsLoading, isLoading } = useCurrentApp();
   const fetchBookLoans = async () => {
     if (!dataDetailBook || !user) return;
     setIsLoading(true);
@@ -155,7 +155,7 @@ const BookDetailContent = ({
           </div>
         </div>
         <div className="md:col-span-1">
-          <Card className="border shadow-md sticky top-20">
+          <Card className="border shadow-md ">
             <CardHeader>
               <CardTitle>Borrow This Book</CardTitle>
               <CardDescription>Choose your borrow duration</CardDescription>
@@ -166,6 +166,7 @@ const BookDetailContent = ({
                 <Select
                   value={borrowDuration}
                   onValueChange={setBorrowDuration}
+                  disabled={checkUser || checkStatusBook}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select duration" />
@@ -178,15 +179,16 @@ const BookDetailContent = ({
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">
-                    Due Date:
-                  </span>{" "}
-                  {calculateDueDate(Number.parseInt(borrowDuration))}
-                </p>
-              </div>
+              {!checkStatusBook && (
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      Due Date:
+                    </span>
+                    {calculateDueDate(+borrowDuration)}
+                  </p>
+                </div>
+              )}
 
               {checkCard && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">

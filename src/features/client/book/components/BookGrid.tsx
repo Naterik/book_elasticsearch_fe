@@ -2,13 +2,14 @@ import { Card, CardTitle } from "@/components/ui/card";
 import BookCard from "./BookCard";
 import BookListCard from "./BookListCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { memo } from "react";
 
 type Props = {
   items: IBook[] | undefined;
   view: "List" | "Kanban";
 };
 
-export default function BookGrid({ items, view }: Props) {
+const BookGrid = ({ items, view }: Props) => {
   const isMobile = useIsMobile();
 
   const getGridClass = (): string => {
@@ -18,7 +19,7 @@ export default function BookGrid({ items, view }: Props) {
     if (isMobile) {
       return "grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3";
     }
-    return "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6";
+    return "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 ";
   };
 
   if (items?.length === 0) {
@@ -38,4 +39,6 @@ export default function BookGrid({ items, view }: Props) {
         : items?.map((it) => <BookCard key={it.id} item={it} />)}
     </div>
   );
-}
+};
+
+export default memo(BookGrid);

@@ -2,8 +2,8 @@ import BookToolbar from "@/features/client/book/components/BookToolbar";
 import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
-import SelectedFilters from "@/features/client/book/components/SelectedFilters";
-import { useBookSearch } from "@/features/client/book/hooks/useBookSearch";
+import BookSelectedFilters from "@/features/client/book/components/BookSelectedFilters";
+import { useBookFilter, useBookData } from "@/features/client/book";
 import SearchBar from "@/components/Search";
 import {
   Sheet,
@@ -16,6 +16,28 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 
 const BookPage = () => {
+  const filterState = useBookFilter();
+  const {
+    genres,
+    selectedGenres,
+    toggleGenre,
+    languages,
+    selectedLanguage,
+    handleLanguageChange,
+    priceRange,
+    PRICE_BOUNDS,
+    handlePriceChange,
+    yearRange,
+    YEAR_BOUNDS,
+    handleYearChange,
+    countFilter,
+    resetFilters,
+    isFilterOpen,
+    setIsFilterOpen,
+    removeGenreFromSelected,
+    removeLanguageFromSelected,
+  } = filterState;
+
   const {
     dataBook,
     currentPage,
@@ -24,29 +46,11 @@ const BookPage = () => {
     setCurrentPage,
     searchInput,
     setSearchInput,
-    genres,
-    selectedGenres,
-    toggleGenre,
-    languages,
-    selectedLanguage,
-    setSelectedLanguage,
-    priceRange,
-    PRICE_BOUNDS,
-    setPriceRange,
-    yearRange,
-    YEAR_BOUNDS,
-    setYearRange,
     view,
     setView,
     sortBy,
     setSortBy,
-    countFilter,
-    resetFilters,
-    isFilterOpen,
-    setIsFilterOpen,
-    removeGenreFromSelected,
-    removeLanguageFromSelected,
-  } = useBookSearch();
+  } = useBookData(filterState);
 
   const handleResetFilters = () => {
     resetFilters();
@@ -98,14 +102,14 @@ const BookPage = () => {
                   genresSelected={selectedGenres}
                   onToggleGenre={toggleGenre}
                   selectedLanguage={selectedLanguage}
-                  onChangeLanguage={setSelectedLanguage}
+                  onChangeLanguage={handleLanguageChange}
                   languagesAll={languages}
                   priceRange={priceRange}
                   priceBounds={PRICE_BOUNDS}
-                  onPriceChange={setPriceRange}
+                  onPriceChange={handlePriceChange}
                   yearRange={yearRange}
                   yearBounds={YEAR_BOUNDS}
-                  onYearChange={setYearRange}
+                  onYearChange={handleYearChange}
                   onReset={handleResetFilters}
                   sticky={false}
                   isCompact={true}
@@ -123,14 +127,14 @@ const BookPage = () => {
                 genresSelected={selectedGenres}
                 onToggleGenre={toggleGenre}
                 selectedLanguage={selectedLanguage}
-                onChangeLanguage={setSelectedLanguage}
+                onChangeLanguage={handleLanguageChange}
                 languagesAll={languages}
                 priceRange={priceRange}
                 priceBounds={PRICE_BOUNDS}
-                onPriceChange={setPriceRange}
+                onPriceChange={handlePriceChange}
                 yearRange={yearRange}
                 yearBounds={YEAR_BOUNDS}
-                onYearChange={setYearRange}
+                onYearChange={handleYearChange}
                 onReset={resetFilters}
                 sticky={true}
                 isCompact={false}
@@ -139,7 +143,7 @@ const BookPage = () => {
           </aside>
 
           <div className="flex-1 min-w-0">
-            <SelectedFilters
+            <BookSelectedFilters
               selectedGenres={selectedGenres}
               selectedLanguage={selectedLanguage}
               onRemoveGenre={removeGenreFromSelected}

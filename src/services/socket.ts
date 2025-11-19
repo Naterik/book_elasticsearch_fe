@@ -142,5 +142,4 @@ class SocketService {
   }
 }
 
-// Singleton
 export const socketService = new SocketService();

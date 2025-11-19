@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { List, LayoutGrid } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { memo } from "react";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
@@ -25,19 +26,18 @@ type Props = {
   total: number;
 };
 
-export default function BookToolbar({
+const BookToolbar = ({
   view,
   onChangeView,
   sortBy,
   onChangeSort,
   countFilter,
   total,
-}: Props) {
+}: Props) => {
   const isMobile = useIsMobile();
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
-      {/* Top Row - Results */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           {countFilter > 0 && (
@@ -52,7 +52,6 @@ export default function BookToolbar({
           )}
         </div>
 
-        {/* Sort Dropdown */}
         <div className="flex items-center gap-2 text-xs sm:text-sm">
           <span className="text-muted-foreground hidden sm:inline">
             Sort by
@@ -76,9 +75,8 @@ export default function BookToolbar({
         </div>
       </div>
 
-      {/* Bottom Row - View Toggle (Full Width on Mobile) */}
       <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0">
-        <span className="text-xs text-muted-foreground mr-auto">View</span>
+        <span className="text-xs text-muted-foreground mr-auto ">View</span>
         <ToggleGroup
           type="single"
           value={view}
@@ -103,4 +101,6 @@ export default function BookToolbar({
       </div>
     </div>
   );
-}
+};
+
+export default memo(BookToolbar);

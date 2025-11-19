@@ -8,7 +8,6 @@ declare global {
   type ILogin = API.ILogin;
   type IRegister = API.IRegister;
 
-  // Book Models
   type IBook = Models.IBook;
   type IAuthor = Models.IAuthor;
   type IGenre = Models.IGenre;
@@ -17,27 +16,22 @@ declare global {
   type ILanguages = Models.ILanguages;
   type IBookCopy = Models.IBookCopy;
 
-  // User Models
   type IUserBase = Models.IUserBase;
   type IUser = Models.IUser;
   type IUserInfo = Models.IUserInfo;
   type IAdminUser = Models.IAdminUser;
   type IAdminUserDetail = Models.IAdminUserDetail;
 
-  // Loan Models
   type ILoan = Models.ILoan;
   type IReservation = Models.IReservation;
 
-  // Payment Models
   type IFine = Models.IFine;
   type IFineDetail = Models.IFineDetail;
   type IPayment = Models.IPayment;
 
-  // Other Models
   type INotification = Models.INotification;
   type IDashboardStats = Models.IDashboardStats;
 
-  // Enums (as types for backward compatibility)
   type UserStatus = keyof typeof Enums.UserStatus;
   type UserAccountType = keyof typeof Enums.UserAccountType;
   type UserRole = keyof typeof Enums.UserRole;

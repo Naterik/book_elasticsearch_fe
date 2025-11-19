@@ -8,7 +8,6 @@ import { placeholderImage } from "@/config";
 
 export default function BookListCard({ item }: { item: IBook }) {
   const navigate = useNavigate();
-
   const isAvailable = item.quantity - item.borrowed > 0;
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group bg-white">

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { memo } from "react";
 
 type Props = {
   selectedGenres: string[];
@@ -10,13 +11,13 @@ type Props = {
   onClearAll: () => void;
 };
 
-export default function SelectedFilters({
+const BookSelectedFilters = ({
   selectedGenres,
   selectedLanguage,
   onRemoveGenre,
   onRemoveLanguage,
   onClearAll,
-}: Props) {
+}: Props) => {
   const hasFilters = selectedGenres.length > 0 || selectedLanguage;
 
   if (!hasFilters) return null;
@@ -71,4 +72,6 @@ export default function SelectedFilters({
       </div>
     </div>
   );
-}
+};
+
+export default memo(BookSelectedFilters);

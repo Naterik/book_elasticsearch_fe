@@ -56,3 +56,10 @@ export interface IBookCopy {
   bookId: number;
   books: IBook;
 }
+
+export interface FilterState {
+  selectedGenres: string[];
+  selectedLanguage: string | null;
+  priceRange: [number, number];
+  yearRange: [number, number];
+}

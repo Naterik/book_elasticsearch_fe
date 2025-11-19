@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, MailCheck } from "lucide-react";
 import {
   getNotificationsByUserIdAPI,
-  putBulkNotificationAsReadAPI,
   putSingleNotificationAsReadAPI,
+  putBulkNotificationAsReadAPI,
 } from "@/services/api";
 
 export default function NotificationList() {
@@ -64,7 +64,6 @@ export default function NotificationList() {
       );
       toast.success("All notifications marked as read");
     } catch (error) {
-      console.error("Failed to mark all notifications as read:", error);
       toast.error("Failed to mark all as read");
     } finally {
       setIsMarkingAll(false);
@@ -79,7 +78,6 @@ export default function NotificationList() {
 
   return (
     <div className="w-full max-w-2xl">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold">Notifications</h2>
@@ -112,7 +110,6 @@ export default function NotificationList() {
         )}
       </div>
 
-      {/* Notifications */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

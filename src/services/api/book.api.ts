@@ -14,29 +14,6 @@ export const getBookByIdAPI = (id: number) => {
   return axios.get<IBackendRes<IBook>>(`/api/v1/books/${id}`);
 };
 
-export const filterBookAPI = (
-  title: string,
-  detailDesc: string,
-  minPrice: number,
-  maxPrice: number,
-  publishDate: string,
-  genres: string[],
-  page: number
-) => {
-  const urlBackend = "/api/v1/filter";
-  return axios.get<IModelPaginate<IBook>>(urlBackend, {
-    params: {
-      page,
-      title,
-      detailDesc,
-      minPrice,
-      maxPrice,
-      publishDate,
-      genres,
-    },
-  });
-};
-
 export const getFilterBookAPI = (
   page: number,
   yearRange: number[],

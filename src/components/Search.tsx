@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search as SearchIcon, X, Clock, TrendingUp } from "lucide-react";
+import { Search as SearchIcon, X, Clock, Book, User } from "lucide-react";
 import { getSuggestAPI } from "@/services/api";
 
 type SearchBarProps = {
@@ -13,7 +13,7 @@ type SearchBarProps = {
 const RECENT_KEY = "recent_searches_v1";
 const MAX_RECENT = 5;
 const DEBOUNCE_MS = 280;
-const MIN_CHARS = 2;
+const MIN_CHARS = 1;
 
 function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
@@ -83,6 +83,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     localStorage.setItem(RECENT_KEY, JSON.stringify(next));
     setRecent(next);
 
+    setQuery(keyword);
     setOpen(false);
     onSearch(keyword);
   };
@@ -104,6 +105,8 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     setRecent([]);
     localStorage.removeItem(RECENT_KEY);
   };
+
+  const hasSuggestions = titles.length > 0 || authors.length > 0;
 
   return (
     <div ref={wrapRef} className="w-full max-w-3xl mx-auto my-8 relative z-50">
@@ -136,9 +139,10 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
           </Button>
         )}
       </form>
+
       {open && (
         <div
-          className="absolute left-0 top-full mt-1 w-full rounded-md border bg-white shadow-xl overflow-hidden"
+          className="absolute left-0 top-full mt-1 w-full rounded-md border bg-white shadow-xl overflow-hidden max-h-96 overflow-y-auto"
           onMouseDown={(e) => e.preventDefault()}
         >
           {query.trim().length >= MIN_CHARS ? (
@@ -148,25 +152,30 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-blue-600"></div>
                   <p className="mt-2 text-sm text-gray-500">Searching...</p>
                 </div>
-              ) : (
+              ) : hasSuggestions ? (
                 <>
-                  {!!titles.length && (
+                  {/* Book Titles Section */}
+                  {titles.length > 0 && (
                     <div className="border-b border-gray-100">
-                      <div className="px-3 py-2 bg-gray-50/80 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-blue-600" />
-                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                          Book Titles
+                      <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-50/50 flex items-center gap-2 sticky top-0">
+                        <Book className="h-4 w-4 text-blue-600" />
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          Books
+                        </span>
+                        <span className="ml-auto text-xs text-gray-500">
+                          {titles.length} results
                         </span>
                       </div>
-                      <div className="p-1">
-                        {titles.map((t, i) => (
+                      <div className="divide-y divide-gray-100">
+                        {titles.map((title, idx) => (
                           <div
-                            key={`t-${i}`}
-                            className="px-3 py-2.5 cursor-pointer hover:bg-blue-50 rounded transition-colors"
-                            onClick={() => commitSearch(t)}
+                            key={`title-${idx}`}
+                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors group flex items-start gap-3"
+                            onClick={() => commitSearch(title)}
                           >
-                            <p className="text-sm text-gray-800 font-medium line-clamp-1">
-                              {t}
+                            <SearchIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-gray-800 font-medium line-clamp-2 flex-1">
+                              {title}
                             </p>
                           </div>
                         ))}
@@ -174,50 +183,54 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
                     </div>
                   )}
 
-                  {!!authors.length && (
+                  {/* Authors Section */}
+                  {authors.length > 0 && (
                     <div>
-                      <div className="px-3 py-2 bg-gray-50/80 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-green-50/50 flex items-center gap-2 sticky top-0">
+                        <User className="h-4 w-4 text-green-600" />
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                           Authors
                         </span>
+                        <span className="ml-auto text-xs text-gray-500">
+                          {authors.length} results
+                        </span>
                       </div>
-                      <div className="p-1">
-                        {authors.map((a, i) => (
+                      <div className="divide-y divide-gray-100">
+                        {authors.map((author, idx) => (
                           <div
-                            key={`a-${i}`}
-                            className="px-3 py-2.5 cursor-pointer hover:bg-green-50 rounded transition-colors"
-                            onClick={() => commitSearch(a)}
+                            key={`author-${idx}`}
+                            className="px-4 py-3 cursor-pointer hover:bg-green-50 transition-colors group flex items-start gap-3"
+                            onClick={() => commitSearch(author)}
                           >
-                            <p className="text-sm text-gray-800 font-medium line-clamp-1">
-                              {a}
+                            <SearchIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-gray-800 font-medium line-clamp-2 flex-1">
+                              {author}
                             </p>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
-
-                  {!titles.length && !authors.length && (
-                    <div className="px-4 py-8 text-center">
-                      <SearchIcon className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 font-medium">
-                        No suggestions found
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Try different keywords
-                      </p>
                     </div>
                   )}
                 </>
+              ) : (
+                <div className="px-4 py-8 text-center">
+                  <SearchIcon className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 font-medium">
+                    No results found
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Try different keywords
+                  </p>
+                </div>
               )}
             </>
           ) : (
             <>
-              <div className="px-3 py-2 bg-gray-50/80 flex items-center justify-between border-b border-gray-100">
+              {/* Recent Searches Section */}
+              <div className="px-4 py-3 bg-gray-50/80 flex items-center justify-between border-b border-gray-100 sticky top-0">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Recent Searches
                   </span>
                 </div>
@@ -233,19 +246,17 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
               </div>
 
               {recent.length > 0 ? (
-                <div className="p-1 max-h-64 overflow-y-auto">
+                <div className="divide-y divide-gray-100">
                   {recent.map((r, i) => (
                     <div
-                      key={`r-${i}`}
-                      className="px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded transition-colors group"
+                      key={`recent-${i}`}
+                      className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors group flex items-center justify-between"
                       onClick={() => commitSearch(r)}
                     >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-700 line-clamp-1">
-                          {r}
-                        </p>
-                        <SearchIcon className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
-                      </div>
+                      <p className="text-sm text-gray-700 line-clamp-1 flex-1">
+                        {r}
+                      </p>
+                      <SearchIcon className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
                     </div>
                   ))}
                 </div>
@@ -256,7 +267,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
                     No recent searches
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Type at least {MIN_CHARS} characters to get suggestions
+                    Type to get suggestions
                   </p>
                 </div>
               )}

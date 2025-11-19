@@ -1,7 +1,3 @@
-/**
- * Notification Model
- */
-
 export interface INotification {
   id: number;
   title: string;

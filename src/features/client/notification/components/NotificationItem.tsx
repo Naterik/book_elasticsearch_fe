@@ -11,12 +11,12 @@ import {
   getNotificationPath,
 } from "@/helper/notificationUtils";
 
-interface NotificationItemProps {
+type NotificationItemProps = {
   notification: INotification;
   onMarkAsRead?: (id: number) => void;
   onDelete?: (id: number) => void;
   onClick?: () => void;
-}
+};
 
 export default function NotificationItem({
   notification,
