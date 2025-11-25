@@ -18,4 +18,5 @@ export type {
   IModelPaginate,
   ILogin,
   IRegister,
+  IHistorySearch,
 } from "./api/response.types";

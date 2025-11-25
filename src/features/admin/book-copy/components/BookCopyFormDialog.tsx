@@ -60,7 +60,7 @@ const BookCopyFormDialog = ({
     resolver: zodResolver(bookCopyFormSchema),
     defaultValues: {
       copyNumber: "",
-      yearPublished: new Date().getFullYear().toString(),
+      year_published: new Date().getFullYear().toString(),
       status: "available",
       location: "",
       bookId: "",
@@ -73,7 +73,7 @@ const BookCopyFormDialog = ({
       if (bookCopy) {
         form.reset({
           copyNumber: bookCopy.copyNumber,
-          yearPublished: String(bookCopy.year_published),
+          year_published: String(bookCopy.year_published),
           status: bookCopy.status,
           location: bookCopy.location,
           bookId: String(bookCopy.bookId),
@@ -81,7 +81,7 @@ const BookCopyFormDialog = ({
       } else {
         form.reset({
           copyNumber: "",
-          yearPublished: String(new Date().getFullYear()),
+          year_published: String(new Date().getFullYear()),
           status: "available",
           location: "",
           bookId: "",
@@ -97,7 +97,6 @@ const BookCopyFormDialog = ({
         setBooks(res.data.result);
       }
     } catch (error) {
-      console.error("Error fetching books:", error);
       toast.error("Failed to load books");
     }
   };
@@ -108,7 +107,7 @@ const BookCopyFormDialog = ({
     try {
       const submitData = {
         copyNumber: values.copyNumber,
-        yearPublished: parseInt(values.yearPublished),
+        year_published: +values.year_published,
         status: values.status,
         location: values.location,
         bookId: parseInt(values.bookId),
@@ -201,7 +200,7 @@ const BookCopyFormDialog = ({
 
             <FormField
               control={form.control}
-              name="yearPublished"
+              name="year_published"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Year Published *</FormLabel>

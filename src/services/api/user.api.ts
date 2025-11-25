@@ -32,3 +32,37 @@ export const updatePaymentFineAPI = (
     paymentRef,
   });
 };
+
+export const getHistorySearchByUserId = (userId: number) => {
+  const urlBackend = `/api/v1/history-searches/full/${userId}`;
+  return axios.get<IBackendRes<IHistorySearch>>(urlBackend);
+};
+
+export const postHistorySearchByUserId = (userId: number, term: string) => {
+  const urlBackend = "/api/v1/history-searches/recent";
+  return axios.post<IBackendRes<IHistorySearch>>(urlBackend, {
+    userId,
+    term,
+  });
+};
+
+export const postMergeRecentSearchAsGuest = (
+  userId: number,
+  terms: Array<string>
+) => {
+  const urlBackend = `/api/v1/history-searches/merge`;
+  return axios.post<IBackendRes<IHistorySearch>>(urlBackend, {
+    userId,
+    terms,
+  });
+};
+
+export const deleteHistorySearchByUserId = (searchId: number) => {
+  const urlBackend = `/api/v1/history-searches/${searchId}`;
+  return axios.delete<IBackendRes<IHistorySearch>>(urlBackend);
+};
+
+export const deleteAllHistorySearchUser = () => {
+  const urlBackend = `/api/v1/history-searches`;
+  return axios.delete<IBackendRes<IHistorySearch>>(urlBackend);
+};

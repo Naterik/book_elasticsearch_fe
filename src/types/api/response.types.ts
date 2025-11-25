@@ -1,5 +1,5 @@
 export interface IBackendRes<T> {
-  error?: string | string[];
+  error?: string;
   message: string;
   data?: T;
 }
@@ -31,4 +31,17 @@ export interface IRegister {
   id: number;
   email: string;
   fullName: string | null;
+}
+
+export interface IHistorySearch {
+  id: number;
+  term: string;
+}
+
+export interface ISuggestElastic {
+  data: ISuggest[];
+}
+
+export interface ISuggest {
+  text: string;
 }

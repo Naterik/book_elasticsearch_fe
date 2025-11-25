@@ -1,3 +1,4 @@
+import { ISuggest } from "./api/response.types";
 import type * as Models from "./models";
 import type * as Enums from "./enums";
 import type * as API from "./api";
@@ -7,6 +8,9 @@ declare global {
   type IModelPaginate<T> = API.IModelPaginate<T>;
   type ILogin = API.ILogin;
   type IRegister = API.IRegister;
+  type IHistorySearch = API.IHistorySearch;
+  type ISuggestElastic = API.ISuggestElastic;
+  type ISuggest = API.ISuggest;
 
   type IBook = Models.IBook;
   type IAuthor = Models.IAuthor;

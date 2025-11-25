@@ -51,7 +51,6 @@ export const useBookCopyManagement = () => {
         toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching book copies:", error);
       toast.error("Failed to fetch book copies");
     } finally {
       setIsLoading(false);
@@ -76,7 +75,6 @@ export const useBookCopyManagement = () => {
         setBookCopies([]);
       }
     } catch (error) {
-      console.error("Error searching book copies:", error);
       toast.error("Failed to search book copies");
       setBookCopies([]);
     } finally {

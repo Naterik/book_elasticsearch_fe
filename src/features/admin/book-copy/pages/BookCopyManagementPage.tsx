@@ -58,11 +58,10 @@ const BookCopyManagementPage = () => {
         </Button>
       </div>
 
-      {/* Custom Search Bar with Elasticsearch */}
       <div className="mb-6 flex gap-2">
         <div className="flex-1 relative">
           <Input
-            placeholder="Search by location, copy number, title, ISBN... (n-gram search)"
+            placeholder="Search by location, copy number, title, ISBN"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full"
@@ -95,9 +94,7 @@ const BookCopyManagementPage = () => {
           showPagination={true}
           showSearch={false}
           emptyMessage={
-            searchQuery
-              ? "No book copies found. Try a different search."
-              : "No book copies found. Add your first book copy to get started."
+            searchQuery ?? "No book copies found. Try a different search."
           }
         />
       )}
