@@ -23,7 +23,7 @@ const ReservationManagementPage = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -53,7 +53,7 @@ const ReservationManagementPage = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={5} />
       ) : (
         <DataTable

@@ -23,7 +23,7 @@ const FineManagementPage = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -53,7 +53,7 @@ const FineManagementPage = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={5} />
       ) : (
         <DataTable

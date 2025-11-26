@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import { getPublishersAPI, deletePublisherAPI } from "../services";
 import { getPublisherColumns } from "../publisher-columns";
 
 export const usePublisherManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [publishers, setPublishers] = useState<IPublisher[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -16,11 +15,6 @@ export const usePublisherManagement = () => {
     null
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchPublishers();
@@ -43,7 +37,6 @@ export const usePublisherManagement = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -122,6 +115,5 @@ export const usePublisherManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

@@ -24,7 +24,7 @@ const BookManagement = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -57,7 +57,7 @@ const BookManagement = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={6} />
       ) : (
         <DataTable

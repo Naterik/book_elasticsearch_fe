@@ -33,7 +33,7 @@ const GenreManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isInitialLoading,
+    isLoading,
   } = useGenreManagement();
 
   return (
@@ -51,7 +51,7 @@ const GenreManagementPage = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={4} />
       ) : (
         <DataTable

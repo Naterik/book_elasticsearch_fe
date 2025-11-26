@@ -7,7 +7,7 @@ import {
 } from "@/features/admin/book/services";
 import { getBookColumns } from "@/features/admin/book/book-columns";
 export const useBookManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [books, setBooks] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -20,11 +20,6 @@ export const useBookManagement = () => {
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookToDelete, setBookToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchBooks();
@@ -47,7 +42,6 @@ export const useBookManagement = () => {
       toast.error("Failed to fetch books");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -141,6 +135,5 @@ export const useBookManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

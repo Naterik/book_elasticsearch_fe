@@ -24,7 +24,6 @@ export const useHomePage = () => {
 
   const fetchHomePageData = async () => {
     try {
-      setIsLoading(true);
       const [trending, newBooks, mostBorrowed] = await Promise.all([
         getTrendingBooksAPI(),
         getNewArrivalBooksAPI(),

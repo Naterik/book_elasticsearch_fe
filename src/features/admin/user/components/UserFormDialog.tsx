@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createUserAPI, updateUserAPI } from "@/features/admin/user/services";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import {
   userFormSchema,
   type UserFormValues,
@@ -63,7 +63,7 @@ const UserFormDialog = ({
   user,
   onSuccess,
 }: UserFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
+  // const { setIsLoading } = useCurrentApp();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const isEditMode = !!user;
 
@@ -141,7 +141,7 @@ const UserFormDialog = ({
   };
 
   const onSubmit = async (values: UserFormValues) => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -152,7 +152,7 @@ const UserFormDialog = ({
         formData.append("password", values.password);
       } else if (!isEditMode) {
         toast.error("Password is required for new users");
-        setIsLoading(false);
+        // setIsLoading(false);
         return;
       }
       if (values.address) {
@@ -190,7 +190,7 @@ const UserFormDialog = ({
         isEditMode ? "Failed to update user" : "Failed to create user"
       );
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
@@ -402,7 +402,10 @@ const UserFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update User" : "Create User"}
               </Button>
             </DialogFooter>

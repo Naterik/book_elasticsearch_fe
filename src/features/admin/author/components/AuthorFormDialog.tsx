@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +26,7 @@ import {
   authorFormSchema,
   type AuthorFormValues,
 } from "@/lib/validators/author";
+import { Loader2 } from "lucide-react";
 
 interface AuthorFormDialogProps {
   open: boolean;
@@ -41,7 +41,6 @@ const AuthorFormDialog = ({
   author,
   onSuccess,
 }: AuthorFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!author;
 
   const form = useForm<AuthorFormValues>({
@@ -69,7 +68,6 @@ const AuthorFormDialog = ({
   }, [open, author, form]);
 
   const onSubmit = async (values: AuthorFormValues) => {
-    setIsLoading(true);
     try {
       let response;
       if (isEditMode && author) {
@@ -93,8 +91,6 @@ const AuthorFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update author" : "Failed to create author"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -153,7 +149,10 @@ const AuthorFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Author" : "Create Author"}
               </Button>
             </DialogFooter>

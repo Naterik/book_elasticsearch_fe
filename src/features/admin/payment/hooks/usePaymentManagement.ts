@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllPaymentsAdminAPI,
   deletePaymentAPI,
@@ -8,7 +8,7 @@ import {
 import { getPaymentColumns } from "@/features/admin/payment/payment-columns";
 
 export const usePaymentManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [payments, setPayments] = useState<IPayment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -17,11 +17,6 @@ export const usePaymentManagement = () => {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [paymentToDelete, setPaymentToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchPayments();
@@ -45,7 +40,6 @@ export const usePaymentManagement = () => {
       toast.error("Failed to fetch payments");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -97,7 +91,6 @@ export const usePaymentManagement = () => {
     pageSize,
     columns,
     isLoading,
-    isInitialLoading,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,

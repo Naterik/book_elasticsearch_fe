@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import { getAuthorsAPI, deleteAuthorAPI } from "../services";
 import { getAuthorColumns } from "../author-columns";
 
 export const useAuthorManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [authors, setAuthors] = useState<IAuthor[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -17,14 +17,9 @@ export const useAuthorManagement = () => {
   const [selectedAuthor, setSelectedAuthor] = useState<IAuthor | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [authorToDelete, setAuthorToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
   useEffect(() => {
     fetchAuthors(currentPage);
   }, [currentPage]);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   const fetchAuthors = async (page: number) => {
     setIsLoading(true);
@@ -44,7 +39,6 @@ export const useAuthorManagement = () => {
       toast.error("Failed to fetch authors");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -124,6 +118,5 @@ export const useAuthorManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

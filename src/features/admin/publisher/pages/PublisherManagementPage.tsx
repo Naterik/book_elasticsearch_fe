@@ -33,7 +33,7 @@ const PublisherManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isInitialLoading,
+    isLoading,
   } = usePublisherManagement();
 
   return (
@@ -51,7 +51,7 @@ const PublisherManagementPage = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={4} />
       ) : (
         <DataTable

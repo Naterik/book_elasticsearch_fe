@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -35,7 +35,7 @@ import {
   getAllPublishersAPI,
   getAllGenresAPI,
 } from "@/services/admin";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { bookFormSchema, type BookFormValues } from "@/lib/validators/book";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -52,7 +52,7 @@ const BookFormDialog = ({
   book,
   onSuccess,
 }: BookFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
+  // const { setIsLoading } = useCurrentApp();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [authors, setAuthors] = useState<IAuthor[]>([]);
   const [publishers, setPublishers] = useState<IPublisher[]>([]);
@@ -173,7 +173,7 @@ const BookFormDialog = ({
   };
 
   const onSubmit = async (values: BookFormValues) => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -228,7 +228,7 @@ const BookFormDialog = ({
         isEditMode ? "Failed to update book" : "Failed to create book"
       );
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
@@ -564,7 +564,10 @@ const BookFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Book" : "Create Book"}
               </Button>
             </DialogFooter>

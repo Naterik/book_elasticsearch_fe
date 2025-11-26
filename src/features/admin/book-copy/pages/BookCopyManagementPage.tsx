@@ -25,7 +25,7 @@ const BookCopyManagementPage = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -77,7 +77,7 @@ const BookCopyManagementPage = () => {
         </div>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={6} />
       ) : (
         <DataTable

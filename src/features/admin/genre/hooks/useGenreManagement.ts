@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import { getGenresAPI, deleteGenreAPI } from "../services";
 import { getGenreColumns } from "../genre-columns";
 
 export const useGenreManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -14,11 +13,6 @@ export const useGenreManagement = () => {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<IGenre | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchGenres();
@@ -41,7 +35,6 @@ export const useGenreManagement = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -120,6 +113,5 @@ export const useGenreManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

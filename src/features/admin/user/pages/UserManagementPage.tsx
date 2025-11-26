@@ -24,7 +24,7 @@ const UserManagement = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -57,7 +57,7 @@ const UserManagement = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={5} />
       ) : (
         <DataTable

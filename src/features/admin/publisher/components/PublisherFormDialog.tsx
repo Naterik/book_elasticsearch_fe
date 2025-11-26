@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { createPublisherAPI, updatePublisherAPI } from "../services";
 import {
   publisherFormSchema,
@@ -40,7 +40,6 @@ const PublisherFormDialog = ({
   publisher,
   onSuccess,
 }: PublisherFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
   const isEditMode = !!publisher;
 
   const form = useForm<PublisherFormValues>({
@@ -65,7 +64,6 @@ const PublisherFormDialog = ({
   }, [open, publisher, form]);
 
   const onSubmit = async (values: PublisherFormValues) => {
-    setIsLoading(true);
     try {
       let response;
       if (isEditMode && publisher) {
@@ -89,8 +87,6 @@ const PublisherFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update publisher" : "Failed to create publisher"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -131,7 +127,10 @@ const PublisherFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Publisher" : "Create Publisher"}
               </Button>
             </DialogFooter>

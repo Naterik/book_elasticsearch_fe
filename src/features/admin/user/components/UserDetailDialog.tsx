@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/helper";
 import { StatusBadgeUser } from "./StatusUser";
+import { Loader2 } from "lucide-react";
+
 interface UserDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,7 +44,7 @@ const UserDetailDialog = ({
   onOpenChange,
   userId,
 }: UserDetailDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IAdminUser | null>(null);
   useEffect(() => {
     if (open && userId) {
@@ -85,7 +86,11 @@ const UserDetailDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {user ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : user ? (
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20">

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const fineFormSchema = z.object({
   amount: z.string().min(1, "Amount is required"),
   reason: z.string().min(1, "Reason is required"),
-  isPaid: z.string(),
+  isPaid: z.boolean(),
   loanId: z.string().min(1, "Loan ID is required"),
   userId: z.string().min(1, "User ID is required"),
 });

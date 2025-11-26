@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllLoansAdminAPI,
   deleteLoanAPI,
@@ -9,7 +9,7 @@ import {
 import { getLoanColumns } from "@/features/admin/loan/loan-columns";
 
 export const useLoanManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loans, setLoans] = useState<ILoan[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -18,18 +18,13 @@ export const useLoanManagement = () => {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [loanToDelete, setLoanToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchLoans();
   }, [currentPage]);
 
   const fetchLoans = async () => {
-    setIsInitialLoading(true);
+    setIsLoading(true);
     try {
       const response = await getAllLoansAdminAPI(currentPage);
 
@@ -44,7 +39,7 @@ export const useLoanManagement = () => {
     } catch (error) {
       toast.error("Failed to fetch loans");
     } finally {
-      setIsInitialLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -125,6 +120,5 @@ export const useLoanManagement = () => {
     handlePageSizeChange,
     handleReturnBook,
     isLoading,
-    isInitialLoading,
   };
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllReservationsAdminAPI,
   deleteReservationAPI,
@@ -9,7 +9,7 @@ import {
 import { getReservationColumns } from "@/features/admin/reservation/reservation-columns";
 
 export const useReservationManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [reservations, setReservations] = useState<IReservation[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -23,11 +23,6 @@ export const useReservationManagement = () => {
   const [reservationToDelete, setReservationToDelete] = useState<number | null>(
     null
   );
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchReservations();
@@ -51,7 +46,6 @@ export const useReservationManagement = () => {
       toast.error("Failed to fetch reservations");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -167,6 +161,5 @@ export const useReservationManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

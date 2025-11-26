@@ -33,7 +33,7 @@ const AuthorManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isInitialLoading,
+    isLoading,
   } = useAuthorManagement();
 
   return (
@@ -51,7 +51,7 @@ const AuthorManagementPage = () => {
         </Button>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={4} />
       ) : (
         <DataTable

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllFinesAdminAPI,
   deleteFineAPI,
@@ -8,7 +8,7 @@ import {
 import { getFineColumns } from "@/features/admin/fine/fine-columns";
 
 export const useFineManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fines, setFines] = useState<IFine[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -19,11 +19,6 @@ export const useFineManagement = () => {
   const [selectedFine, setSelectedFine] = useState<IFine | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [fineToDelete, setFineToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchFines();
@@ -47,7 +42,6 @@ export const useFineManagement = () => {
       toast.error("Failed to fetch fines");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -132,6 +126,5 @@ export const useFineManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

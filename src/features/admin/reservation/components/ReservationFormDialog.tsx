@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +35,7 @@ import {
   reservationFormSchema,
   type ReservationFormValues,
 } from "@/lib/validators/reservation";
+import { Loader2 } from "lucide-react";
 
 interface ReservationFormDialogProps {
   open: boolean;
@@ -50,7 +50,6 @@ const ReservationFormDialog = ({
   reservation,
   onSuccess,
 }: ReservationFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
   const isEditMode = !!reservation;
 
@@ -92,8 +91,6 @@ const ReservationFormDialog = ({
   };
 
   const onSubmit = async (values: ReservationFormValues) => {
-    setIsLoading(true);
-
     try {
       let response;
       if (isEditMode && reservation?.id) {
@@ -125,8 +122,6 @@ const ReservationFormDialog = ({
           ? "Failed to update reservation"
           : "Failed to create reservation"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -202,7 +197,10 @@ const ReservationFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Reservation" : "Create Reservation"}
               </Button>
             </DialogFooter>

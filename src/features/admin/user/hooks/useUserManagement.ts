@@ -5,7 +5,7 @@ import { getAllUsersAPI, deleteUserAPI } from "@/features/admin/user/services";
 import { getUserColumns } from "../user-columns";
 
 export const useUserManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [users, setUsers] = useState<IAdminUser[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -19,11 +19,6 @@ export const useUserManagement = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -46,7 +41,6 @@ export const useUserManagement = () => {
       toast.error("Failed to fetch users");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -140,6 +134,5 @@ export const useUserManagement = () => {
     handlePageChange,
     handlePageSizeChange,
     isLoading,
-    isInitialLoading,
   };
 };

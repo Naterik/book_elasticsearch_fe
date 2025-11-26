@@ -22,7 +22,6 @@ type SearchBarProps = {
 const RECENT_KEY = "recent_searches_v1";
 const MAX_RECENT = 5;
 const DEBOUNCE_MS = 280;
-const MIN_CHARS = 1;
 
 function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
   const { isAuthenticated, user } = useCurrentApp();
@@ -41,7 +40,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     const q = query.trim();
-    if (q.length < MIN_CHARS) {
+    if (q.length < 1) {
       setSearchResult([]);
       setLoading(false);
       return;
@@ -55,7 +54,6 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
           setSearchResult(res.data);
         }
       } catch (error: any) {
-        console.error("Suggest API error:", error);
         toast.error("Failed to fetch search suggestions", error.message);
       } finally {
         setLoading(false);
@@ -69,14 +67,11 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
 
   const commitSearch = (text: string) => {
     const keyword = text.trim();
-    if (!keyword) return;
-
     if (isAuthenticated && user?.id) {
       saveToBackend(keyword);
     } else {
       saveToLocalStorage(keyword);
     }
-
     setQuery(keyword);
     setOpen(false);
     onSearch(keyword);
@@ -86,18 +81,15 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     try {
       const res = await postHistorySearchByUserId(user!.id, term);
       if (res?.message) {
-        throw new Error(res.message);
+        toast.error(res.message);
       }
-
       const updatedRes = await getHistorySearchByUserId(user!.id);
       if (updatedRes?.data) {
         setRecent(updatedRes.data);
         toast.success("Search saved");
       }
     } catch (error) {
-      console.error("Error saving search:", error);
       toast.error("Failed to save search");
-      // Revert state
       const reverted = recent.filter((r) => r.term !== term);
       setRecent(reverted);
     }
@@ -122,32 +114,22 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
               user.id,
               localTerms
             );
-            if (resMergeItem.data) {
-              toast.success("Search history migrated");
-            }
-            if (resMergeItem.message) {
-              toast.error("Merged Failed");
-            }
-            // Clear localStorage after upload
             localStorage.removeItem(RECENT_KEY);
             setRecent(resMergeItem.data);
           } catch (error: any) {
-            console.error("Error uploading searches:", error);
             toast.error("Failed to migrate search history");
-            localStorage.removeItem(RECENT_KEY); // Clear on error
+            localStorage.removeItem(RECENT_KEY);
           }
         }
       } else {
         if (localRecent) {
           const parsed = JSON.parse(localRecent);
-          console.log("parsed :>> ", parsed);
           setRecent(parsed);
         } else {
           setRecent([]);
         }
       }
     } catch (error) {
-      console.error("Error syncing history:", error);
       toast.error("Failed to sync search history");
     }
   };
@@ -159,8 +141,8 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
 
   const handleClear = () => {
     setQuery("");
-    setSearchResult([]);
     setOpen(false);
+    onSearch("");
     onClear?.();
   };
 
@@ -168,27 +150,16 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     try {
       if (isAuthenticated && user?.id) {
         const res = await deleteAllHistorySearchUser();
-
         if (res?.message) {
-          throw new Error(res.message);
+          toast.error(res.message);
         }
-
         setRecent([]);
       } else {
         setRecent([]);
         localStorage.removeItem(RECENT_KEY);
       }
     } catch (error: any) {
-      console.error("Error clearing searches:", error);
-      toast.error("Failed to clear searches");
-    }
-  };
-
-  const handleCheckShowRecent = () => {
-    if (recent.length > 0) {
-      setOpen(true);
-    } else {
-      setOpen(false);
+      toast.error("Failed to clear searches", error);
     }
   };
 
@@ -202,29 +173,21 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     itemIndex: number
   ) => {
     e.stopPropagation();
-
+    const updated = recent.filter((_, index) => index !== itemIndex);
     try {
       if (isAuthenticated && user?.id) {
-        const searchItem = recent[itemIndex];
-        const searchId = (searchItem as any)?.id;
-        if (!searchId) return;
+        const searchId = recent[itemIndex]?.id;
         const res = await deleteHistorySearchByUserId(searchId);
-
         if (res?.message) {
-          throw new Error(res.message);
+          toast.error(res.message);
         }
-
-        const updated = recent.filter((_, index) => index !== itemIndex);
         setRecent(updated);
-        toast.success("Search removed");
       } else {
-        const updated = recent.filter((_, index) => index !== itemIndex);
         setRecent(updated);
         localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
       }
     } catch (error: any) {
-      console.error("Error removing search:", error);
-      toast.error("Failed to remove search");
+      toast.error("Failed to remove search", error);
     }
   };
 
@@ -239,7 +202,10 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
             placeholder="Search for books by title or author..."
             value={query}
             onChange={handleSearch}
-            onFocus={handleCheckShowRecent}
+            onFocus={() =>
+              recent && recent.length > 0 ? setOpen(true) : setOpen(false)
+            }
+            onBlur={() => setOpen(false)}
             className="w-full pl-10 pr-4 h-12"
           />
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
@@ -267,7 +233,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
           className="absolute left-0 top-full mt-1 w-full rounded-md border bg-white shadow-xl overflow-hidden max-h-96 overflow-y-auto"
           onMouseDown={(e) => e.preventDefault()}
         >
-          {query.trim().length >= MIN_CHARS ? (
+          {query.trim().length > 0 ? (
             <>
               {loading ? (
                 <div className="px-4 py-8 text-center">

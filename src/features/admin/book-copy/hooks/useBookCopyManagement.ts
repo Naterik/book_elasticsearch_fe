@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
@@ -9,7 +9,7 @@ import {
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
 
 export const useBookCopyManagement = () => {
-  const { isLoading, setIsLoading } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -23,11 +23,6 @@ export const useBookCopyManagement = () => {
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-  }, []);
 
   useEffect(() => {
     if (isSearching && searchQuery.trim()) {
@@ -54,7 +49,6 @@ export const useBookCopyManagement = () => {
       toast.error("Failed to fetch book copies");
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
   const fetchBookCopiesWithSearch = async () => {
@@ -79,7 +73,6 @@ export const useBookCopyManagement = () => {
       setBookCopies([]);
     } finally {
       setIsLoading(false);
-      setIsInitialLoading(false);
     }
   };
 
@@ -173,7 +166,6 @@ export const useBookCopyManagement = () => {
     pageSize,
     columns,
     isLoading,
-    isInitialLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,

@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { createLoanAPI, updateLoanAPI } from "@/features/admin/loan/services";
 import { getAllBookCopiesAdminAPI } from "@/features/admin/book-copy/services";
 import { loanFormSchema, type LoanFormValues } from "@/lib/validators/loan";
+import { Loader2 } from "lucide-react";
 
 interface LoanFormDialogProps {
   open: boolean;
@@ -47,7 +48,7 @@ const LoanFormDialog = ({
   loan,
   onSuccess,
 }: LoanFormDialogProps) => {
-  const { setIsLoading, user } = useCurrentApp();
+  const { user } = useCurrentApp();
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const isEditMode = !!loan;
 
@@ -95,8 +96,6 @@ const LoanFormDialog = ({
   };
 
   const onSubmit = async (values: LoanFormValues) => {
-    setIsLoading(true);
-
     try {
       let response;
       if (isEditMode && loan?.id) {
@@ -125,8 +124,6 @@ const LoanFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update loan" : "Failed to create loan"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -230,7 +227,10 @@ const LoanFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Loan" : "Create Loan"}
               </Button>
             </DialogFooter>

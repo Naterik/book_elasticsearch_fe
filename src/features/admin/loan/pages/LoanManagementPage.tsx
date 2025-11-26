@@ -20,7 +20,7 @@ const LoanManagementPage = () => {
     totalItems,
     pageSize,
     columns,
-    isInitialLoading,
+    isLoading,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
@@ -41,7 +41,7 @@ const LoanManagementPage = () => {
         </div>
       </div>
 
-      {isInitialLoading ? (
+      {isLoading ? (
         <TableSkeletonLoader rows={12} columns={5} />
       ) : (
         <DataTable

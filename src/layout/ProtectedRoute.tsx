@@ -9,12 +9,15 @@ type IProps = {
 };
 
 const ProtectedRoute = ({ children }: IProps) => {
-  const { isAuthenticated, user, authLoading } = useCurrentApp();
+  const { isAuthenticated, user, isLoading } = useCurrentApp();
   const location = useLocation();
   const isAdminRoute = location.pathname.includes("/admin");
 
-  // ✅ Hiển thị loader chung khi đang xác thực
-  if (authLoading) {
+  // Chỉ hiển thị GlobalLoader khi:
+  // 1. Đang load auth ban đầu (chưa có isAuthenticated)
+  // 2. Hoặc đang load ở trang Client (không phải Admin)
+  // Đối với Admin route đã đăng nhập: Không hiện GlobalLoader để hiển thị Skeleton trong page
+  if (isLoading && (!isAuthenticated || !isAdminRoute)) {
     return <GlobalLoader isVisible={true} />;
   }
 

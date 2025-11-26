@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +36,7 @@ import {
   bookCopyFormSchema,
   type BookCopyFormValues,
 } from "@/lib/validators/book-copy";
+import { Loader2 } from "lucide-react";
 
 interface BookCopyFormDialogProps {
   open: boolean;
@@ -51,7 +51,6 @@ const BookCopyFormDialog = ({
   bookCopy,
   onSuccess,
 }: BookCopyFormDialogProps) => {
-  const { setIsLoading } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
 
   const isEditMode = !!bookCopy;
@@ -102,8 +101,6 @@ const BookCopyFormDialog = ({
   };
 
   const onSubmit = async (values: BookCopyFormValues) => {
-    setIsLoading(true);
-
     try {
       const submitData = {
         copyNumber: values.copyNumber,
@@ -135,8 +132,6 @@ const BookCopyFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update book copy" : "Failed to create book copy"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -266,7 +261,10 @@ const BookCopyFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Book Copy" : "Create Book Copy"}
               </Button>
             </DialogFooter>
