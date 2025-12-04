@@ -12,7 +12,6 @@ import {
 import { PlusIcon } from "lucide-react";
 import ReservationFormDialog from "@/features/admin/reservation/components/ReservationFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useReservationManagement } from "@/features/admin/reservation/hooks/useReservationManagement";
 
 const ReservationManagementPage = () => {
@@ -53,26 +52,23 @@ const ReservationManagementPage = () => {
         </Button>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={5} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={reservations}
-          searchKey="user.fullName"
-          searchPlaceholder="Search by member name..."
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={true}
-          emptyMessage="No reservations found. Create your first reservation to get started."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={reservations}
+        searchKey="user.fullName"
+        searchPlaceholder="Search by member name..."
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={true}
+        emptyMessage="No reservations found. Create your first reservation to get started."
+        isLoading={isLoading}
+      />
 
       <ReservationFormDialog
         open={isFormDialogOpen}

@@ -30,11 +30,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createBookAPI, updateBookAPI } from "@/features/admin/book/services";
-import {
-  getAllAuthorsAPI,
-  getAllPublishersAPI,
-  getAllGenresAPI,
-} from "@/services/admin";
+import { getAllAuthorsAPI } from "@/features/admin/author/services";
+import { getAllPublishersAPI } from "@/features/admin/publisher/services";
+import { getAllGenresAPI } from "@/features/admin/genre/services";
+
 import { Upload, X, Loader2 } from "lucide-react";
 import { bookFormSchema, type BookFormValues } from "@/lib/validators/book";
 import { Textarea } from "@/components/ui/textarea";

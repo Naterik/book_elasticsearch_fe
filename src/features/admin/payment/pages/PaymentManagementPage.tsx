@@ -8,9 +8,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { usePaymentManagement } from "@/features/admin/payment/hooks/usePaymentManagement";
+
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
+import { usePaymentManagement } from "@/features/admin/payment/hooks/usePaymentManagement";
+("@/components/layout/admin/data-table");
 
 const PaymentManagementPage = () => {
   const {
@@ -41,26 +42,23 @@ const PaymentManagementPage = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={5} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={payments}
-          searchKey="transactionId"
-          searchPlaceholder="Search by transaction ID..."
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={true}
-          emptyMessage="No payments found."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={payments}
+        searchKey="transactionId"
+        searchPlaceholder="Search by transaction ID..."
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={true}
+        emptyMessage="No payments found."
+        isLoading={isLoading}
+      />
 
       <AlertDialog
         open={isDeleteDialogOpen}

@@ -109,7 +109,7 @@ const BookDetailDialog = ({
               <User className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Author</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground ">
                   {book.authors.name}
                 </p>
               </div>

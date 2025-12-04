@@ -67,8 +67,13 @@ export const getBookColumns = (
   {
     accessorKey: "authors",
     header: "Author",
+
     cell: ({ row }) => {
-      return <span>{row.original.authors.name}</span>;
+      return (
+        <div className="text-md text-muted-foreground truncate max-w-xs">
+          {row.original.authors.name || "-"}
+        </div>
+      );
     },
   },
   {

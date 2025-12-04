@@ -20,3 +20,8 @@ export const updatePublisherAPI = (id: number, data: { name: string }) => {
 export const deletePublisherAPI = (id: number) => {
   return axios.delete<IBackendRes<null>>(`/api/v1/publishers/${id}`);
 };
+
+export const getAllPublishersAPI = () => {
+  const urlBackend = `/api/v1/publishers`;
+  return axios.get<IBackendRes<IPublisher[]>>(urlBackend);
+};

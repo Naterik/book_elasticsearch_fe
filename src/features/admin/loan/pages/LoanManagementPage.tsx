@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useLoanManagement } from "@/features/admin/loan/hooks/useLoanManagement";
 
 const LoanManagementPage = () => {
@@ -41,26 +40,23 @@ const LoanManagementPage = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={5} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={loans}
-          searchKey="user.fullName"
-          searchPlaceholder="Search by user name..."
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={true}
-          emptyMessage="No loans found."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={loans}
+        searchKey="user.fullName"
+        searchPlaceholder="Search by user name..."
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={true}
+        emptyMessage="No loans found."
+        isLoading={isLoading}
+      />
 
       <AlertDialog
         open={isDeleteDialogOpen}

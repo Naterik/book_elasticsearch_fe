@@ -12,7 +12,6 @@ import {
 import { PlusIcon } from "lucide-react";
 import BookCopyFormDialog from "@/features/admin/book-copy/components/BookCopyFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
@@ -77,27 +76,24 @@ const BookCopyManagementPage = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={6} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={bookCopies}
-          searchKey={undefined}
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={false}
-          emptyMessage={
-            searchQuery ?? "No book copies found. Try a different search."
-          }
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={bookCopies}
+        searchKey={undefined}
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={false}
+        emptyMessage={
+          searchQuery ?? "No book copies found. Try a different search."
+        }
+        isLoading={isLoading}
+      />
 
       <BookCopyFormDialog
         open={isFormDialogOpen}

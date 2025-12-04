@@ -13,7 +13,6 @@ import { PlusIcon } from "lucide-react";
 import UserFormDialog from "@/features/admin/user/components/UserFormDialog";
 import UserDetailDialog from "@/features/admin/user/components/UserDetailDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { useUserManagement } from "@/features/admin/user/hooks/useUserManagement";
 
 const UserManagement = () => {
@@ -57,26 +56,23 @@ const UserManagement = () => {
         </Button>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={5} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={users}
-          searchKey="username"
-          searchPlaceholder="Search by username..."
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={true}
-          emptyMessage="No users found. Add your first user to get started."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={users}
+        searchKey="username"
+        searchPlaceholder="Search by username..."
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={true}
+        emptyMessage="No users found. Add your first user to get started."
+        isLoading={isLoading}
+      />
 
       <UserFormDialog
         open={isFormDialogOpen}

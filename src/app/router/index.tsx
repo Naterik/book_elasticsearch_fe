@@ -14,7 +14,7 @@ import NotificationsPage from "@/pages/client/Notifications";
 import ClientLayout from "@/layout/ClientLayout";
 import BookManagement from "@/features/admin/book/pages/BookManagementPage";
 import AdminLayout from "@/layout/AdminLayout";
-import Dashboard from "@/pages/Dashboard";
+import { DashboardPage } from "@/features/admin/dashboard";
 import UserManagement from "@/features/admin/user/pages/UserManagementPage";
 import ForbiddenPage from "@/pages/403";
 import NotFoundPage from "@/pages/404";
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, Component: Dashboard },
+      { index: true, Component: DashboardPage },
       { path: "users", Component: UserManagement },
       {
         path: "books",

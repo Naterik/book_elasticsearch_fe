@@ -19,6 +19,11 @@ export const updateAuthorAPI = (
   return axios.put<IBackendRes<IAuthor>>(`/api/v1/authors/${id}`, data);
 };
 
+export const getAllAuthorsAPI = () => {
+  const urlBackend = `/api/v1/authors`;
+  return axios.get<IBackendRes<IAuthor[]>>(urlBackend);
+};
+
 export const deleteAuthorAPI = (id: number) => {
   return axios.delete<IBackendRes<void>>(`/api/v1/authors/${id}`);
 };

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PlusIcon } from "lucide-react";
 import { DataTable } from "@/components/layout/admin/data-table";
-import { TableSkeletonLoader } from "@/components/layout/admin/table-skeleton-loader";
 import { usePublisherManagement } from "../hooks/usePublisherManagement";
 import PublisherFormDialog from "../components/PublisherFormDialog";
 
@@ -51,26 +50,23 @@ const PublisherManagementPage = () => {
         </Button>
       </div>
 
-      {isLoading ? (
-        <TableSkeletonLoader rows={12} columns={4} />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={publishers}
-          searchKey="name"
-          searchPlaceholder="Search by publisher name..."
-          pageCount={totalPages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          showColumnToggle={true}
-          showPagination={true}
-          showSearch={true}
-          emptyMessage="No publishers found. Add your first publisher to get started."
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={publishers}
+        searchKey="name"
+        searchPlaceholder="Search by publisher name..."
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        currentPage={currentPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        showColumnToggle={true}
+        showPagination={true}
+        showSearch={true}
+        emptyMessage="No publishers found. Add your first publisher to get started."
+        isLoading={isLoading}
+      />
 
       <PublisherFormDialog
         open={isFormDialogOpen}

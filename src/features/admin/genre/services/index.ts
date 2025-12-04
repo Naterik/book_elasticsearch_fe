@@ -19,3 +19,8 @@ export const updateGenreAPI = (data: IGenre) => {
 export const deleteGenreAPI = (id: number) => {
   return axios.delete<IBackendRes<null>>(`/api/v1/genres/${+id}`);
 };
+
+export const getAllGenresAPI = () => {
+  const urlBackend = `/api/v1/genres`;
+  return axios.get<IBackendRes<IGenre[]>>(urlBackend);
+};
