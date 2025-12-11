@@ -31,7 +31,7 @@ const BookPagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="my-6 sm:my-8 flex justify-center">
+    <div className="my-6 sm:my-8 flex justify-center cursor-pointer">
       <div className="flex w-full items-center justify-between sm:hidden px-2">
         <button
           onClick={goPrev}

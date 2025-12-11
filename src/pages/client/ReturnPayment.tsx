@@ -88,7 +88,11 @@ const ReturnPayment = () => {
                   size="lg"
                   className="flex-1 gap-2"
                 >
-                  <Link to={paymentType === "membership" ? "/info" : "/loan"}>
+                  <Link
+                    to={
+                      paymentType === "membership" ? "/user/info" : "/user/loan"
+                    }
+                  >
                     <History className="h-4 w-4" />
                     {paymentType === "membership" ? "View Info" : "View Loans"}
                     <ArrowRight className="h-4 w-4" />
@@ -159,7 +163,13 @@ const ReturnPayment = () => {
                   size="lg"
                   className="flex-1 gap-2"
                 >
-                  <Link to={paymentType === "membership" ? "/member" : "/loan"}>
+                  <Link
+                    to={
+                      paymentType === "membership"
+                        ? "/user/member"
+                        : "/user/loan"
+                    }
+                  >
                     Try Again
                     <ArrowRight className="h-4 w-4" />
                   </Link>

@@ -7,11 +7,18 @@ export interface IBackendRes<T> {
 export interface IModelPaginate<T> {
   pagination: {
     currentPage: number;
-    totalPages: number;
     pageSize: number;
+    totalPages: number;
     totalItems: number;
   };
   result: T[];
+}
+
+export interface IPagination {
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
 }
 
 export interface ILogin {

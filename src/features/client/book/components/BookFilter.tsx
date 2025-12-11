@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/helper";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-responsive";
 import { cn } from "@/lib/utils";
 import { memo, useState } from "react";
 import { LANGUAGE_FLAGS } from "@/helper/icon";

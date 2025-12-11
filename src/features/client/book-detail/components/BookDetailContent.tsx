@@ -62,13 +62,13 @@ const BookDetailContent = ({
       );
       if (res.data) {
         toast.success("Book borrowed successfully!");
-        navigate("/loan");
+        navigate("/user/loan");
       } else {
         toast.error(res.message || "Failed to borrow book");
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("An error occurred while borrowing the book");
-    } finally {
       setIsLoading(false);
     }
   };

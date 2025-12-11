@@ -46,7 +46,6 @@ export const useLoanPage = () => {
 
   const fetchAllLoans = useCallback(async () => {
     if (!userId || userId === 0) return;
-    setIsLoading(true);
     try {
       const res: any = await getLoanByUserIdAPI(userId);
       if (res.data) {
@@ -54,14 +53,11 @@ export const useLoanPage = () => {
       }
     } catch (error) {
       toast.error("Cannot load the book on loan.");
-    } finally {
-      setIsLoading(false);
     }
-  }, [userId, setIsLoading]);
+  }, [userId]);
 
   const fetchReturnedLoan = useCallback(async () => {
     if (!userId || userId === 0) return;
-    setIsLoading(true);
     try {
       const res = await getReturnedLoanByUserAPI(userId);
       if (res.data) {
@@ -70,14 +66,11 @@ export const useLoanPage = () => {
     } catch (error) {
       toast.error("Failed to fetch returned loans");
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [userId, setIsLoading]);
+  }, [userId]);
 
   const fetchReservation = useCallback(async () => {
     if (!userId || userId === 0) return;
-    setIsLoading(true);
     try {
       const res = await getReservationByUserAPI(userId);
       if (res.data) {
@@ -86,14 +79,11 @@ export const useLoanPage = () => {
     } catch (error) {
       toast.error("Failed to fetch reservation");
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [userId, setIsLoading]);
+  }, [userId]);
 
   const fetchFineByUserId = useCallback(async () => {
     if (!userId || userId === 0) return;
-    setIsLoading(true);
     try {
       const res = await getFineByUserIdAPI(userId);
       if (res.data) {
@@ -102,10 +92,8 @@ export const useLoanPage = () => {
     } catch (error) {
       toast.error("Failed to fetch fine");
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [userId, setIsLoading]);
+  }, [userId]);
 
   const handleRenewLoan = async (loanId: number) => {
     if (!userId || userId === 0) return;
@@ -140,13 +128,25 @@ export const useLoanPage = () => {
   };
 
   useEffect(() => {
-    fetchAllLoans();
-    fetchReturnedLoan();
-    fetchFineByUserId();
-    if (checkStatus) {
-      fetchReservation();
-    }
-  }, [fetchAllLoans, fetchReturnedLoan, fetchReservation, fetchFineByUserId]);
+    const initData = async () => {
+      setIsLoading(true);
+      await Promise.all([
+        fetchAllLoans(),
+        fetchReturnedLoan(),
+        fetchFineByUserId(),
+        checkStatus ? fetchReservation() : Promise.resolve(),
+      ]);
+      setIsLoading(false);
+    };
+    initData();
+  }, [
+    fetchAllLoans,
+    fetchReturnedLoan,
+    fetchReservation,
+    fetchFineByUserId,
+    checkStatus,
+    setIsLoading,
+  ]);
 
   return {
     dataLoanReturn,

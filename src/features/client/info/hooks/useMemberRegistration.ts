@@ -27,7 +27,7 @@ export const useMemberRegistration = () => {
   const form = useForm<MemberRegistrationSchema>({
     resolver: zodResolver(memberRegistrationSchema),
     defaultValues: {
-      fullName: "",
+      fullName: user?.fullName || "",
       phone: "",
       address: "",
     },

@@ -53,6 +53,9 @@ interface DataTableProps<TData, TValue> {
   enableSorting?: boolean;
   enableFiltering?: boolean;
   isLoading?: boolean;
+
+  onSearch?: (value: string) => void;
+  searchValue?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -73,6 +76,9 @@ export function DataTable<TData, TValue>({
   enableSorting = true,
   enableFiltering = true,
   isLoading = false,
+
+  onSearch,
+  searchValue,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -112,10 +118,16 @@ export function DataTable<TData, TValue>({
               <Input
                 placeholder={searchPlaceholder}
                 value={
-                  (table.getColumn(searchKey)?.getFilterValue() as string) ?? ""
+                  searchValue ??
+                  (table.getColumn(searchKey)?.getFilterValue() as string) ??
+                  ""
                 }
                 onChange={(event) =>
-                  table.getColumn(searchKey)?.setFilterValue(event.target.value)
+                  onSearch
+                    ? onSearch(event.target.value)
+                    : table
+                        .getColumn(searchKey)
+                        ?.setFilterValue(event.target.value)
                 }
                 className="h-9 w-[150px] lg:w-[250px]"
               />

@@ -3,7 +3,7 @@ import BookGrid from "@/features/client/book/components/BookGrid";
 import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
 import BookSelectedFilters from "@/features/client/book/components/BookSelectedFilters";
-import { useBookFilter, useBookData } from "@/features/client/book";
+import { useBookData, useBookFilter } from "@/features/client/book";
 import SearchBar from "@/components/Search";
 import {
   Sheet,
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
+import BookGridVirtual from "@/features/client/book/components/BookGridVirtual";
+import { useBookInfinite } from "@/features/client/book/hooks/useBookInfinite";
 
 const BookPage = () => {
   const filterState = useBookFilter();
@@ -40,17 +42,35 @@ const BookPage = () => {
 
   const {
     dataBook,
-    currentPage,
-    totalPages,
     totalItems,
-    setCurrentPage,
+    totalPages,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
     searchInput,
     setSearchInput,
     view,
     setView,
     sortBy,
     setSortBy,
-  } = useBookData(filterState);
+    fetchNextPage,
+  } = useBookInfinite(filterState);
+
+  // const {
+  //   dataBook,
+  //   currentPage,
+  //   totalPages,
+  //   totalItems,
+  //   setCurrentPage,
+  //   searchInput,
+  //   setSearchInput,
+  //   view,
+  //   setView,
+  //   sortBy,
+  //   setSortBy,
+  //   isPending,
+  //   isLoading,
+  // } = useBookData(filterState);
 
   const handleResetFilters = () => {
     resetFilters();
@@ -60,7 +80,7 @@ const BookPage = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto p-2 sm:py-6">
+        <div className="container mx-auto p-2 sm:py-3">
           <SearchBar
             initialQuery={searchInput}
             onSearch={setSearchInput}
@@ -158,12 +178,25 @@ const BookPage = () => {
               countFilter={countFilter}
               total={totalItems}
             />
-            <BookGrid items={dataBook} view={view} />
+
+            <BookGridVirtual
+              dataBook={dataBook}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              isLoading={isLoading}
+              isFetchingNextPage={isFetchingNextPage}
+              hasNextPage={hasNextPage}
+              fetchNextPage={fetchNextPage}
+              view={view}
+              countFilter={countFilter}
+            />
+
+            {/* <BookGrid items={dataBook} view={view} isPending={isLoading} />
             <BookPagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-            />
+            /> */}
           </div>
         </div>
       </div>

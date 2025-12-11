@@ -1,15 +1,19 @@
 import { Card, CardTitle } from "@/components/ui/card";
 import BookCard from "./BookCard";
 import BookListCard from "./BookListCard";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-responsive";
 import { memo } from "react";
+import type { IBook, IBookElasticIndex } from "@/types/models/book.model";
+import BookCardSkeleton from "./BookCardSkeleton";
+import type { ViewCard } from "@/types";
 
 type Props = {
-  items: IBook[] | undefined;
-  view: "List" | "Kanban";
+  items: (IBook | IBookElasticIndex)[] | undefined;
+  view: ViewCard;
+  isPending: boolean;
 };
 
-const BookGrid = ({ items, view }: Props) => {
+const BookGrid = ({ items, view, isPending }: Props) => {
   const isMobile = useIsMobile();
 
   const getGridClass = (): string => {
@@ -35,8 +39,20 @@ const BookGrid = ({ items, view }: Props) => {
   return (
     <div className={getGridClass()}>
       {view === "List"
-        ? items?.map((it) => <BookListCard key={it.id} item={it} />)
-        : items?.map((it) => <BookCard key={it.id} item={it} />)}
+        ? items?.map((it) => {
+            return (
+              <div key={it.id}>
+                {isPending ? <BookCardSkeleton /> : <BookListCard item={it} />}
+              </div>
+            );
+          })
+        : items?.map((it) => {
+            return (
+              <div key={it.id}>
+                {isPending ? <BookCardSkeleton /> : <BookCard item={it} />}
+              </div>
+            );
+          })}
     </div>
   );
 };

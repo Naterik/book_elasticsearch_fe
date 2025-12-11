@@ -8,8 +8,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { List, LayoutGrid } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-responsive";
 import { memo } from "react";
+import type { ViewCard } from "@/types";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
@@ -18,8 +19,8 @@ const SORT_OPTIONS = [
 ] as const;
 
 type Props = {
-  view: "List" | "Kanban";
-  onChangeView: (v: "List" | "Kanban") => void;
+  view: ViewCard;
+  onChangeView: (v: ViewCard) => void;
   sortBy: string;
   onChangeSort: (v: string) => void;
   countFilter: number;
@@ -80,7 +81,7 @@ const BookToolbar = ({
         <ToggleGroup
           type="single"
           value={view}
-          onValueChange={(v) => v && onChangeView(v as "List" | "Kanban")}
+          onValueChange={(v: ViewCard) => v && onChangeView(v)}
           className="border rounded-md"
         >
           <ToggleGroupItem

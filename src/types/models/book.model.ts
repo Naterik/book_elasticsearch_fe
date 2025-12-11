@@ -1,3 +1,21 @@
+export interface IAuthor {
+  id: number;
+  name: string;
+  bio?: string | null;
+}
+
+export interface IGenre {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface IPublisher {
+  id: number;
+  name: string;
+  description?: string;
+}
+
 export interface IBook {
   id: number;
   isbn: string;
@@ -18,31 +36,25 @@ export interface IBook {
   publishers: IPublisher;
 }
 
-export interface IAuthor {
-  id: string;
-  name: string;
-  bio: string | null;
+export interface IBookElasticIndex extends IBook {
+  suggest: string[];
+  score: null;
 }
 
-export interface IGenre {
-  id: string;
-  name: string;
-  description?: string;
+export interface IPagination {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+}
+
+export interface IBookElasticResponse {
+  result: IBookElasticIndex[];
+  pagination: IPagination;
 }
 
 export interface IGenreBook {
   genres: IGenre;
-}
-
-export interface IPublisher {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-export interface ILanguages {
-  key: string;
-  doc_count: number;
 }
 
 export interface IBookCopy {
@@ -62,4 +74,9 @@ export interface FilterState {
   selectedLanguage: string | null;
   priceRange: [number, number];
   yearRange: [number, number];
+}
+
+export interface ILanguages {
+  key: string;
+  doc_count: number;
 }

@@ -15,9 +15,7 @@ const ProtectedRoute = ({ children }: IProps) => {
 
   // Chỉ hiển thị GlobalLoader khi:
   // 1. Đang load auth ban đầu (chưa có isAuthenticated)
-  // 2. Hoặc đang load ở trang Client (không phải Admin)
-  // Đối với Admin route đã đăng nhập: Không hiện GlobalLoader để hiển thị Skeleton trong page
-  if (isLoading && (!isAuthenticated || !isAdminRoute)) {
+  if (isLoading && !isAuthenticated) {
     return <GlobalLoader isVisible={true} />;
   }
 

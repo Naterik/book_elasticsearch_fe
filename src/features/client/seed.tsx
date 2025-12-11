@@ -17,7 +17,7 @@ export const features = [
     description: `Our loan management system helps you keep track of your borrowed books. 
     Get notifications for due dates and manage your loans easily. View your borrowing history 
     and current loans in one place, making it simple to stay organized with your library activities.`,
-    link: "/loan",
+    link: "/user/loan",
     stats: { number: "Easy", label: "Tracking" },
     imageUrl:
       "https://images.pexels.com/photos/12170723/pexels-photo-12170723.jpeg",

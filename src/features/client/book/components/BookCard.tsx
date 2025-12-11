@@ -1,18 +1,18 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card } from "@/components/ui/card";
+import type { IBookElasticIndex } from "@/types";
 import { TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function BookCard({ item }: { item: IBook }) {
+const BookCard = ({ item }: { item: IBook | IBookElasticIndex }) => {
   const navigate = useNavigate();
   const placeholderImage =
-    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop";
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTt_R8ZDAp9kjtZyNyxjKHoZ_rrKoU1gH3pA&s";
 
   const isAvailable = item.quantity - item.borrowed > 0;
-
   return (
     <Card
-      className="p-0 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 duration-300 cursor-pointer group bg-white"
+      className="p-0 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 duration-300 cursor-pointer group bg-white "
       onClick={() => navigate(`/book/${item.id}`)}
     >
       <AspectRatio ratio={3 / 4}>
@@ -46,4 +46,6 @@ export default function BookCard({ item }: { item: IBook }) {
       </div>
     </Card>
   );
-}
+};
+
+export default BookCard;

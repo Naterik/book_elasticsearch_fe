@@ -57,11 +57,11 @@ const router = createBrowserRouter([
           { path: "loan", Component: LoanPage },
           { path: "fine", Component: LoanPage },
           { path: "notifications", Component: NotificationsPage },
-          {
-            path: "vnpay/return-url",
-            Component: ReturnPayment,
-          },
         ],
+      },
+      {
+        path: "vnpay/return-url",
+        Component: ReturnPayment,
       },
     ],
   },

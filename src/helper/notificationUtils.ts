@@ -125,17 +125,17 @@ export const getNotificationPath = (type: string): string | null => {
   switch (type) {
     case "MEMBERSHIP_ACTIVATED":
     case "MEMBERSHIP_INACTIVE":
-      return "/info";
+      return "/user/info";
     case "LOAN_CREATED":
     case "LOAN_RENEWED":
-      return "/loan";
+      return "/user/loan";
     case "FINE_CREATED":
     case "PAYMENT_RECEIVED":
-      return "/fine";
+      return "/user/fine";
     case "RESERVATION_CREATED":
-      return "/loan";
+      return "/user/loan";
     case "SUCCESS_RETURNED":
-      return "/loan";
+      return "/user/loan";
     default:
       return null;
   }

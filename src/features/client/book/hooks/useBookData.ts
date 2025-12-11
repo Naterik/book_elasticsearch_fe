@@ -2,79 +2,84 @@ import { useState, useEffect, useCallback, useTransition } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { getFilterBookElasticAPI } from "@/services/api";
-import type { FilterState } from "@/types";
+import type { FilterState, ViewCard } from "@/types";
+import { useDebounce } from "@/hooks/use-debounce";
+import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book.enum";
 
-export const useBookData = (filterState: FilterState) => {
+export const useBookData = ({
+  priceRange,
+  yearRange,
+  selectedGenres,
+  selectedLanguage,
+}: FilterState) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isPending] = useTransition();
-
+  const [isPending, startTransition] = useTransition();
   const [dataBook, setDataBook] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [searchInput, setSearchInput] = useState(searchParams.get("q") || "");
-  const [view, setView] = useState<"List" | "Kanban">("Kanban");
+  const [searchInput, setSearchInput] = useState<string>(
+    searchParams.get("q") || ""
+  );
+  const [view, setView] = useState<ViewCard>("Kanban");
   const [sortBy, setSortBy] = useState<string>("newest");
 
+  const debouncedSearch = useDebounce(searchInput, 500);
+  const debouncedPrice = useDebounce(priceRange, 500);
+  const debouncedYear = useDebounce(yearRange, 500);
+  const fetchBookData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getFilterBookElasticAPI(
+        currentPage,
+        debouncedYear[0] !== YEAR_BOUNDS[0] ||
+          debouncedYear[1] !== YEAR_BOUNDS[1]
+          ? debouncedYear
+          : null,
+        debouncedPrice[0] !== PRICE_BOUNDS[0] ||
+          debouncedPrice[1] !== PRICE_BOUNDS[1]
+          ? debouncedPrice
+          : null,
+        debouncedSearch,
+        sortBy,
+        selectedGenres,
+        selectedLanguage
+      );
+      if (res.data !== null) {
+        const pagination = res.data.pagination;
+        startTransition(() => {
+          setDataBook(res.data.result);
+          setTotalPages(pagination.totalPages);
+          setTotalItems(pagination.totalItems);
+        });
+      } else {
+        setTotalItems(0);
+        setDataBook([]);
+      }
+    } catch (err) {
+      toast.error("Failed to fetch book data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
     const keyword = searchParams.get("q") || "";
     setSearchInput(keyword);
   }, [searchParams]);
 
   useEffect(() => {
-    const fetchBookData = async () => {
-      try {
-        const res = await getFilterBookElasticAPI(
-          currentPage,
-          filterState.yearRange[0] !== 1960 || filterState.yearRange[1] !== 2025
-            ? filterState.yearRange
-            : null,
-          filterState.priceRange[0] !== 120_000 ||
-            filterState.priceRange[1] !== 1_500_000
-            ? filterState.priceRange
-            : null,
-          searchInput,
-          sortBy,
-          filterState.selectedGenres,
-          filterState.selectedLanguage
-        );
-        if (res.data !== null) {
-          const pagination = res.data.pagination;
-          setDataBook(res.data.result);
-          setCurrentPage(pagination.currentPage);
-          setTotalPages(pagination.totalPages);
-          setTotalItems(pagination.totalItems);
-        } else {
-          setTotalItems(0);
-          setDataBook([]);
-        }
-      } catch (err) {
-        toast.error("Failed to fetch book data");
-      }
-    };
-
     fetchBookData();
   }, [
     currentPage,
-    filterState.yearRange,
-    filterState.priceRange,
-    searchInput,
+    debouncedYear,
+    debouncedPrice,
+    debouncedSearch,
     sortBy,
-    filterState.selectedGenres,
-    filterState.selectedLanguage,
-  ]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    filterState.selectedGenres,
-    filterState.selectedLanguage,
-    filterState.priceRange,
-    filterState.yearRange,
-    searchInput,
-    sortBy,
+    selectedGenres,
+    selectedLanguage,
   ]);
 
   const handleSearch = useCallback(
@@ -94,6 +99,7 @@ export const useBookData = (filterState: FilterState) => {
     currentPage,
     totalPages,
     totalItems,
+    isLoading,
 
     setCurrentPage: handlePageChange,
     searchInput,
@@ -104,5 +110,6 @@ export const useBookData = (filterState: FilterState) => {
     setSortBy,
 
     isPending,
+    startTransition,
   };
 };

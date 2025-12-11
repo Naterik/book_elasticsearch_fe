@@ -26,3 +26,6 @@ export type PriceBounds = typeof PRICE_BOUNDS;
 
 export const YEAR_BOUNDS = [1960, 2025] as const;
 export type YearBounds = typeof YEAR_BOUNDS;
+
+export const ViewCard = ["List", "Kanban"] as const;
+export type ViewCard = (typeof ViewCard)[number];

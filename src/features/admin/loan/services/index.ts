@@ -1,9 +1,7 @@
 import createInstanceAxios from "@/services/axios.customize";
-import { ur } from "zod/v4/locales";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-// Loan Management APIs
 export const getAllLoansAdminAPI = (page: number = 1) => {
   const urlBackend = `/api/v1/loans?page=${page}`;
   return axios.get<IBackendRes<IModelPaginate<ILoan>>>(urlBackend);

@@ -5,8 +5,13 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { placeholderImage } from "@/config";
+import type { IBookElasticIndex } from "@/types";
 
-export default function BookListCard({ item }: { item: IBook }) {
+export default function BookListCard({
+  item,
+}: {
+  item: IBook | IBookElasticIndex;
+}) {
   const navigate = useNavigate();
   const isAvailable = item.quantity - item.borrowed > 0;
   return (

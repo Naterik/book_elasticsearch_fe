@@ -1,4 +1,5 @@
 import createInstanceAxios from "@/services/axios.customize";
+import type { IBookElasticIndex } from "@/types";
 import qs from "qs";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
@@ -42,11 +43,11 @@ export const getFilterBookElasticAPI = (
   priceRange: number[] | null,
   search: string,
   order: string,
-  genres: string[],
+  genres: string[] | null,
   language: string | null
 ) => {
   const urlBackend = "/api/v1/filter/elastic";
-  return axios.get(urlBackend, {
+  return axios.get<IBackendRes<IBookElasticIndex>>(urlBackend, {
     params: {
       page,
       yearRange,
