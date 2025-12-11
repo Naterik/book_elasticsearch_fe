@@ -63,3 +63,25 @@ export const calculateDueDate = (days: number) => {
     }
   );
 };
+
+export function getCompactItems(
+  current: number,
+  total: number,
+  siblingCount = 1
+): Array<number | "ELLIPSIS"> {
+  const maxShown = 2 + 2 * siblingCount + 2;
+  if (total <= maxShown) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const left = Math.max(2, current - siblingCount);
+  const right = Math.min(total - 1, current + siblingCount);
+
+  const pages: Array<number | "ELLIPSIS"> = [1];
+  if (left > 2) pages.push("ELLIPSIS");
+
+  for (let p = left; p <= right; p++) pages.push(p);
+
+  if (right < total - 1) pages.push("ELLIPSIS");
+  pages.push(total);
+
+  return pages;
+}

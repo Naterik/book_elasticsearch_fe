@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { registerAPI } from "@/services/api";
 import { useNavigate } from "react-router";
-
-// shadcn/ui
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,7 +46,6 @@ const RegisterPage = () => {
         confirmPassword,
         fullName
       );
-
       if (res.data) {
         toast.success("Register success! Redirecting to login page...");
         navigate("/login");
@@ -57,7 +54,6 @@ const RegisterPage = () => {
       }
     } catch (error) {
       toast.error("An error occurred during registration.");
-      console.error(error);
     } finally {
       setIsSubmit(false);
     }
@@ -65,12 +61,11 @@ const RegisterPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { username, password, confirmPassword, fullName } = formValues;
+    const { username, password, confirmPassword } = formValues;
     if (!username || !password || !confirmPassword) {
       toast.warning("Please fill in all required fields.");
       return;
     }
-
     if (password !== confirmPassword) {
       toast.warning("Password and Confirm Password do not match.");
       return;
@@ -93,7 +88,6 @@ const RegisterPage = () => {
                 name="fullName"
                 value={formValues.fullName}
                 onChange={handleInputChange}
-                required
               />
             </div>
 

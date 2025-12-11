@@ -15,14 +15,13 @@ type Props = {
 const BookDetailInfo = ({ item }: Props) => {
   return (
     <div className="w-full">
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="details" className="w-full co">
+        <TabsList className="grid w-full grid-cols-3 ">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="description">Description</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
 
-        {/* Details Tab */}
         <TabsContent value="details" className="mt-6">
           <Card>
             <CardHeader>
@@ -54,7 +53,6 @@ const BookDetailInfo = ({ item }: Props) => {
                     </h3>
                     <p className="text-base">{item?.authors?.name}</p>
                   </div>
-
                   <div>
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-1">
                       Publisher
@@ -62,7 +60,6 @@ const BookDetailInfo = ({ item }: Props) => {
                     <p className="text-base">{item?.publishers?.name}</p>
                   </div>
                 </div>
-
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-1">
@@ -101,7 +98,6 @@ const BookDetailInfo = ({ item }: Props) => {
           </Card>
         </TabsContent>
 
-        {/* Description Tab */}
         <TabsContent value="description" className="mt-6">
           <Card>
             <CardHeader>

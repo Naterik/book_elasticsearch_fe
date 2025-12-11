@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/helper";
 import { StatusBadgeUser } from "./StatusUser";
+import { Loader2 } from "lucide-react";
 
 interface UserDetailDialogProps {
   open: boolean;
@@ -21,7 +21,6 @@ interface UserDetailDialogProps {
   userId: number | null;
 }
 
-type UserAccountType = "SYSTEM" | "GOOGLE";
 const getTypeBadge = (type: UserAccountType) => {
   return type === "SYSTEM" ? (
     <Badge variant="default">System</Badge>
@@ -45,7 +44,7 @@ const UserDetailDialog = ({
   onOpenChange,
   userId,
 }: UserDetailDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IAdminUser | null>(null);
   useEffect(() => {
     if (open && userId) {
@@ -56,7 +55,7 @@ const UserDetailDialog = ({
   }, [open, userId]);
   const fetchUserDetails = async () => {
     if (!userId) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getUserByIdAPI(userId);
 
@@ -73,7 +72,7 @@ const UserDetailDialog = ({
       toast.error("Failed to fetch user details");
       onOpenChange(false);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -87,7 +86,11 @@ const UserDetailDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {user ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : user ? (
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20">
@@ -105,8 +108,8 @@ const UserDetailDialog = ({
                 </h3>
                 <p className="text-muted-foreground">{user.username}</p>
                 <div className="flex gap-2 pt-2 flex-wrap">
-                  {StatusBadgeUser(user.status)}
-                  {getTypeBadge(user.type)}
+                  {StatusBadgeUser(user.status as UserStatus)}
+                  {getTypeBadge(user.type as UserAccountType)}
                   <Badge variant="outline">{user.role.name}</Badge>
                 </div>
               </div>

@@ -7,76 +7,53 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { getCompactItems } from "@/helper";
+import { memo } from "react";
 
 type Props = {
-  error: boolean;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   siblingCount?: number; // mặc định 1
 };
 
-function getCompactItems(
-  current: number,
-  total: number,
-  siblingCount = 1
-): Array<number | "ELLIPSIS"> {
-  const maxShown = 2 + 2 * siblingCount + 2;
-  if (total <= maxShown) return Array.from({ length: total }, (_, i) => i + 1);
-
-  const left = Math.max(2, current - siblingCount);
-  const right = Math.min(total - 1, current + siblingCount);
-
-  const pages: Array<number | "ELLIPSIS"> = [1];
-  if (left > 2) pages.push("ELLIPSIS");
-
-  for (let p = left; p <= right; p++) pages.push(p);
-
-  if (right < total - 1) pages.push("ELLIPSIS");
-  pages.push(total);
-
-  return pages;
-}
-
-export default function BookPagination({
-  error,
+const BookPagination = ({
   currentPage,
   totalPages,
   onPageChange,
   siblingCount = 1,
-}: Props) {
+}: Props) => {
   const goPrev = () => currentPage > 1 && onPageChange(currentPage - 1);
   const goNext = () =>
     currentPage < totalPages && onPageChange(currentPage + 1);
-
   const items = getCompactItems(currentPage, totalPages, siblingCount);
 
   if (totalPages <= 1) return null;
-  if (error) return null;
+
   return (
-    <div className="cursor-pointer my-4 flex justify-center">
-      <div className="flex w-full items-center justify-between sm:hidden">
+    <div className="my-6 sm:my-8 flex justify-center cursor-pointer">
+      <div className="flex w-full items-center justify-between sm:hidden px-2">
         <button
           onClick={goPrev}
           disabled={currentPage === 1}
-          className="rounded-md border px-3 py-2 disabled:opacity-50 "
+          className="rounded-md border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
         >
-          Prev
+          ← Prev
         </button>
-        <span className="text-sm text-muted-foreground">
-          Page {currentPage} / {totalPages}
+        <span className="text-xs sm:text-sm font-medium text-muted-foreground">
+          {currentPage} of {totalPages}
         </span>
         <button
           onClick={goNext}
           disabled={currentPage === totalPages}
-          className="rounded-md border px-3 py-2 disabled:opacity-50"
+          className="rounded-md border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
         >
-          Next
+          Next →
         </button>
       </div>
 
       <Pagination className="hidden sm:flex">
-        <PaginationContent>
+        <PaginationContent className="gap-1">
           <PaginationItem>
             <PaginationPrevious
               onClick={(e) => {
@@ -84,16 +61,18 @@ export default function BookPagination({
                 goPrev();
               }}
               aria-disabled={currentPage === 1}
-              className={
-                currentPage === 1 ? "pointer-events-none opacity-50" : ""
-              }
+              className={`text-xs sm:text-sm ${
+                currentPage === 1
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer hover:bg-gray-100"
+              }`}
             />
           </PaginationItem>
 
           {items.map((it, idx) =>
             it === "ELLIPSIS" ? (
               <PaginationItem key={`e-${idx}`}>
-                <PaginationEllipsis />
+                <PaginationEllipsis className="text-xs sm:text-sm" />
               </PaginationItem>
             ) : (
               <PaginationItem key={it}>
@@ -103,6 +82,7 @@ export default function BookPagination({
                     e.preventDefault();
                     if (it !== currentPage) onPageChange(it);
                   }}
+                  className="text-xs sm:text-sm"
                 >
                   {it}
                 </PaginationLink>
@@ -117,15 +97,17 @@ export default function BookPagination({
                 goNext();
               }}
               aria-disabled={currentPage === totalPages}
-              className={
+              className={`text-xs sm:text-sm ${
                 currentPage === totalPages
                   ? "pointer-events-none opacity-50"
-                  : ""
-              }
+                  : "cursor-pointer hover:bg-gray-100"
+              }`}
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
     </div>
   );
-}
+};
+
+export default memo(BookPagination);

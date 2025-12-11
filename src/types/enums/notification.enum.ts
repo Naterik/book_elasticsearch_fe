@@ -1,0 +1,14 @@
+export const NotificationType = {
+  LOAN_DUE: "LOAN_DUE",
+  LOAN_OVERDUE: "LOAN_OVERDUE",
+  RESERVATION_READY: "RESERVATION_READY",
+  RESERVATION_CANCELLED: "RESERVATION_CANCELLED",
+  FINE_ISSUED: "FINE_ISSUED",
+  FINE_PAID: "FINE_PAID",
+  MEMBERSHIP_EXPIRING: "MEMBERSHIP_EXPIRING",
+  MEMBERSHIP_EXPIRED: "MEMBERSHIP_EXPIRED",
+  GENERAL: "GENERAL",
+} as const;
+
+export type NotificationType =
+  (typeof NotificationType)[keyof typeof NotificationType];

@@ -32,6 +32,7 @@ const GenreManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   } = useGenreManagement();
 
   return (
@@ -64,6 +65,7 @@ const GenreManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No genres found. Add your first genre to get started."
+        isLoading={isLoading}
       />
 
       <GenreFormDialog

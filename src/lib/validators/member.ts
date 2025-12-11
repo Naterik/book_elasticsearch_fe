@@ -16,5 +16,4 @@ export const memberRegistrationSchema = z.object({
   paymentRef: z.string().optional(),
 });
 
-// Export a TypeScript type from the schema
 export type MemberRegistrationSchema = z.infer<typeof memberRegistrationSchema>;

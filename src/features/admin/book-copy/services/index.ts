@@ -3,13 +3,11 @@ import qs from "qs";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-// Book Copy Management APIs
 export const getAllBookCopiesAdminAPI = (page: number = 1) => {
   const urlBackend = `/api/v1/book-copies?page=${page}`;
   return axios.get<IBackendRes<IModelPaginate<IBookCopy>>>(urlBackend);
 };
 
-// Book Copy Elasticsearch Search API - n_gram search
 export const getFilterBookCopyElasticAPI = (
   page: number = 1,
   search: string = ""
@@ -33,7 +31,7 @@ export const getBookCopyByIdAdminAPI = (id: number) => {
 };
 
 export const createBookCopyAPI = (data: {
-  yearPublished: number;
+  year_published: number;
   copyNumber: string;
   status: string;
   location: string;
@@ -45,7 +43,7 @@ export const createBookCopyAPI = (data: {
 
 export const updateBookCopyAPI = (data: {
   id: number;
-  yearPublished: number;
+  year_published: number;
   copyNumber: string;
   status: string;
   location: string;

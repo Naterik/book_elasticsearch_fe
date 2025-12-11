@@ -18,8 +18,7 @@ import {
   Loader2,
   ShieldAlert,
 } from "lucide-react";
-import { getVNPayUrlAPI } from "@/services/api";
-import { postCreateFinePaymentAPI } from "@/services/loans";
+import { getVNPayUrlAPI, postCreateFinePaymentAPI } from "@/services/api";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 

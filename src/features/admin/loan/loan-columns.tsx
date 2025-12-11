@@ -1,4 +1,4 @@
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { BadgeCheck, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
+import { formatDate } from "@/helper";
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -24,17 +25,9 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
 export const getLoanColumns = (
-  onEdit: (loan: ILoan) => void,
-  onDelete: (loanId: number) => void
+  onDelete: (loanId: number) => void,
+  onBookReturn: (loanId: number, userId: number) => void
 ): ColumnDef<ILoan>[] => [
   {
     accessorKey: "id",
@@ -137,17 +130,17 @@ export const getLoanColumns = (
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => onEdit(loan)}
-              className="cursor-pointer"
+              onClick={() => onBookReturn(loan.id, loan.userId)}
+              className="cursor-pointer text-[#26ec18] focus:text-[#0fad0398]"
             >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
+              <BadgeCheck className="mr-2 h-4 w-4 " color="#26ec18" />
+              Approved
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDelete(loan.id)}
               className="cursor-pointer text-destructive focus:text-destructive"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="mr-2 h-4 w-4" color="red" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

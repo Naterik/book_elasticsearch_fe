@@ -1,13 +1,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllBooksAdminAPI,
   deleteBookAPI,
 } from "@/features/admin/book/services";
 import { getBookColumns } from "@/features/admin/book/book-columns";
+import { useDebounce } from "@/hooks/use-debounce";
+
 export const useBookManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [books, setBooks] = useState<IBook[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -23,28 +27,27 @@ export const useBookManagement = () => {
 
   useEffect(() => {
     fetchBooks();
-  }, [currentPage]);
+  }, [currentPage, debouncedSearchTerm, pageSize]);
+
 
   const fetchBooks = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
-      const response = await getAllBooksAdminAPI(currentPage);
+      const response = await getAllBooksAdminAPI(currentPage, debouncedSearchTerm);
+
 
       if (response.data && response.data.result) {
         setBooks(response.data.result);
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else if (response.message) {
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching books:", error);
       toast.error("Failed to fetch books");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -70,14 +73,12 @@ export const useBookManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!bookToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteBookAPI(bookToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Book deleted successfully");
         fetchBooks();
@@ -86,7 +87,7 @@ export const useBookManagement = () => {
       console.error("Error deleting book:", error);
       toast.error("Failed to delete book");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setBookToDelete(null);
     }
@@ -139,5 +140,8 @@ export const useBookManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
+    searchTerm,
+    setSearchTerm,
   };
 };

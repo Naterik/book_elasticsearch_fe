@@ -23,6 +23,10 @@ const BookManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
+    searchTerm,
+    setSearchTerm,
+
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -70,6 +74,10 @@ const BookManagement = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No books found. Add your first book to get started."
+
+        isLoading={isLoading}
+        onSearch={setSearchTerm}
+        searchValue={searchTerm}
       />
 
       <BookFormDialog

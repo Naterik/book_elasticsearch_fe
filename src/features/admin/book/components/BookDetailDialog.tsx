@@ -24,7 +24,7 @@ const BookDetailDialog = ({
   onOpenChange,
   bookId,
 }: BookDetailDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const { setIsLoading } = useCurrentApp();
   const [book, setBook] = useState<IBook | null>(null);
 
   useEffect(() => {
@@ -36,22 +36,20 @@ const BookDetailDialog = ({
   const fetchBookDetails = async () => {
     if (!bookId) return;
 
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getBookByIdAdminAPI(bookId);
 
       if (response.data) {
         setBook(response.data);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      }
+      if (response?.message) {
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching book details:", error);
       toast.error("Failed to fetch book details");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -70,7 +68,6 @@ const BookDetailDialog = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Book Cover and Basic Info */}
           <div className="flex gap-6">
             {book.image && (
               <div className="flex-shrink-0">
@@ -107,13 +104,12 @@ const BookDetailDialog = ({
 
           <Separator />
 
-          {/* Detailed Information Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
               <User className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Author</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground ">
                   {book.authors.name}
                 </p>
               </div>
@@ -168,7 +164,6 @@ const BookDetailDialog = ({
 
           <Separator />
 
-          {/* Inventory Information */}
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
             <div className="text-center">
               <p className="text-2xl font-bold">{book.quantity}</p>
@@ -186,7 +181,6 @@ const BookDetailDialog = ({
             </div>
           </div>
 
-          {/* Detailed Description */}
           {book.detailDesc && (
             <>
               <Separator />

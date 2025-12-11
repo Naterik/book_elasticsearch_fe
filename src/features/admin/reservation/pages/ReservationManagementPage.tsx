@@ -22,6 +22,7 @@ const ReservationManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -66,6 +67,7 @@ const ReservationManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No reservations found. Create your first reservation to get started."
+        isLoading={isLoading}
       />
 
       <ReservationFormDialog

@@ -1,22 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllLoansAdminAPI,
   deleteLoanAPI,
+  returnBookApproveAPI,
 } from "@/features/admin/loan/services";
 import { getLoanColumns } from "@/features/admin/loan/loan-columns";
 
 export const useLoanManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loans, setLoans] = useState<ILoan[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
 
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
-  const [selectedLoan, setSelectedLoan] = useState<ILoan | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [loanToDelete, setLoanToDelete] = useState<number | null>(null);
 
@@ -25,7 +24,7 @@ export const useLoanManagement = () => {
   }, [currentPage]);
 
   const fetchLoans = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllLoansAdminAPI(currentPage);
 
@@ -34,27 +33,14 @@ export const useLoanManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching loans:", error);
       toast.error("Failed to fetch loans");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
-  };
-
-  const handleCreateLoan = () => {
-    setSelectedLoan(null);
-    setIsFormDialogOpen(true);
-  };
-
-  const handleEditLoan = (loan: ILoan) => {
-    setSelectedLoan(loan);
-    setIsFormDialogOpen(true);
   };
 
   const handleDeleteClick = (loanId: number) => {
@@ -62,34 +48,43 @@ export const useLoanManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleReturnBook = async (loanId: number, userId: number) => {
+    setIsLoading(true);
+    try {
+      const res = await returnBookApproveAPI(loanId, userId);
+      if (res.data) {
+        toast.success("Book return approved successfully");
+        fetchLoans();
+      } else {
+        toast.error(res.message);
+      }
+    } catch {
+      toast.error("Failed to approve book return");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleConfirmDelete = async () => {
     if (!loanToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteLoanAPI(loanToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
-      } else {
+      if (response.data) {
         toast.success("Loan deleted successfully");
-        fetchLoans();
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error deleting loan:", error);
       toast.error("Failed to delete loan");
     } finally {
-      hideLoader();
+      fetchLoans();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setLoanToDelete(null);
     }
-  };
-
-  const handleFormSuccess = () => {
-    setIsFormDialogOpen(false);
-    setSelectedLoan(null);
-    fetchLoans();
   };
 
   const handlePageChange = (page: number) => {
@@ -104,7 +99,7 @@ export const useLoanManagement = () => {
   };
 
   const columns = useMemo(
-    () => getLoanColumns(handleEditLoan, handleDeleteClick),
+    () => getLoanColumns(handleDeleteClick, handleReturnBook),
     []
   );
 
@@ -116,18 +111,14 @@ export const useLoanManagement = () => {
     pageSize,
     columns,
 
-    isFormDialogOpen,
-    setIsFormDialogOpen,
-    selectedLoan,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
-    handleCreateLoan,
-    handleEditLoan,
     handleDeleteClick,
     handleConfirmDelete,
-    handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    handleReturnBook,
+    isLoading,
   };
 };

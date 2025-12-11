@@ -8,12 +8,11 @@ import {
   TypographyH3,
   TypographyP,
   TypographyLead,
-  TypographyList,
 } from "@/components/ui/typography";
 import { Search, UserCircle } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
-import { features, stats } from "@/features/seed";
+import { features, stats } from "@/features/client/seed";
 
 const AboutPage = () => {
   return (

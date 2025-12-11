@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
@@ -9,38 +9,31 @@ import {
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
 
 export const useBookCopyManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
-
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
   const [selectedBookCopy, setSelectedBookCopy] = useState<IBookCopy | null>(
     null
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
-
-  // Search state
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  // Fetch data when page or search state changes
   useEffect(() => {
     if (isSearching && searchQuery.trim()) {
-      // Fetch with Elasticsearch search
       fetchBookCopiesWithSearch();
     } else {
-      // Fetch all book copies (regular pagination)
       fetchBookCopies();
     }
   }, [currentPage, searchQuery, isSearching]);
 
-  // Fetch all book copies (regular pagination)
   const fetchBookCopies = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllBookCopiesAdminAPI(currentPage);
 
@@ -49,22 +42,17 @@ export const useBookCopyManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("Error fetching book copies:", error);
       toast.error("Failed to fetch book copies");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
-
-  // Fetch book copies with Elasticsearch search
   const fetchBookCopiesWithSearch = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getFilterBookCopyElasticAPI(
         currentPage,
@@ -76,18 +64,15 @@ export const useBookCopyManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
         setBookCopies([]);
       }
     } catch (error) {
-      console.error("Error searching book copies:", error);
       toast.error("Failed to search book copies");
       setBookCopies([]);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -108,14 +93,12 @@ export const useBookCopyManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!bookCopyToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteBookCopyAPI(bookCopyToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Book copy deleted successfully");
         fetchBookCopies();
@@ -124,7 +107,7 @@ export const useBookCopyManagement = () => {
       console.error("Error deleting book copy:", error);
       toast.error("Failed to delete book copy");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setBookCopyToDelete(null);
     }
@@ -182,6 +165,7 @@ export const useBookCopyManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,

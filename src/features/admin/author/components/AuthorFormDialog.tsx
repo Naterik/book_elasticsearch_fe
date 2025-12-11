@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -24,13 +22,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createAuthorAPI, updateAuthorAPI } from "../services";
-
-const authorFormSchema = z.object({
-  name: z.string().min(1, "Author name is required"),
-  bio: z.string().optional(),
-});
-
-type AuthorFormValues = z.infer<typeof authorFormSchema>;
+import {
+  authorFormSchema,
+  type AuthorFormValues,
+} from "@/lib/validators/author";
+import { Loader2 } from "lucide-react";
 
 interface AuthorFormDialogProps {
   open: boolean;
@@ -45,7 +41,6 @@ const AuthorFormDialog = ({
   author,
   onSuccess,
 }: AuthorFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
   const isEditMode = !!author;
 
   const form = useForm<AuthorFormValues>({
@@ -73,20 +68,16 @@ const AuthorFormDialog = ({
   }, [open, author, form]);
 
   const onSubmit = async (values: AuthorFormValues) => {
-    showLoader();
     try {
       let response;
       if (isEditMode && author) {
-        response = await updateAuthorAPI(author.id, values);
+        response = await updateAuthorAPI(+author.id, values);
       } else {
         response = await createAuthorAPI(values);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode
@@ -100,8 +91,6 @@ const AuthorFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update author" : "Failed to create author"
       );
-    } finally {
-      hideLoader();
     }
   };
 
@@ -160,7 +149,10 @@ const AuthorFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Author" : "Create Author"}
               </Button>
             </DialogFooter>

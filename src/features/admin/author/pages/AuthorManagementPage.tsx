@@ -32,6 +32,7 @@ const AuthorManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   } = useAuthorManagement();
 
   return (
@@ -64,6 +65,7 @@ const AuthorManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No authors found. Add your first author to get started."
+        isLoading={isLoading}
       />
 
       <AuthorFormDialog

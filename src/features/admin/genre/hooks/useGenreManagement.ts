@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import { getGenresAPI, deleteGenreAPI } from "../services";
 import { getGenreColumns } from "../genre-columns";
 
 export const useGenreManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -20,22 +19,22 @@ export const useGenreManagement = () => {
   }, [currentPage]);
 
   const fetchGenres = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
-      const res = await getGenresAPI({ page: currentPage });
-      if (res.data && res.data.result) {
-        setGenres(res.data.result);
-        setTotalPages(res.data.pagination.totalPages);
-        setTotalItems(res.data.pagination.totalItems);
-        setPageSize(res.data.pagination.pageSize);
-      } else if (res.error) {
-        toast.error(Array.isArray(res.error) ? res.error[0] : res.error);
+      const response = await getGenresAPI({ page: currentPage });
+      if (response.data && response.data.result) {
+        setGenres(response.data.result);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalItems(response.data.pagination.totalItems);
+        setPageSize(response.data.pagination.pageSize);
+      } else {
+        toast.error(response.message);
       }
     } catch (err) {
       toast.error("Failed to fetch genres.");
       console.error(err);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -56,16 +55,20 @@ export const useGenreManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedGenre) return;
-    showLoader();
+    setIsLoading(true);
     try {
-      await deleteGenreAPI(selectedGenre.id);
-      toast.success("Genre deleted successfully.");
-      fetchGenres();
+      const response = await deleteGenreAPI(+selectedGenre.id);
+      if (response.message) {
+        toast.error(response.message);
+      } else {
+        toast.success("Genre deleted successfully.");
+        fetchGenres();
+      }
     } catch (error) {
       toast.error("Failed to delete genre.");
       console.error(error);
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setSelectedGenre(null);
     }
@@ -109,5 +112,6 @@ export const useGenreManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   };
 };

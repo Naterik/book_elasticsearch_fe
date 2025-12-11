@@ -1,40 +1,14 @@
-import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import InfoAvatar from "@/features/client/info/InfoAvatar";
-import InfoOverview from "@/features/client/info/InfoOverview";
-import InfoHistory from "@/features/client/info/InfoHistory";
-import { getUserProfileAPI } from "@/services/api";
-import { useCurrentApp } from "@/app/providers/app.context";
-import { toast } from "sonner";
-
-const onSettingsClick = () => console.log("Open settings");
+import {
+  InfoAvatar,
+  InfoOverview,
+  InfoHistory,
+  useInfoPage,
+} from "@/features/client/info";
 
 export default function InfoPage() {
-  const { user, showLoader, hideLoader } = useCurrentApp();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [currentUser, setCurrentUser] = useState<IUserInfo | null>(null);
-  const checkUserId = user?.id ?? 0;
-
-  const fetchUserProfile = async () => {
-    if (!checkUserId || checkUserId === 0) return;
-    showLoader();
-    try {
-      const res = await getUserProfileAPI(checkUserId);
-      if (res.data) {
-        setCurrentUser(res.data);
-      } else {
-        toast.error(res.message);
-      }
-    } finally {
-      hideLoader();
-    }
-  };
-
-  useEffect(() => {
-    if (checkUserId && checkUserId !== 0) {
-      fetchUserProfile();
-    }
-  }, [checkUserId, showLoader, hideLoader]);
+  const { activeTab, setActiveTab, currentUser, onSettingsClick } =
+    useInfoPage();
 
   return (
     <div className="container mx-auto">

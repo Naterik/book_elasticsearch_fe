@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -31,16 +29,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createFineAPI, updateFineAPI } from "@/features/admin/fine/services";
-
-const fineFormSchema = z.object({
-  amount: z.string().min(1, "Amount is required"),
-  reason: z.string().min(1, "Reason is required"),
-  isPaid: z.string(),
-  loanId: z.string().min(1, "Loan ID is required"),
-  userId: z.string().min(1, "User ID is required"),
-});
-
-type FineFormValues = z.infer<typeof fineFormSchema>;
+import { fineFormSchema, type FineFormValues } from "@/lib/validators/fine";
+import { Loader2 } from "lucide-react";
 
 interface FineFormDialogProps {
   open: boolean;
@@ -55,7 +45,6 @@ const FineFormDialog = ({
   fine,
   onSuccess,
 }: FineFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
   const isEditMode = !!fine;
 
   const form = useForm<FineFormValues>({
@@ -63,7 +52,7 @@ const FineFormDialog = ({
     defaultValues: {
       amount: "",
       reason: "",
-      isPaid: "false",
+      isPaid: false,
       loanId: "",
       userId: "",
     },
@@ -75,7 +64,7 @@ const FineFormDialog = ({
         form.reset({
           amount: String(fine.amount),
           reason: fine.reason,
-          isPaid: String(fine.isPaid),
+          isPaid: fine.isPaid,
           loanId: String(fine.loanId),
           userId: String(fine.userId),
         });
@@ -83,7 +72,7 @@ const FineFormDialog = ({
         form.reset({
           amount: "",
           reason: "",
-          isPaid: "false",
+          isPaid: false,
           loanId: "",
           userId: "",
         });
@@ -92,13 +81,11 @@ const FineFormDialog = ({
   }, [open, fine, form]);
 
   const onSubmit = async (values: FineFormValues) => {
-    showLoader();
-
     try {
       const submitData = {
         amount: parseFloat(values.amount),
         reason: values.reason,
-        isPaid: values.isPaid === "true",
+        isPaid: values.isPaid,
         loanId: parseInt(values.loanId),
         userId: parseInt(values.userId),
       };
@@ -112,13 +99,16 @@ const FineFormDialog = ({
           isPaid: submitData.isPaid,
         });
       } else {
-        response = await createFineAPI(submitData);
+        response = await createFineAPI({
+          amount: submitData.amount,
+          reason: submitData.reason,
+          loanId: submitData.loanId,
+          userId: submitData.userId,
+        });
       }
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "Fine updated successfully" : "Fine created successfully"
@@ -128,8 +118,6 @@ const FineFormDialog = ({
     } catch (error) {
       console.error("Error submitting fine:", error);
       toast.error("Failed to submit fine");
-    } finally {
-      hideLoader();
     }
   };
 
@@ -191,7 +179,10 @@ const FineFormDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Payment Status</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ? "true" : "false"}
+                    onValueChange={(value) => field.onChange(value === "true")}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -251,7 +242,10 @@ const FineFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Fine" : "Create Fine"}
               </Button>
             </DialogFooter>

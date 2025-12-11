@@ -38,7 +38,10 @@ export const getBookColumns = (
       const book = row.original;
       return book.image ? (
         <img
-          src={book.image}
+          src={
+            book.image ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTt_R8ZDAp9kjtZyNyxjKHoZ_rrKoU1gH3pA&s"
+          }
           alt={book.title}
           className="w-12 h-16 object-cover rounded"
         />
@@ -67,8 +70,13 @@ export const getBookColumns = (
   {
     accessorKey: "authors",
     header: "Author",
+
     cell: ({ row }) => {
-      return <span>{row.original.authors.name}</span>;
+      return (
+        <div className="text-md text-muted-foreground truncate max-w-xs">
+          {row.original.authors.name || "-"}
+        </div>
+      );
     },
   },
   {

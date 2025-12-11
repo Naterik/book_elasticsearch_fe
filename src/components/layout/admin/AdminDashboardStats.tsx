@@ -101,26 +101,7 @@ const StatCard = ({
 
 export default function AdminDashboardStats({
   stats,
-  isLoading = false,
 }: AdminDashboardStatsProps) {
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="border-0 shadow-md">
-            <CardHeader className="pb-3">
-              <div className="h-10 bg-slate-200 rounded animate-pulse" />
-            </CardHeader>
-            <CardContent>
-              <div className="h-12 bg-slate-200 rounded animate-pulse mb-3" />
-              <div className="h-6 bg-slate-200 rounded animate-pulse w-24" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Header */}

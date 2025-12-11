@@ -32,6 +32,7 @@ const PublisherManagementPage = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   } = usePublisherManagement();
 
   return (
@@ -64,6 +65,7 @@ const PublisherManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No publishers found. Add your first publisher to get started."
+        isLoading={isLoading}
       />
 
       <PublisherFormDialog

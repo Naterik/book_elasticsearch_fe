@@ -17,15 +17,14 @@ import { useUserManagement } from "@/features/admin/user/hooks/useUserManagement
 
 const UserManagement = () => {
   const {
-    // Data
     users,
     currentPage,
     totalPages,
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
-    // UI State
     isFormDialogOpen,
     setIsFormDialogOpen,
     isDetailDialogOpen,
@@ -35,7 +34,6 @@ const UserManagement = () => {
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
-    // Handlers
     handleCreateUser,
     handleConfirmDelete,
     handleFormSuccess,
@@ -73,6 +71,7 @@ const UserManagement = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No users found. Add your first user to get started."
+        isLoading={isLoading}
       />
 
       <UserFormDialog

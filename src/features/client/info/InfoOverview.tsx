@@ -11,14 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, BookOpen, Bell as BellIcon } from "lucide-react";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { getLoanByUserIdAPI, getFineByUserIdAPI } from "@/services/loans";
-import { getNotificationsByUserIdAPI } from "@/services/notifications";
+import {
+  getLoanByUserIdAPI,
+  getFineByUserIdAPI,
+  getNotificationsByUserIdAPI,
+} from "@/services/api";
 import {
   getNotificationIcon,
   getNotificationIconColor,
   getNotificationTitle,
   formatNotificationContent,
-} from "@/features/client/notifications/notificationUtils";
+} from "@/helper/notificationUtils";
 
 export default function InfoOverview() {
   const { user } = useCurrentApp();
@@ -111,7 +114,7 @@ export default function InfoOverview() {
             </div>
           )}
 
-          <Link to="/loan" className="block mt-4">
+          <Link to="/user/loan" className="block mt-4">
             <Button
               variant="outline"
               className="w-full justify-between"
@@ -198,12 +201,12 @@ export default function InfoOverview() {
           )}
 
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Link to="/loan" className="block">
+            <Link to="/user/loan" className="block">
               <Button variant="outline" className="w-full" size="sm">
                 View loans
               </Button>
             </Link>
-            <Link to="/notifications" className="block">
+            <Link to="/user/notifications" className="block">
               <Button variant="outline" className="w-full" size="sm">
                 View alerts
               </Button>

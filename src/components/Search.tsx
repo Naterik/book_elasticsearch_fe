@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search as SearchIcon, X, Clock, TrendingUp } from "lucide-react";
-import { getSuggestAPI } from "@/services/api";
+import { Search as SearchIcon, X, Clock, Book } from "lucide-react";
+import {
+  getSuggestAPI,
+  postHistorySearchByUserId,
+  getHistorySearchByUserId,
+  deleteHistorySearchByUserId,
+  deleteAllHistorySearchUser,
+  postMergeRecentSearchAsGuest,
+} from "@/services/api";
+import { toast } from "sonner";
+import { useCurrentApp } from "@/app/providers/app.context";
 
 type SearchBarProps = {
   initialQuery?: string;
@@ -13,31 +22,26 @@ type SearchBarProps = {
 const RECENT_KEY = "recent_searches_v1";
 const MAX_RECENT = 5;
 const DEBOUNCE_MS = 280;
-const MIN_CHARS = 2;
 
 function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
+  const { isAuthenticated, user } = useCurrentApp();
   const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
-  const [titles, setTitles] = useState<string[]>([]);
-  const [authors, setAuthors] = useState<string[]>([]);
-  const [recent, setRecent] = useState<string[]>([]);
+  const [searchResult, setSearchResult] = useState<ISuggestElastic>([]);
+  const [recent, setRecent] = useState<IHistorySearch[] | Array<string>>([]);
   const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => setQuery(initialQuery), [initialQuery]);
-
+  const localRecent = localStorage.getItem(RECENT_KEY);
   useEffect(() => {
-    const raw = localStorage.getItem(RECENT_KEY);
-    setRecent(raw ? JSON.parse(raw) : []);
-  }, []);
+    loginUserHistorySearch();
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     const q = query.trim();
-    if (q.length < MIN_CHARS) {
-      setTitles([]);
-      setAuthors([]);
+    if (q.length < 1) {
+      setSearchResult([]);
       setLoading(false);
       return;
     }
@@ -46,14 +50,11 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     timer.current = setTimeout(async () => {
       try {
         const res = await getSuggestAPI(q, 6);
-        const data = res?.data?.data || { titles: [], authors: [] };
-
-        setTitles((data.titles || []).map((x: any) => x.text));
-        setAuthors((data.authors || []).map((x: any) => x.text));
-      } catch (error) {
-        console.error("Suggest API error:", error);
-        setTitles([]);
-        setAuthors([]);
+        if (res.data) {
+          setSearchResult(res.data);
+        }
+      } catch (error: any) {
+        toast.error("Failed to fetch search suggestions", error.message);
       } finally {
         setLoading(false);
       }
@@ -64,27 +65,73 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     };
   }, [query]);
 
-  useEffect(() => {
-    const onDocClick = (e: MouseEvent) => {
-      if (!wrapRef.current) return;
-      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
-
   const commitSearch = (text: string) => {
     const keyword = text.trim();
-    if (!keyword) return;
-    const next = [
-      keyword,
-      ...recent.filter((r) => r.toLowerCase() !== keyword.toLowerCase()),
-    ].slice(0, MAX_RECENT);
-    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-    setRecent(next);
-
+    if (isAuthenticated && user?.id) {
+      saveToBackend(keyword);
+    } else {
+      saveToLocalStorage(keyword);
+    }
+    setQuery(keyword);
     setOpen(false);
     onSearch(keyword);
+  };
+
+  const saveToBackend = async (term: string) => {
+    try {
+      const res = await postHistorySearchByUserId(user!.id, term);
+      if (res?.message) {
+        toast.error(res.message);
+      }
+      const updatedRes = await getHistorySearchByUserId(user!.id);
+      if (updatedRes?.data) {
+        setRecent(updatedRes.data);
+        toast.success("Search saved");
+      }
+    } catch (error) {
+      toast.error("Failed to save search");
+      const reverted = recent.filter((r) => r.term !== term);
+      setRecent(reverted);
+    }
+  };
+
+  const saveToLocalStorage = (term: string) => {
+    const filtered = recent.filter(
+      (r) => r.toLowerCase() !== term.toLowerCase()
+    );
+    const next = [term, ...filtered].slice(0, MAX_RECENT);
+    setRecent(next);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  };
+
+  const loginUserHistorySearch = async () => {
+    try {
+      if (isAuthenticated && user?.id) {
+        if (localRecent) {
+          try {
+            const localTerms = JSON.parse(localRecent);
+            const resMergeItem = await postMergeRecentSearchAsGuest(
+              user.id,
+              localTerms
+            );
+            localStorage.removeItem(RECENT_KEY);
+            setRecent(resMergeItem.data);
+          } catch (error: any) {
+            toast.error("Failed to migrate search history");
+            localStorage.removeItem(RECENT_KEY);
+          }
+        }
+      } else {
+        if (localRecent) {
+          const parsed = JSON.parse(localRecent);
+          setRecent(parsed);
+        } else {
+          setRecent([]);
+        }
+      }
+    } catch (error) {
+      toast.error("Failed to sync search history");
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,16 +141,57 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
 
   const handleClear = () => {
     setQuery("");
-    setTitles([]);
-    setAuthors([]);
     setOpen(false);
+    onSearch("");
     onClear?.();
   };
 
-  const clearRecentSearches = () => {
-    setRecent([]);
-    localStorage.removeItem(RECENT_KEY);
+  const clearRecentSearches = async () => {
+    try {
+      if (isAuthenticated && user?.id) {
+        const res = await deleteAllHistorySearchUser();
+        if (res?.message) {
+          toast.error(res.message);
+        }
+        setRecent([]);
+      } else {
+        setRecent([]);
+        localStorage.removeItem(RECENT_KEY);
+      }
+    } catch (error: any) {
+      toast.error("Failed to clear searches", error);
+    }
   };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    setOpen(true);
+  };
+
+  const handleRemove = async (
+    e: React.MouseEvent<SVGSVGElement>,
+    itemIndex: number
+  ) => {
+    e.stopPropagation();
+    const updated = recent.filter((_, index) => index !== itemIndex);
+    try {
+      if (isAuthenticated && user?.id) {
+        const searchId = recent[itemIndex]?.id;
+        const res = await deleteHistorySearchByUserId(searchId);
+        if (res?.message) {
+          toast.error(res.message);
+        }
+        setRecent(updated);
+      } else {
+        setRecent(updated);
+        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+      }
+    } catch (error: any) {
+      toast.error("Failed to remove search", error);
+    }
+  };
+
+  const hasSuggestions = searchResult.length > 0;
 
   return (
     <div ref={wrapRef} className="w-full max-w-3xl mx-auto my-8 relative z-50">
@@ -113,8 +201,11 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
             type="text"
             placeholder="Search for books by title or author..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setOpen(true)}
+            onChange={handleSearch}
+            onFocus={() =>
+              recent && recent.length > 0 ? setOpen(true) : setOpen(false)
+            }
+            onBlur={() => setOpen(false)}
             className="w-full pl-10 pr-4 h-12"
           />
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
@@ -136,129 +227,135 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
           </Button>
         )}
       </form>
+
       {open && (
         <div
-          className="absolute left-0 top-full mt-1 w-full rounded-md border bg-white shadow-xl overflow-hidden"
+          className="absolute left-0 top-full mt-1 w-full rounded-md border bg-white shadow-xl overflow-hidden max-h-96 overflow-y-auto"
           onMouseDown={(e) => e.preventDefault()}
         >
-          {query.trim().length >= MIN_CHARS ? (
+          {query.trim().length > 0 ? (
             <>
               {loading ? (
                 <div className="px-4 py-8 text-center">
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-blue-600"></div>
                   <p className="mt-2 text-sm text-gray-500">Searching...</p>
                 </div>
-              ) : (
+              ) : hasSuggestions ? (
                 <>
-                  {!!titles.length && (
-                    <div className="border-b border-gray-100">
-                      <div className="px-3 py-2 bg-gray-50/80 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-blue-600" />
-                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                          Book Titles
-                        </span>
-                      </div>
-                      <div className="p-1">
-                        {titles.map((t, i) => (
+                  <div className="border-b border-gray-100">
+                    <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-50/50 flex items-center gap-2 sticky top-0">
+                      <Book className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Books
+                      </span>
+                      <span className="ml-auto text-xs text-gray-500">
+                        {searchResult.length} results
+                      </span>
+                    </div>
+                    <div className="divide-y divide-gray-100">
+                      {searchResult.map((items: ISuggest, idx: number) => {
+                        return (
                           <div
-                            key={`t-${i}`}
-                            className="px-3 py-2.5 cursor-pointer hover:bg-blue-50 rounded transition-colors"
-                            onClick={() => commitSearch(t)}
+                            key={`title-${idx}`}
+                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors group flex items-start gap-3"
+                            onClick={() => commitSearch(items.text)}
                           >
-                            <p className="text-sm text-gray-800 font-medium line-clamp-1">
-                              {t}
+                            <SearchIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-gray-800 font-medium line-clamp-2 flex-1">
+                              {items.text}
                             </p>
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
                     </div>
-                  )}
-
-                  {!!authors.length && (
-                    <div>
-                      <div className="px-3 py-2 bg-gray-50/80 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                          Authors
-                        </span>
-                      </div>
-                      <div className="p-1">
-                        {authors.map((a, i) => (
-                          <div
-                            key={`a-${i}`}
-                            className="px-3 py-2.5 cursor-pointer hover:bg-green-50 rounded transition-colors"
-                            onClick={() => commitSearch(a)}
-                          >
-                            <p className="text-sm text-gray-800 font-medium line-clamp-1">
-                              {a}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {!titles.length && !authors.length && (
-                    <div className="px-4 py-8 text-center">
-                      <SearchIcon className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500 font-medium">
-                        No suggestions found
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Try different keywords
-                      </p>
-                    </div>
-                  )}
+                  </div>
                 </>
+              ) : (
+                <div className="px-4 py-8 text-center">
+                  <SearchIcon className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 font-medium">
+                    No results found
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Try different keywords
+                  </p>
+                </div>
               )}
             </>
           ) : (
             <>
-              <div className="px-3 py-2 bg-gray-50/80 flex items-center justify-between border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                    Recent Searches
-                  </span>
-                </div>
-                {recent.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={clearRecentSearches}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
-
-              {recent.length > 0 ? (
-                <div className="p-1 max-h-64 overflow-y-auto">
-                  {recent.map((r, i) => (
-                    <div
-                      key={`r-${i}`}
-                      className="px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded transition-colors group"
-                      onClick={() => commitSearch(r)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-700 line-clamp-1">
-                          {r}
-                        </p>
-                        <SearchIcon className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
-                      </div>
+              {recent.length > 0 && localRecent && (
+                <>
+                  <div className="px-4 py-3 bg-gray-50/80 flex justify-between border-b border-gray-100 sticky top-0">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Recent Searches
+                      </span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="px-4 py-8 text-center">
-                  <Clock className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 font-medium">
-                    No recent searches
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Type at least {MIN_CHARS} characters to get suggestions
-                  </p>
-                </div>
+                    <button
+                      type="button"
+                      onClick={clearRecentSearches}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                  <div className="divide-y divide-gray-100">
+                    {recent.map((searchRecent, index) => (
+                      <div
+                        key={`recent-${index}`}
+                        className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between gap-5"
+                        onClick={() => commitSearch(searchRecent)}
+                      >
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <p className="text-sm text-gray-700 line-clamp-1 flex-1 text-left">
+                          {searchRecent}
+                        </p>
+                        <X
+                          onClick={(e) => handleRemove(e, index)}
+                          className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {recent.length > 0 && isAuthenticated && (
+                <>
+                  <div className="px-4 py-3 bg-gray-50/80 flex justify-between border-b border-gray-100 sticky top-0">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Recent Searches
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={clearRecentSearches}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                  <div className="divide-y divide-gray-100">
+                    {recent.map((searchRecent, index) => (
+                      <div
+                        key={searchRecent.id}
+                        className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between gap-5"
+                        onClick={() => commitSearch(searchRecent.term)}
+                      >
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <p className="text-sm text-gray-700 line-clamp-1 flex-1 text-left">
+                          {searchRecent.term}
+                        </p>
+                        <X
+                          onClick={(e) => handleRemove(e, index)}
+                          className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </>
           )}

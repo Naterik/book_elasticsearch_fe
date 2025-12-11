@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createUserAPI, updateUserAPI } from "@/features/admin/user/services";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import {
   userFormSchema,
   type UserFormValues,
@@ -63,7 +63,7 @@ const UserFormDialog = ({
   user,
   onSuccess,
 }: UserFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  // const { setIsLoading } = useCurrentApp();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const isEditMode = !!user;
 
@@ -90,7 +90,7 @@ const UserFormDialog = ({
           address: user.address || "",
           phone: user.phone || "",
           roleId: user.roleId.toString(),
-          status: user.status,
+          status: user.status as UserStatusType,
           avatar: undefined,
         });
         if (user.avatar) {
@@ -141,7 +141,7 @@ const UserFormDialog = ({
   };
 
   const onSubmit = async (values: UserFormValues) => {
-    showLoader();
+    // setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -152,7 +152,7 @@ const UserFormDialog = ({
         formData.append("password", values.password);
       } else if (!isEditMode) {
         toast.error("Password is required for new users");
-        hideLoader();
+        // setIsLoading(false);
         return;
       }
       if (values.address) {
@@ -176,11 +176,8 @@ const UserFormDialog = ({
       } else {
         response = await createUserAPI(formData);
       }
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "User updated successfully" : "User created successfully"
@@ -193,7 +190,7 @@ const UserFormDialog = ({
         isEditMode ? "Failed to update user" : "Failed to create user"
       );
     } finally {
-      hideLoader();
+      // setIsLoading(false);
     }
   };
 
@@ -405,7 +402,10 @@ const UserFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update User" : "Create User"}
               </Button>
             </DialogFooter>

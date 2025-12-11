@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "./pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,6 +52,10 @@ interface DataTableProps<TData, TValue> {
   // Additional features
   enableSorting?: boolean;
   enableFiltering?: boolean;
+  isLoading?: boolean;
+
+  onSearch?: (value: string) => void;
+  searchValue?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -70,6 +75,10 @@ export function DataTable<TData, TValue>({
   emptyMessage = "No results found.",
   enableSorting = true,
   enableFiltering = true,
+  isLoading = false,
+
+  onSearch,
+  searchValue,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -109,10 +118,16 @@ export function DataTable<TData, TValue>({
               <Input
                 placeholder={searchPlaceholder}
                 value={
-                  (table.getColumn(searchKey)?.getFilterValue() as string) ?? ""
+                  searchValue ??
+                  (table.getColumn(searchKey)?.getFilterValue() as string) ??
+                  ""
                 }
                 onChange={(event) =>
-                  table.getColumn(searchKey)?.setFilterValue(event.target.value)
+                  onSearch
+                    ? onSearch(event.target.value)
+                    : table
+                        .getColumn(searchKey)
+                        ?.setFilterValue(event.target.value)
                 }
                 className="h-9 w-[150px] lg:w-[250px]"
               />
@@ -180,7 +195,17 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: pageSize }).map((_, rowIndex) => (
+                <TableRow key={`skeleton-row-${rowIndex}`}>
+                  {columns.map((_, colIndex) => (
+                    <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`}>
+                      <Skeleton className="h-6 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

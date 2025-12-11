@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,8 +8,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PlusIcon } from "lucide-react";
-import LoanFormDialog from "@/features/admin/loan/components/LoanFormDialog";
 import { DataTable } from "@/components/layout/admin/data-table";
 import { useLoanManagement } from "@/features/admin/loan/hooks/useLoanManagement";
 
@@ -22,16 +19,12 @@ const LoanManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
-    isFormDialogOpen,
-    setIsFormDialogOpen,
-    selectedLoan,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
-    handleCreateLoan,
     handleConfirmDelete,
-    handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
   } = useLoanManagement();
@@ -45,10 +38,6 @@ const LoanManagementPage = () => {
             Manage book loans and track due dates
           </p>
         </div>
-        <Button onClick={handleCreateLoan} className="gap-2">
-          <PlusIcon className="h-4 w-4" />
-          Add Loan
-        </Button>
       </div>
 
       <DataTable
@@ -65,14 +54,8 @@ const LoanManagementPage = () => {
         showColumnToggle={true}
         showPagination={true}
         showSearch={true}
-        emptyMessage="No loans found. Create your first loan to get started."
-      />
-
-      <LoanFormDialog
-        open={isFormDialogOpen}
-        onOpenChange={setIsFormDialogOpen}
-        loan={selectedLoan}
-        onSuccess={handleFormSuccess}
+        emptyMessage="No loans found."
+        isLoading={isLoading}
       />
 
       <AlertDialog

@@ -1,7 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +9,15 @@ import {
   Calendar,
   BookOpen,
   Globe,
+  ChevronDown,
 } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/helper";
+import { useIsMobile } from "@/hooks/use-responsive";
+import { cn } from "@/lib/utils";
+import { memo, useState } from "react";
+import { LANGUAGE_FLAGS } from "@/helper/icon";
+import { ITEMS_PER_SHOW } from "@/types";
 
 type Props = {
   genresAll: IGenre[];
@@ -24,20 +27,20 @@ type Props = {
   onChangeLanguage: (value: string | null) => void;
   languagesAll: ILanguages[] | undefined;
 
-  priceRange: [number, number];
-  priceBounds: [number, number];
+  priceRange: readonly [number, number];
+  priceBounds: readonly [number, number];
   onPriceChange: (range: [number, number]) => void;
 
-  yearRange: [number, number];
-  yearBounds: [number, number];
+  yearRange: readonly [number, number];
+  yearBounds: readonly [number, number];
   onYearChange: (range: [number, number]) => void;
 
-  onApply: () => void;
   onReset: () => void;
   sticky?: boolean;
+  isCompact?: boolean;
 };
 
-export default function BookFilter({
+const BookFilter = ({
   genresAll,
   genresSelected,
   onToggleGenre,
@@ -50,33 +53,38 @@ export default function BookFilter({
   yearRange,
   yearBounds,
   onYearChange,
-  onApply,
   onReset,
   sticky = true,
-}: Props) {
-  const updatePriceMin = (v: number) =>
-    onPriceChange([
-      Math.min(Math.max(v, priceBounds[0]), priceRange[1]),
-      priceRange[1],
-    ]);
+  isCompact = false,
+}: Props) => {
+  const isMobile = useIsMobile();
+  const [visibleGenresCount, setVisibleGenresCount] = useState(10);
+  const [visibleLanguagesCount, setVisibleLanguagesCount] = useState(10);
 
-  const updatePriceMax = (v: number) =>
-    onPriceChange([
-      priceRange[0],
-      Math.max(Math.min(v, priceBounds[1]), priceRange[0]),
-    ]);
+  const visibleGenres = genresAll.slice(0, visibleGenresCount);
+  const hasMoreGenres = visibleGenresCount < genresAll.length;
+  const isAllGenresShown = visibleGenresCount >= genresAll.length;
 
-  const updateYearMin = (v: number) =>
-    onYearChange([
-      Math.min(Math.max(v, yearBounds[0]), yearRange[1]),
-      yearRange[1],
-    ]);
+  const visibleLanguages = languagesAll?.slice(0, visibleLanguagesCount) ?? [];
+  const hasMoreLanguages = visibleLanguagesCount < (languagesAll?.length ?? 0);
+  const isAllLanguagesShown =
+    visibleLanguagesCount >= (languagesAll?.length ?? 0);
 
-  const updateYearMax = (v: number) =>
-    onYearChange([
-      yearRange[0],
-      Math.max(Math.min(v, yearBounds[1]), yearRange[0]),
-    ]);
+  const handleShowMoreGenres = () => {
+    setVisibleGenresCount((prev) => prev + ITEMS_PER_SHOW);
+  };
+
+  const handleShowLessGenres = () => {
+    setVisibleGenresCount(ITEMS_PER_SHOW);
+  };
+
+  const handleShowMoreLanguages = () => {
+    setVisibleLanguagesCount((prev) => prev + ITEMS_PER_SHOW);
+  };
+
+  const handleShowLessLanguages = () => {
+    setVisibleLanguagesCount(ITEMS_PER_SHOW);
+  };
 
   const hasActiveFilters =
     genresSelected.length > 0 ||
@@ -88,123 +96,175 @@ export default function BookFilter({
 
   return (
     <Card
-      className={`w-full max-w-[360px] shrink-0 border shadow-sm ${
-        sticky ? "sticky top-24" : ""
-      }`}
+      className={`w-full border shadow-sm ${
+        isCompact ? "border-0 shadow-none" : ""
+      } ${sticky && !isMobile ? "lg:sticky lg:top-24" : ""}`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={`${isCompact ? "pb-2" : "pb-2 sm:pb-3"}`}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Filters</CardTitle>
+            <Filter
+              className={`text-muted-foreground ${
+                isCompact ? "h-3.5 w-3.5" : "h-4 w-4 sm:h-5 sm:w-5"
+              }`}
+            />
+            <CardTitle
+              className={isCompact ? "text-sm" : "text-base sm:text-lg"}
+            >
+              Filters
+            </CardTitle>
           </div>
           {hasActiveFilters && (
-            <Badge variant="secondary" className="text-xs">
-              Active
+            <Badge
+              variant="secondary"
+              className="bg-blue-500 text-white dark:bg-blue-600 text-xs"
+            >
+              {[genresSelected.length, selectedLanguage ? 1 : 0].reduce(
+                (a, b) => a + b,
+                0
+              )}{" "}
+              active
             </Badge>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Genres Section */}
-        <section className="space-y-2">
+      <CardContent
+        className={`${isCompact ? "space-y-2" : "space-y-3 sm:space-y-4"}`}
+      >
+        <section className={isCompact ? "space-y-1" : "space-y-2"}>
           <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+            <BookOpen
+              className={`text-muted-foreground ${
+                isCompact ? "h-3.5 w-3.5" : "h-4 w-4"
+              }`}
+            />
+            <h3
+              className={`font-semibold uppercase text-muted-foreground ${
+                isCompact ? "text-xs" : "text-xs"
+              }`}
+            >
               Genres
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {genresAll.map((g) => {
-              const checked = genresSelected.includes(g.name);
-              const id = `genre-${g.id}`;
+          <div className={`flex flex-wrap gap-2`}>
+            {visibleGenres.map((g) => {
+              const isSelected = genresSelected.includes(g.name);
               return (
-                <label
+                <Button
                   key={g.id}
-                  className="flex items-center gap-2 cursor-pointer p-1.5 rounded-md hover:bg-slate-100 transition-colors"
-                  htmlFor={id}
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "text-xs font-medium transition-all",
+                    isSelected
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "hover:bg-slate-100"
+                  )}
+                  onClick={() => onToggleGenre(g.name, !isSelected)}
                 >
-                  <Checkbox
-                    id={id}
-                    checked={checked}
-                    className="h-4 w-4"
-                    onCheckedChange={(c) => onToggleGenre(g.name, Boolean(c))}
-                  />
-                  <Label
-                    htmlFor={id}
-                    className="text-xs cursor-pointer font-medium leading-none"
-                  >
-                    {g.name}
-                  </Label>
-                </label>
+                  {g.name}
+                </Button>
               );
             })}
           </div>
+
+          {(hasMoreGenres || isAllGenresShown) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-medium text-blue-600 hover:text-blue-700 p-0 h-auto mt-2"
+              onClick={
+                isAllGenresShown ? handleShowLessGenres : handleShowMoreGenres
+              }
+            >
+              {isAllGenresShown ? "- Show Less" : "+ Show More"}
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 ml-1 transition-transform",
+                  isAllGenresShown ? "rotate-180" : ""
+                )}
+              />
+            </Button>
+          )}
         </section>
 
         <Separator />
 
-        {/* Genres and Languages in 2-Column Layout */}
-        <div className="grid grid-cols-1 gap-4">
-          {/* Languages Section */}
-          <section className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-              <h3 className="font-semibold text-xs uppercase text-muted-foreground">
-                Language
-              </h3>
-            </div>
-            <RadioGroup
-              className="grid grid-cols-2 gap-1.5"
-              value={selectedLanguage ?? ""}
-              onValueChange={(v) => onChangeLanguage(v || null)}
+        <section className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+              Language
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={selectedLanguage === null ? "default" : "outline"}
+              size="sm"
+              className={cn(
+                "text-xs font-medium transition-all",
+                selectedLanguage === null
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "hover:bg-slate-100"
+              )}
+              onClick={() => onChangeLanguage(null)}
             >
-              <label
-                className="group flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-100 transition-colors cursor-pointer col-span-2"
-                htmlFor="lang-all"
-              >
-                <RadioGroupItem
-                  id="lang-all"
-                  value=""
-                  className="h-3.5 w-3.5"
-                />
-                <Label
-                  htmlFor="lang-all"
-                  className="text-xs font-medium cursor-pointer leading-none"
+              All Languages
+            </Button>
+
+            {visibleLanguages.map((l) => {
+              const isSelected = selectedLanguage === l.key;
+              const flag = LANGUAGE_FLAGS[l.key.toUpperCase()] || "🌍";
+              return (
+                <Button
+                  key={l.key}
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "text-xs font-medium transition-all flex items-center gap-1.5",
+                    isSelected
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "hover:bg-slate-100"
+                  )}
+                  onClick={() => onChangeLanguage(l.key)}
                 >
-                  All
-                </Label>
-              </label>
-
-              {languagesAll?.map((l) => {
-                const id = `lang-${l.key}`;
-                return (
-                  <label
-                    key={id}
-                    htmlFor={id}
-                    className="group flex items-center gap-1.5 p-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+                  <span className="text-sm">{flag}</span>
+                  <span>{l.key}</span>
+                  <span
+                    className={cn(
+                      "text-xs",
+                      isSelected ? "text-blue-100" : "text-muted-foreground"
+                    )}
                   >
-                    <RadioGroupItem id={id} value={l.key} className="h-3 w-3" />
-                    <div className="flex-1 min-w-0">
-                      <Label
-                        htmlFor={id}
-                        className="text-xs font-medium cursor-pointer leading-none truncate"
-                      >
-                        {l.key}
-                      </Label>
-                      <span className="text-xs text-muted-foreground">
-                        ({l.doc_count})
-                      </span>
-                    </div>
-                  </label>
-                );
-              })}
-            </RadioGroup>
-          </section>
+                    ({l.doc_count})
+                  </span>
+                </Button>
+              );
+            })}
+          </div>
 
-          <Separator />
-        </div>
+          {(hasMoreLanguages || isAllLanguagesShown) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-medium text-blue-600 hover:text-blue-700 p-0 h-auto mt-2"
+              onClick={
+                isAllLanguagesShown
+                  ? handleShowLessLanguages
+                  : handleShowMoreLanguages
+              }
+            >
+              {isAllLanguagesShown ? "- Show Less" : "+ Show More"}
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 ml-1 transition-transform",
+                  isAllLanguagesShown ? "rotate-180" : ""
+                )}
+              />
+            </Button>
+          )}
+        </section>
         <section className="space-y-2">
           <div className="flex items-center gap-1.5">
             <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
@@ -226,36 +286,16 @@ export default function BookFilter({
               min={priceBounds[0]}
               max={priceBounds[1]}
               step={10_000}
-              value={priceRange}
+              value={priceRange as [number, number]}
               onValueChange={(v) =>
                 onPriceChange([v[0] ?? priceBounds[0], v[1] ?? priceBounds[1]])
               }
               className="w-full"
             />
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => updatePriceMin(Number(e.target.value))}
-                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                min={priceBounds[0]}
-                max={priceRange[1]}
-              />
-              <span className="text-xs text-muted-foreground">—</span>
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => updatePriceMax(Number(e.target.value))}
-                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                min={priceRange[0]}
-                max={priceBounds[1]}
-              />
-            </div>
           </div>
         </section>
         <Separator />
 
-        {/* Publication Year Section */}
         <section className="space-y-2">
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -277,7 +317,7 @@ export default function BookFilter({
               min={yearBounds[0]}
               max={yearBounds[1]}
               step={1}
-              value={yearRange}
+              value={yearRange as [number, number]}
               onValueChange={(v) =>
                 onYearChange([v[0] ?? yearBounds[0], v[1] ?? yearBounds[1]] as [
                   number,
@@ -286,50 +326,34 @@ export default function BookFilter({
               }
               className="w-full"
             />
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={yearRange[0]}
-                onChange={(e) => updateYearMin(Number(e.target.value))}
-                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                min={yearBounds[0]}
-                max={yearRange[1]}
-              />
-              <span className="text-xs text-muted-foreground">—</span>
-              <input
-                type="number"
-                value={yearRange[1]}
-                onChange={(e) => updateYearMax(Number(e.target.value))}
-                className="flex-1 h-7 px-1.5 py-0.5 text-xs border rounded bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                min={yearRange[0]}
-                max={yearBounds[1]}
-              />
-            </div>
           </div>
         </section>
 
         <Separator />
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
-          <Button
-            onClick={onApply}
-            className="h-8 bg-blue-600 hover:bg-blue-700 text-sm"
-            size="sm"
-          >
-            Apply
-          </Button>
+        <div
+          className={`grid grid-cols-2 gap-2 sm:gap-3 ${
+            isCompact ? "pt-1" : "pt-2"
+          }`}
+        >
           <Button
             variant="outline"
-            className="h-8 text-sm"
+            className={`${
+              isCompact ? "h-7 text-xs" : "h-8 sm:h-9 text-xs sm:text-sm"
+            }`}
             onClick={onReset}
             size="sm"
           >
-            <RotateCcw className="h-3 w-3 mr-1.5" />
+            <RotateCcw
+              className={`${
+                isCompact ? "h-3 w-3" : "h-3 w-3 sm:h-4 sm:w-4"
+              } mr-1`}
+            />
             Reset
           </Button>
         </div>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default memo(BookFilter);

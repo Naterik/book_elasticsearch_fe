@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllPaymentsAdminAPI,
   deletePaymentAPI,
@@ -8,7 +8,7 @@ import {
 import { getPaymentColumns } from "@/features/admin/payment/payment-columns";
 
 export const usePaymentManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [payments, setPayments] = useState<IPayment[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -23,7 +23,7 @@ export const usePaymentManagement = () => {
   }, [currentPage]);
 
   const fetchPayments = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllPaymentsAdminAPI(currentPage);
 
@@ -32,16 +32,14 @@ export const usePaymentManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching payments:", error);
       toast.error("Failed to fetch payments");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -52,14 +50,12 @@ export const usePaymentManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!paymentToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deletePaymentAPI(paymentToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Payment deleted successfully");
         fetchPayments();
@@ -68,7 +64,7 @@ export const usePaymentManagement = () => {
       console.error("Error deleting payment:", error);
       toast.error("Failed to delete payment");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setPaymentToDelete(null);
     }
@@ -94,6 +90,7 @@ export const usePaymentManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
@@ -23,7 +22,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -31,15 +32,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createLoanAPI, updateLoanAPI } from "@/features/admin/loan/services";
 import { getAllBookCopiesAdminAPI } from "@/features/admin/book-copy/services";
-import { User } from "lucide-react";
-
-const loanFormSchema = z.object({
-  bookcopyId: z.string().min(1, "Book copy is required"),
-  dueDate: z.string().min(1, "Due date is required"),
-  status: z.string().min(1, "Status is required"),
-});
-
-type LoanFormValues = z.infer<typeof loanFormSchema>;
+import { loanFormSchema, type LoanFormValues } from "@/lib/validators/loan";
+import { Loader2 } from "lucide-react";
 
 interface LoanFormDialogProps {
   open: boolean;
@@ -54,14 +48,14 @@ const LoanFormDialog = ({
   loan,
   onSuccess,
 }: LoanFormDialogProps) => {
-  const { showLoader, hideLoader, user } = useCurrentApp();
+  const { user } = useCurrentApp();
   const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
   const isEditMode = !!loan;
 
   const form = useForm<LoanFormValues>({
     resolver: zodResolver(loanFormSchema),
     defaultValues: {
-      bookcopyId: "",
+      bookId: "",
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
@@ -74,13 +68,12 @@ const LoanFormDialog = ({
       fetchBookCopies();
       if (loan) {
         form.reset({
-          bookcopyId: String(loan.bookcopyId),
+          bookId: String(loan.bookCopy.bookId),
           dueDate: loan.dueDate.split("T")[0],
-          status: loan.status,
         });
       } else {
         form.reset({
-          bookcopyId: "",
+          bookId: "",
           dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
             .toISOString()
             .split("T")[0],
@@ -103,8 +96,6 @@ const LoanFormDialog = ({
   };
 
   const onSubmit = async (values: LoanFormValues) => {
-    showLoader();
-
     try {
       let response;
       if (isEditMode && loan?.id) {
@@ -113,20 +104,15 @@ const LoanFormDialog = ({
           status: values.status,
         });
       } else {
-        // For create, we need userId - this is a limitation that should be handled by the backend
-        // or we need to add a user selection field
         response = await createLoanAPI({
-          bookcopyId: parseInt(values.bookcopyId),
+          bookId: parseInt(values.bookId),
           userId: user?.id || 1,
           dueDate: values.dueDate,
         });
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode ? "Loan updated successfully" : "Loan created successfully"
@@ -138,8 +124,6 @@ const LoanFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update loan" : "Failed to create loan"
       );
-    } finally {
-      hideLoader();
     }
   };
 
@@ -161,10 +145,10 @@ const LoanFormDialog = ({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="bookcopyId"
+              name="bookId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Book Copy *</FormLabel>
+                  <FormLabel>Book Copy</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -196,7 +180,7 @@ const LoanFormDialog = ({
               name="dueDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date *</FormLabel>
+                  <FormLabel>Due Date </FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -210,21 +194,24 @@ const LoanFormDialog = ({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status *</FormLabel>
+                  <FormLabel>Status </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select a status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="RETURNED">Returned</SelectItem>
-                      <SelectItem value="LOST">Lost</SelectItem>
-                      <SelectItem value="OVERDUE">Overdue</SelectItem>
-                      <SelectItem value="ON_LOAN">On Loan</SelectItem>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value="RETURNED">Returned</SelectItem>
+                        <SelectItem value="LOST">Lost</SelectItem>
+                        <SelectItem value="OVERDUE">Overdue</SelectItem>
+                        <SelectItem value="ON_LOAN">On Loan</SelectItem>
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -240,7 +227,10 @@ const LoanFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Loan" : "Create Loan"}
               </Button>
             </DialogFooter>

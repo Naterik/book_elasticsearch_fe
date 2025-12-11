@@ -1,16 +1,18 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card } from "@/components/ui/card";
+import type { IBookElasticIndex } from "@/types";
 import { TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function BookCard({ item }: { item: IBook }) {
+const BookCard = ({ item }: { item: IBook | IBookElasticIndex }) => {
   const navigate = useNavigate();
   const placeholderImage =
-    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop";
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTt_R8ZDAp9kjtZyNyxjKHoZ_rrKoU1gH3pA&s";
 
+  const isAvailable = item.quantity - item.borrowed > 0;
   return (
     <Card
-      className="p-0 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-2 duration-300 cursor-pointer group"
+      className="p-0 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 duration-300 cursor-pointer group bg-white "
       onClick={() => navigate(`/book/${item.id}`)}
     >
       <AspectRatio ratio={3 / 4}>
@@ -21,29 +23,29 @@ export default function BookCard({ item }: { item: IBook }) {
           draggable={false}
         />
       </AspectRatio>
-      <div className="p-3 bg-white">
-        <p className="text-sm font-semibold truncate text-gray-900">
+      <div className="p-2 sm:p-3 bg-white">
+        <p className="text-xs sm:text-sm font-semibold truncate text-gray-900 line-clamp-1">
           {item.title}
         </p>
-        <p className="text-xs text-gray-500 truncate mt-1">
-          {item.authors?.name}
+        <p className="text-xs text-gray-500 truncate mt-0.5 line-clamp-1">
+          {item.authors?.name || "Unknown"}
         </p>
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center justify-between mt-2 gap-1">
           <span
             className={`text-xs font-medium ${
-              item.quantity - item.borrowed > 0
-                ? "text-blue-600"
-                : "text-red-500"
+              isAvailable ? "text-blue-600" : "text-red-500"
             }`}
           >
-            {item.quantity - item.borrowed > 0 ? "AVAILABLE" : "OUT OF STOCK"}
+            {isAvailable ? "Available" : "Out"}
           </span>
-          <span className="text-xs text-gray-400 flex items-center">
-            <TrendingUp className="h-3 w-3 inline mr-1" />
+          <span className="text-xs text-gray-400 flex items-center gap-0.5">
+            <TrendingUp className="h-3 w-3" />
             {item.borrowed}
           </span>
         </div>
       </div>
     </Card>
   );
-}
+};
+
+export default BookCard;

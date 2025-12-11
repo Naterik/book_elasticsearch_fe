@@ -2,7 +2,6 @@ import createInstanceAxios from "@/services/axios.customize";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-// Loan Management APIs
 export const getAllLoansAdminAPI = (page: number = 1) => {
   const urlBackend = `/api/v1/loans?page=${page}`;
   return axios.get<IBackendRes<IModelPaginate<ILoan>>>(urlBackend);
@@ -14,11 +13,11 @@ export const getLoanByIdAdminAPI = (id: number) => {
 };
 
 export const createLoanAPI = (data: {
-  bookcopyId: number;
+  bookId: number;
   userId: number;
   dueDate: string;
 }) => {
-  const urlBackend = "/api/v1/loans/create";
+  const urlBackend = "/api/v1/loans";
   return axios.post<IBackendRes<ILoan>>(urlBackend, data);
 };
 
@@ -36,4 +35,9 @@ export const updateLoanAPI = (
 export const deleteLoanAPI = (id: number) => {
   const urlBackend = `/api/v1/loans/${id}`;
   return axios.delete<IBackendRes<void>>(urlBackend);
+};
+
+export const returnBookApproveAPI = (loanId: number, userId: number) => {
+  const urlBackend = `/api/v1/loans/return-book`;
+  return axios.put<IBackendRes<ILoan>>(urlBackend, { loanId, userId });
 };

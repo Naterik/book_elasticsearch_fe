@@ -8,8 +8,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { usePaymentManagement } from "@/features/admin/payment/hooks/usePaymentManagement";
+
 import { DataTable } from "@/components/layout/admin/data-table";
+import { usePaymentManagement } from "@/features/admin/payment/hooks/usePaymentManagement";
+("@/components/layout/admin/data-table");
 
 const PaymentManagementPage = () => {
   const {
@@ -19,6 +21,7 @@ const PaymentManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
@@ -54,6 +57,7 @@ const PaymentManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No payments found."
+        isLoading={isLoading}
       />
 
       <AlertDialog

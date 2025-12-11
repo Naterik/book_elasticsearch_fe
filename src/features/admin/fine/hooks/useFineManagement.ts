@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllFinesAdminAPI,
   deleteFineAPI,
@@ -8,7 +8,7 @@ import {
 import { getFineColumns } from "@/features/admin/fine/fine-columns";
 
 export const useFineManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fines, setFines] = useState<IFine[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -25,7 +25,7 @@ export const useFineManagement = () => {
   }, [currentPage]);
 
   const fetchFines = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllFinesAdminAPI(currentPage);
 
@@ -34,16 +34,14 @@ export const useFineManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching fines:", error);
       toast.error("Failed to fetch fines");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -64,14 +62,12 @@ export const useFineManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!fineToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteFineAPI(fineToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Fine deleted successfully");
         fetchFines();
@@ -80,7 +76,7 @@ export const useFineManagement = () => {
       console.error("Error deleting fine:", error);
       toast.error("Failed to delete fine");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setFineToDelete(null);
     }
@@ -129,5 +125,6 @@ export const useFineManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   };
 };

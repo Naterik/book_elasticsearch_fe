@@ -1,9 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,14 +20,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createGenreAPI, updateGenreAPI } from "../services";
-
-const genreFormSchema = z.object({
-  name: z.string().min(1, "Genre name is required"),
-});
-
-type GenreFormValues = z.infer<typeof genreFormSchema>;
+import { genreFormSchema, type GenreFormValues } from "@/lib/validators/genre";
 
 interface GenreFormDialogProps {
   open: boolean;
@@ -43,13 +38,14 @@ const GenreFormDialog = ({
   genre,
   onSuccess,
 }: GenreFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!genre;
 
   const form = useForm<GenreFormValues>({
     resolver: zodResolver(genreFormSchema),
     defaultValues: {
       name: "",
+      description: "",
     },
   });
 
@@ -58,37 +54,46 @@ const GenreFormDialog = ({
       if (genre) {
         form.reset({
           name: genre.name,
+          description: genre.description || "",
         });
       } else {
         form.reset({
           name: "",
+          description: "",
         });
       }
     }
   }, [open, genre, form]);
 
   const onSubmit = async (values: GenreFormValues) => {
-    showLoader();
+    setIsSubmitting(true);
     try {
       let response;
       if (isEditMode && genre) {
-        response = await updateGenreAPI(genre.id, values);
+        response = await updateGenreAPI({
+          name: values.name,
+          description: values.description || "",
+          id: `${genre.id}`,
+        });
       } else {
-        response = await createGenreAPI(values);
+        response = await createGenreAPI({
+          name: values.name,
+          description: values.description || "",
+        });
       }
-
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
-      } else {
+      if (response?.message) {
+        toast.error(response.message);
+      } else if (response?.data) {
         toast.success(
           isEditMode
             ? "Genre updated successfully"
             : "Genre created successfully"
         );
+        form.reset();
+        onOpenChange(false);
         onSuccess();
+      } else {
+        toast.error("Unexpected response from server");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -96,7 +101,7 @@ const GenreFormDialog = ({
         isEditMode ? "Failed to update genre" : "Failed to create genre"
       );
     } finally {
-      hideLoader();
+      setIsSubmitting(false);
     }
   };
 
@@ -129,16 +134,40 @@ const GenreFormDialog = ({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter genre description..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter className="gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit">
-                {isEditMode ? "Update Genre" : "Create Genre"}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {isEditMode ? "Updating..." : "Creating..."}
+                  </>
+                ) : (
+                  <>{isEditMode ? "Update Genre" : "Create Genre"}</>
+                )}
               </Button>
             </DialogFooter>
           </form>

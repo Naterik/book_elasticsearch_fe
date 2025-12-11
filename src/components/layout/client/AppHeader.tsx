@@ -24,35 +24,36 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Bell, Info, LogOut, User, History } from "lucide-react";
-import Notifications from "../../Notification";
-import MobileSheet from "../MobileSheet";
-import NotificationBadge from "../../NotificationBadge";
+import Notifications from "@/components/Notification";
+import MobileSheet from "@/components/layout/MobileSheet";
+import NotificationBadge from "@/components/NotificationBadge";
 import { useCurrentApp } from "@/app/providers/app.context";
 
 const NAV_ITEMS = [
   { to: "/book", label: "Search" },
   { to: "/about", label: "About" },
+  { to: "/login", label: "Login" },
+  { to: "/register", label: "Register" },
 ];
 
 export default function AppHeader() {
-  const { setUser, setIsAuthenticated, showLoader, hideLoader } =
-    useCurrentApp();
+  const { setUser, setIsAuthenticated, setIsLoading, user } = useCurrentApp();
   const navigate = useNavigate();
-
+  const isLogin = user ? NAV_ITEMS.slice(0, 2) : NAV_ITEMS || NAV_ITEMS;
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     setUser(null);
     setIsAuthenticated(false);
-    showLoader();
+    setIsLoading(true);
     navigate("/");
     setTimeout(() => {
-      hideLoader();
+      setIsLoading(false);
     }, 1000);
   };
 
   return (
-    <header className="container mx-auto  sticky top-0 z-50 border-b bg-neutral-900/90 backdrop-blur text-white">
-      <div className="flex h-16 items-center justify-between ">
+    <header className=" sticky top-0 z-50 border-b bg-neutral-900/90 backdrop-blur text-white">
+      <div className="container  mx-auto flex h-16 items-center justify-between ">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="logo" className="h-8 w-auto" />
           <span className="sr-only">Home</span>
@@ -62,7 +63,7 @@ export default function AppHeader() {
           <nav className="hidden md:block">
             <NavigationMenu className="bg-transparent">
               <NavigationMenuList className="gap-1">
-                {NAV_ITEMS.map((item) => (
+                {isLogin.map((item) => (
                   <NavigationMenuItem key={item.to}>
                     <NavigationMenuLink asChild>
                       <Link
@@ -94,51 +95,56 @@ export default function AppHeader() {
               <Notifications />
             </PopoverContent>
           </Popover>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-2 px-2 text-white"
-              >
-                <Avatar className="h-7 w-7">
-                  <AvatarImage src="" alt="@user" />
-                  <AvatarFallback>
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:inline">User</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="hover:bg-gray-500/10">
-                <Link to="/loan" className="flex items-center gap-2 ">
-                  <History className="mr-2 h-4 w-4 text text-green-500" />
-                  Loan
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-gray-500/10">
-                <Link to="/notifications" className="flex items-center gap-2 ">
-                  <Bell className="mr-2 h-4 w-4 text text-blue-500" />
-                  Notifications
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-gray-500/10">
-                <Link to="/info" className="flex items-center gap-2 ">
-                  <Info className="mr-2 h-4 w-4 text text-cyan-500" />
-                  Info
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className=" hover:bg-gray-500/10"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-2 text-white"
+                >
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={user.avatar} alt="@user" />
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline">{user.fullName}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="hover:bg-gray-500/10">
+                  <Link to="/user/loan" className="flex items-center gap-2 ">
+                    <History className="mr-2 h-4 w-4 text text-green-500" />
+                    Loan
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="hover:bg-gray-500/10">
+                  <Link
+                    to="/user/notifications"
+                    className="flex items-center gap-2 "
+                  >
+                    <Bell className="mr-2 h-4 w-4 text text-blue-500" />
+                    Notifications
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="hover:bg-gray-500/10">
+                  <Link to="/user/info" className="flex items-center gap-2 ">
+                    <Info className="mr-2 h-4 w-4 text text-cyan-500" />
+                    Info
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className=" hover:bg-gray-500/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <MobileSheet />
         </div>

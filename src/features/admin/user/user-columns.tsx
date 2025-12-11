@@ -12,12 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { StatusBadgeUser } from "@/features/admin/user/components/StatusUser";
 
-/**
- * User table column definitions
- * This is a configuration file that defines how user data is displayed in the table
- * It receives callbacks from the parent component to handle user actions
- */
-
 export const getUserColumns = (
   onEdit: (user: IAdminUser) => void,
   onDelete: (userId: number) => void,
@@ -72,7 +66,7 @@ export const getUserColumns = (
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return StatusBadgeUser(row.original.status);
+      return StatusBadgeUser(row.original.status as UserStatus);
     },
   },
   {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
+// import { useCurrentApp } from "@/app/providers/app.context";
 import {
   getAllReservationsAdminAPI,
   deleteReservationAPI,
@@ -9,7 +9,7 @@ import {
 import { getReservationColumns } from "@/features/admin/reservation/reservation-columns";
 
 export const useReservationManagement = () => {
-  const { showLoader, hideLoader } = useCurrentApp();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [reservations, setReservations] = useState<IReservation[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -29,7 +29,7 @@ export const useReservationManagement = () => {
   }, [currentPage]);
 
   const fetchReservations = async () => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await getAllReservationsAdminAPI(currentPage);
 
@@ -38,16 +38,14 @@ export const useReservationManagement = () => {
         setTotalPages(response.data.pagination.totalPages);
         setTotalItems(response.data.pagination.totalItems);
         setPageSize(response.data.pagination.pageSize);
-      } else if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error fetching reservations:", error);
       toast.error("Failed to fetch reservations");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -68,14 +66,12 @@ export const useReservationManagement = () => {
 
   const handleConfirmDelete = async () => {
     if (!reservationToDelete) return;
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await deleteReservationAPI(reservationToDelete);
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Reservation deleted successfully");
         fetchReservations();
@@ -84,7 +80,7 @@ export const useReservationManagement = () => {
       console.error("Error deleting reservation:", error);
       toast.error("Failed to delete reservation");
     } finally {
-      hideLoader();
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setReservationToDelete(null);
     }
@@ -94,17 +90,15 @@ export const useReservationManagement = () => {
     reservationId: number,
     newStatus: string
   ) => {
-    showLoader();
+    setIsLoading(true);
     try {
       const response = await updateReservationStatusAPI(
         reservationId,
         newStatus
       );
 
-      if (response.error) {
-        toast.error(
-          Array.isArray(response.error) ? response.error[0] : response.error
-        );
+      if (response.message) {
+        toast.error(response.message);
       } else {
         toast.success("Reservation status updated successfully");
         fetchReservations();
@@ -113,7 +107,7 @@ export const useReservationManagement = () => {
       console.error("Error updating reservation status:", error);
       toast.error("Failed to update reservation status");
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -166,5 +160,6 @@ export const useReservationManagement = () => {
     handleStatusChange,
     handlePageChange,
     handlePageSizeChange,
+    isLoading,
   };
 };

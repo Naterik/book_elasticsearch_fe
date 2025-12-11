@@ -22,7 +22,6 @@ const statusConfig = {
     label: "Suspended",
   },
 };
-type UserStatus = "ACTIVE" | "PENDING_CARD" | "INACTIVE" | "SUSPENDED";
 
 export const StatusBadgeUser = (status: UserStatus) => {
   const config = statusConfig[status];

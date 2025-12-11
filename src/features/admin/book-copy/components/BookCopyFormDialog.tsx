@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { z } from "zod";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -34,16 +32,11 @@ import {
   updateBookCopyAPI,
 } from "@/features/admin/book-copy/services";
 import { getAllBooksAdminAPI } from "@/features/admin/book/services";
-
-const bookCopyFormSchema = z.object({
-  copyNumber: z.string().min(1, "Copy number is required"),
-  yearPublished: z.string().min(4, "Year published is required"),
-  status: z.string().min(1, "Status is required"),
-  location: z.string().min(1, "Location is required"),
-  bookId: z.string().min(1, "Book is required"),
-});
-
-type BookCopyFormValues = z.infer<typeof bookCopyFormSchema>;
+import {
+  bookCopyFormSchema,
+  type BookCopyFormValues,
+} from "@/lib/validators/book-copy";
+import { Loader2 } from "lucide-react";
 
 interface BookCopyFormDialogProps {
   open: boolean;
@@ -58,7 +51,6 @@ const BookCopyFormDialog = ({
   bookCopy,
   onSuccess,
 }: BookCopyFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
   const [books, setBooks] = useState<IBook[]>([]);
 
   const isEditMode = !!bookCopy;
@@ -67,7 +59,7 @@ const BookCopyFormDialog = ({
     resolver: zodResolver(bookCopyFormSchema),
     defaultValues: {
       copyNumber: "",
-      yearPublished: new Date().getFullYear().toString(),
+      year_published: new Date().getFullYear().toString(),
       status: "available",
       location: "",
       bookId: "",
@@ -80,7 +72,7 @@ const BookCopyFormDialog = ({
       if (bookCopy) {
         form.reset({
           copyNumber: bookCopy.copyNumber,
-          yearPublished: String(bookCopy.year_published),
+          year_published: String(bookCopy.year_published),
           status: bookCopy.status,
           location: bookCopy.location,
           bookId: String(bookCopy.bookId),
@@ -88,7 +80,7 @@ const BookCopyFormDialog = ({
       } else {
         form.reset({
           copyNumber: "",
-          yearPublished: String(new Date().getFullYear()),
+          year_published: String(new Date().getFullYear()),
           status: "available",
           location: "",
           bookId: "",
@@ -104,18 +96,15 @@ const BookCopyFormDialog = ({
         setBooks(res.data.result);
       }
     } catch (error) {
-      console.error("Error fetching books:", error);
       toast.error("Failed to load books");
     }
   };
 
   const onSubmit = async (values: BookCopyFormValues) => {
-    showLoader();
-
     try {
       const submitData = {
         copyNumber: values.copyNumber,
-        yearPublished: parseInt(values.yearPublished),
+        year_published: +values.year_published,
         status: values.status,
         location: values.location,
         bookId: parseInt(values.bookId),
@@ -128,11 +117,8 @@ const BookCopyFormDialog = ({
         response = await createBookCopyAPI(submitData);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode
@@ -146,8 +132,6 @@ const BookCopyFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update book copy" : "Failed to create book copy"
       );
-    } finally {
-      hideLoader();
     }
   };
 
@@ -211,7 +195,7 @@ const BookCopyFormDialog = ({
 
             <FormField
               control={form.control}
-              name="yearPublished"
+              name="year_published"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Year Published *</FormLabel>
@@ -277,7 +261,10 @@ const BookCopyFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Book Copy" : "Create Book Copy"}
               </Button>
             </DialogFooter>

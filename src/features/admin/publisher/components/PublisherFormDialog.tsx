@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Dialog,
   DialogContent,
@@ -22,13 +20,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { createPublisherAPI, updatePublisherAPI } from "../services";
-
-const publisherFormSchema = z.object({
-  name: z.string().min(1, "Publisher name is required"),
-});
-
-type PublisherFormValues = z.infer<typeof publisherFormSchema>;
+import {
+  publisherFormSchema,
+  type PublisherFormValues,
+} from "@/lib/validators/publisher";
 
 interface PublisherFormDialogProps {
   open: boolean;
@@ -43,7 +40,6 @@ const PublisherFormDialog = ({
   publisher,
   onSuccess,
 }: PublisherFormDialogProps) => {
-  const { showLoader, hideLoader } = useCurrentApp();
   const isEditMode = !!publisher;
 
   const form = useForm<PublisherFormValues>({
@@ -68,20 +64,16 @@ const PublisherFormDialog = ({
   }, [open, publisher, form]);
 
   const onSubmit = async (values: PublisherFormValues) => {
-    showLoader();
     try {
       let response;
       if (isEditMode && publisher) {
-        response = await updatePublisherAPI(publisher.id, values);
+        response = await updatePublisherAPI(+publisher.id, values);
       } else {
         response = await createPublisherAPI(values);
       }
 
-      if (response.error) {
-        const errorMessage = Array.isArray(response.error)
-          ? response.error.join(", ")
-          : response.error;
-        toast.error(errorMessage);
+      if (response?.message) {
+        toast.error(response.message);
       } else {
         toast.success(
           isEditMode
@@ -95,8 +87,6 @@ const PublisherFormDialog = ({
       toast.error(
         isEditMode ? "Failed to update publisher" : "Failed to create publisher"
       );
-    } finally {
-      hideLoader();
     }
   };
 
@@ -137,7 +127,10 @@ const PublisherFormDialog = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? "Update Publisher" : "Create Publisher"}
               </Button>
             </DialogFooter>

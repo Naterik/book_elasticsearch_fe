@@ -22,6 +22,7 @@ const FineManagementPage = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -66,6 +67,7 @@ const FineManagementPage = () => {
         showPagination={true}
         showSearch={true}
         emptyMessage="No fines found. Create your first fine to get started."
+        isLoading={isLoading}
       />
 
       <FineFormDialog
