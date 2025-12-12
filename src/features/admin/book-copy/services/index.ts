@@ -1,4 +1,4 @@
-import createInstanceAxios from "@/services/axios.customize";
+import createInstanceAxios from "@/lib/api/axios.customize";
 import qs from "qs";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
@@ -10,11 +10,13 @@ export const getAllBookCopiesAdminAPI = (page: number = 1) => {
 
 export const getFilterBookCopyElasticAPI = (
   page: number = 1,
-  search: string = ""
+  search: string = "",
+  year: string = "",
+  status: string = ""
 ) => {
   const urlBackend = "/api/v1/book-copies/elastic";
   return axios.get<IBackendRes<IModelPaginate<IBookCopy>>>(urlBackend, {
-    params: { page, search },
+    params: { page, search, year, status },
     paramsSerializer: {
       serialize: (params) =>
         qs.stringify(params, {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { getUserProfileAPI } from "@/services/api";
+import { getUserProfileAPI } from "@/lib/api";
 import { toast } from "sonner";
 
 export const useInfoPage = () => {

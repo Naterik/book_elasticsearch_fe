@@ -1,7 +1,7 @@
 export const BookCopyStatus = {
   AVAILABLE: "AVAILABLE",
-  BORROWED: "BORROWED",
-  RESERVED: "RESERVED",
+  ON_HOLD: "ON_HOLD",
+  ON_LOAN: "ON_LOAN",
   LOST: "LOST",
 } as const;
 

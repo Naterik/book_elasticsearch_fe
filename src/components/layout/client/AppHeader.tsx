@@ -37,7 +37,8 @@ const NAV_ITEMS = [
 ];
 
 export default function AppHeader() {
-  const { setUser, setIsAuthenticated, setIsLoading, user } = useCurrentApp();
+  const { setUser, setIsAuthenticated, setIsLoading, user, isAuthenticated } =
+    useCurrentApp();
   const navigate = useNavigate();
   const isLogin = user ? NAV_ITEMS.slice(0, 2) : NAV_ITEMS || NAV_ITEMS;
   const handleLogout = () => {
@@ -78,23 +79,26 @@ export default function AppHeader() {
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Open notifications"
-                className="relative"
-              >
-                <Bell className="size-5.5" />
-                <NotificationBadge />
-              </Button>
-            </PopoverTrigger>
+          {isAuthenticated && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open notifications"
+                  className="relative"
+                >
+                  <Bell className="size-5.5" />
+                  <NotificationBadge />
+                </Button>
+              </PopoverTrigger>
 
-            <PopoverContent align="end" className="w-80 p-0">
-              <Notifications />
-            </PopoverContent>
-          </Popover>
+              <PopoverContent align="end" className="w-80 p-0">
+                <Notifications />
+              </PopoverContent>
+            </Popover>
+          )}
+
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

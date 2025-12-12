@@ -9,7 +9,7 @@ import {
   memberRegistrationSchema,
   type MemberRegistrationSchema,
 } from "@/lib/validators/member";
-import { getVNPayUrlAPI, postCreateMemberCardAPI } from "@/services/api";
+import { getVNPayUrlAPI, postCreateMemberCardAPI } from "@/lib/api";
 export const DURATION_COST = {
   "6": 50000,
   "12": 100000,

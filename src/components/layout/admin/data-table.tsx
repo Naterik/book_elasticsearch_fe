@@ -56,6 +56,7 @@ interface DataTableProps<TData, TValue> {
 
   onSearch?: (value: string) => void;
   searchValue?: string;
+  toolbarLeftContent?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -79,6 +80,7 @@ export function DataTable<TData, TValue>({
 
   onSearch,
   searchValue,
+  toolbarLeftContent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -111,9 +113,12 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full space-y-4">
       {/* Toolbar */}
-      {(showSearch || showColumnToggle || customToolbar) && (
-        <div className="flex items-center justify-between">
-          <div className="flex flex-1 items-center space-x-2">
+      {(showSearch ||
+        showColumnToggle ||
+        customToolbar ||
+        toolbarLeftContent) && (
+        <div className="flex items-center justify-between gap-10">
+          <div className="flex flex-1 items-center space-x-3 justify-between ">
             {showSearch && searchKey && (
               <Input
                 placeholder={searchPlaceholder}
@@ -132,6 +137,7 @@ export function DataTable<TData, TValue>({
                 className="h-9 w-[150px] lg:w-[250px]"
               />
             )}
+            {toolbarLeftContent}
           </div>
           <div className="flex items-center space-x-2">
             {customToolbar}
@@ -200,7 +206,7 @@ export function DataTable<TData, TValue>({
                 <TableRow key={`skeleton-row-${rowIndex}`}>
                   {columns.map((_, colIndex) => (
                     <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`}>
-                      <Skeleton className="h-6 w-full" />
+                      <Skeleton className="h-10 w-full" />
                     </TableCell>
                   ))}
                 </TableRow>

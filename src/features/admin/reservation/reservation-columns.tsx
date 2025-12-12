@@ -8,33 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-
-const getStatusColor = (status: string) => {
-  switch (status.toUpperCase()) {
-    case "PENDING":
-      return "bg-yellow-100 text-yellow-800";
-    case "COMPLETED":
-      return "bg-green-100 text-green-800";
-    case "NOTIFIED":
-      return "bg-blue-100 text-blue-800";
-    case "CANCELED":
-      return "bg-red-100 text-red-800";
-    // case "EXPIRED":
-    //   return "bg-gray-100 text-gray-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+import { StatusBadge } from "@/components/StatusBadge";
+import { formatDate } from "@/helper";
 
 export const getReservationColumns = (
   onEdit: (reservation: IReservation) => void,
@@ -101,16 +77,9 @@ export const getReservationColumns = (
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className={`px-2 py-1 h-auto cursor-pointer ${getStatusColor(
-                status
-              )}`}
-            >
-              <span className="text-xs font-medium">
-                {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
-              </span>
-              <ChevronDown className="ml-1 h-3 w-3" />
+            <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+              <StatusBadge status={status} className="cursor-pointer" />
+              <ChevronDown className="ml-1 h-3 w-3 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -120,35 +89,28 @@ export const getReservationColumns = (
               onClick={() => onStatusChange(reservation.id, "PENDING")}
               className="cursor-pointer"
             >
-              <Badge className="bg-yellow-100 text-yellow-800 border-0 mr-2">
-                PENDING
-              </Badge>
+              <StatusBadge status="PENDING" className="mr-2" />
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onStatusChange(reservation.id, "COMPLETED")}
               className="cursor-pointer"
             >
-              <Badge className="bg-green-100 text-green-800 border-0 mr-2">
-                COMPLETED
-              </Badge>
+              <StatusBadge status="COMPLETED" className="mr-2" />
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onStatusChange(reservation.id, "NOTIFIED")}
               className="cursor-pointer"
             >
-              <Badge className="bg-blue-100 text-blue-800 border-0 mr-2">
-                NOTIFIED
-              </Badge>
+              <StatusBadge status="NOTIFIED" className="mr-2" />
             </DropdownMenuItem>
 
             <DropdownMenuItem
               onClick={() => onStatusChange(reservation.id, "CANCELED")}
               className="cursor-pointer text-destructive focus:text-destructive"
             >
-              <Badge className="bg-red-100 text-red-800 border-0 mr-2">
-                CANCELED
-              </Badge>
+              <StatusBadge status="CANCELED" className="mr-2" />
             </DropdownMenuItem>
+
             {/* <DropdownMenuItem
               onClick={() => onStatusChange(reservation.id, "EXPIRED")}
               className="cursor-pointer"

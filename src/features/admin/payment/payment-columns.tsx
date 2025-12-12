@@ -8,32 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatCurrency } from "@/helper";
-
-const getStatusColor = (status: string) => {
-  switch (status.toUpperCase()) {
-    case "PAYMENT_SUCCESS":
-      return "bg-green-100 text-green-800";
-    case "UNPAID":
-      return "bg-red-100 text-red-800";
-    case "CANCELLED":
-      return "bg-gray-100 text-yellow-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+import { formatCurrency, formatDate } from "@/helper";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const getPaymentColumns = (
   onDelete: (paymentId: number) => void
@@ -87,19 +64,15 @@ export const getPaymentColumns = (
     header: "Status",
     cell: ({ row }) => {
       const payment = row.original;
-      return (
-        <Badge variant="outline" className={getStatusColor(payment.status)}>
-          {payment.status}
-        </Badge>
-      );
+      return <StatusBadge status={payment?.status ?? ""} />;
     },
   },
 
   {
-    accessorKey: "fineId",
-    header: "Fine ID",
+    accessorKey: "type",
+    header: "Type",
     cell: ({ row }) => {
-      return <span className="text-sm">Fine #{row.original.fineId}</span>;
+      return <span className="text-sm">{row.original.type}</span>;
     },
   },
   {

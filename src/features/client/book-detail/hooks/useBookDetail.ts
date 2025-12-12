@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { getBookByIdAPI } from "@/services/api";
+import { getBookByIdAPI } from "@/lib/api";
 
 export const useBookDetail = () => {
   const { id } = useParams();

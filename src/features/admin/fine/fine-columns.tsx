@@ -8,13 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency } from "@/helper";
-
-const getStatusColor = (isPaid: boolean) => {
-  return isPaid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
-};
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const getFineColumns = (
   onEdit: (fine: IFine) => void,
@@ -50,11 +46,7 @@ export const getFineColumns = (
     header: "Status",
     cell: ({ row }) => {
       const fine = row.original;
-      return (
-        <Badge variant="outline" className={getStatusColor(fine.isPaid)}>
-          {fine.isPaid ? "Paid" : "Unpaid"}
-        </Badge>
-      );
+      return <StatusBadge status={fine.isPaid} />;
     },
   },
   {

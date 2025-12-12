@@ -8,9 +8,9 @@ import React, {
   useRef,
 } from "react";
 import type { INotification } from "@/types/models/notification.model";
-import { socketService } from "@/services/socket";
+import { socketService } from "@/lib/api/socket";
 import { useCurrentApp } from "./app.context";
-import { getNotificationsByUserIdAPI } from "@/services/api/notification.api";
+import { getNotificationsByUserIdAPI } from "@/lib/api/notification.api";
 
 interface INotificationContext {
   notifications: INotification[];

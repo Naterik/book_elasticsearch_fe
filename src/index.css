@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
 @tailwind utilities;
 @custom-variant dark (&:is(.dark *));
 
@@ -17,6 +18,17 @@
   @variant xl {
     padding-inline: 120px;
   }
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html body[data-scroll-locked] {
+  /* Loại bỏ padding thừa do Radix tự thêm vào */
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  overflow: auto !important;
 }
 :root {
   --radius: 0.625rem;
@@ -157,6 +169,28 @@
   }
   .tabs-trigger[data-state="active"]::after {
     @apply scale-x-100;
+  }
+
+  .success-badge {
+    @apply bg-green-200 !text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-900/30 dark:!text-green-400 dark:border-green-800;
+  }
+  .warning-badge {
+    @apply bg-amber-200 !text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:!text-amber-400 dark:border-amber-800;
+  }
+
+  .destructive-badge {
+    @apply bg-red-100 !text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-900/30 dark:!text-red-400 dark:border-red-800;
+  }
+  .info-badge {
+    @apply bg-blue-200 !text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-900/30 dark:!text-blue-400 dark:border-blue-800;
+  }
+
+  .serious-badge {
+    @apply bg-zinc-800 !text-zinc-100 border-zinc-900 hover:bg-zinc-800/80;
+  }
+
+  .default-badge {
+    @apply bg-slate-200 !text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:!text-slate-400 dark:border-slate-700;
   }
 }
 

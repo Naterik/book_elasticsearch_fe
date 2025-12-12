@@ -26,7 +26,7 @@ import {
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { postCreateLoanAPI } from "@/services/api";
+import { postCreateLoanAPI } from "@/lib/api";
 import { toast } from "sonner";
 import { calculateDueDate } from "@/helper";
 import { useCurrentApp } from "@/app/providers/app.context";

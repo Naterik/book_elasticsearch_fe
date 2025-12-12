@@ -23,14 +23,16 @@ export const useBookCopyManagement = () => {
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [yearFilter, setYearFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   useEffect(() => {
-    if (isSearching && searchQuery.trim()) {
+    if (isSearching || yearFilter || statusFilter) {
       fetchBookCopiesWithSearch();
     } else {
       fetchBookCopies();
     }
-  }, [currentPage, searchQuery, isSearching]);
+  }, [currentPage, searchQuery, isSearching, yearFilter, statusFilter]);
 
   const fetchBookCopies = async () => {
     setIsLoading(true);
@@ -38,10 +40,11 @@ export const useBookCopyManagement = () => {
       const response = await getAllBookCopiesAdminAPI(currentPage);
 
       if (response.data && response.data.result) {
+        const paginationRes = response.data.pagination;
         setBookCopies(response.data.result);
-        setTotalPages(response.data.pagination.totalPages);
-        setTotalItems(response.data.pagination.totalItems);
-        setPageSize(response.data.pagination.pageSize);
+        setTotalPages(paginationRes.totalPages);
+        setTotalItems(paginationRes.totalItems);
+        setPageSize(paginationRes.pageSize);
       } else {
         toast.error(response.message);
       }
@@ -56,7 +59,9 @@ export const useBookCopyManagement = () => {
     try {
       const response = await getFilterBookCopyElasticAPI(
         currentPage,
-        searchQuery
+        searchQuery,
+        yearFilter,
+        statusFilter
       );
 
       if (response.data && response.data.result) {
@@ -153,6 +158,16 @@ export const useBookCopyManagement = () => {
     // useEffect will trigger and fetch all items
   };
 
+  const handleYearFilterChange = (year: string) => {
+    setYearFilter(year);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
+
   const columns = useMemo(
     () => getBookCopyColumns(handleEditBookCopy, handleDeleteClick),
     []
@@ -186,5 +201,9 @@ export const useBookCopyManagement = () => {
     handleSearchChange,
     handleClearSearch,
     isSearching,
+    yearFilter,
+    statusFilter,
+    handleYearFilterChange,
+    handleStatusFilterChange,
   };
 };

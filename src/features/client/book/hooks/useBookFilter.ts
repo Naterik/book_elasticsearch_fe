@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
-import { getAllGenreAPI, getAllLanguagesElasticAPI } from "@/services/api";
+import { getAllGenreAPI, getAllLanguagesElasticAPI } from "@/lib/api";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book.enum";
 import { useSearchParams } from "react-router";

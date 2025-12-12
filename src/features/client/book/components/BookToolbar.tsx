@@ -8,9 +8,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { List, LayoutGrid } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-responsive";
 import { memo } from "react";
 import type { ViewCard } from "@/types";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },

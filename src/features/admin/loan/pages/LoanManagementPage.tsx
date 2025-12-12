@@ -43,8 +43,8 @@ const LoanManagementPage = () => {
       <DataTable
         columns={columns}
         data={loans}
-        searchKey="user.fullName"
-        searchPlaceholder="Search by user name..."
+        searchKey="id"
+        searchPlaceholder=""
         pageCount={totalPages}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

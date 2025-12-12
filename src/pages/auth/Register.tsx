@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { registerAPI } from "@/services/api";
+import { registerAPI } from "@/lib/api";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -32,7 +32,6 @@ export interface IAdminUser extends IUserBase {
   cardNumber: string | null;
   membershipStart: string | null;
   membershipEnd: string | null;
-  googleId: string | null;
   role: {
     id: number;
     name: string;

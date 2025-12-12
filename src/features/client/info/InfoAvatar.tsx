@@ -2,8 +2,9 @@ import { Settings } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getStatusBadgeUser } from "@/components/Statusbook";
+
 import { formatDate } from "@/helper";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type Props = {
   user: IUserInfo | null;
@@ -24,7 +25,7 @@ export default function InfoAvatar({ user, onSettingsClick }: Props) {
             {user?.fullName}
           </h2>
           <p className="text-sm text-muted-foreground mb-2">{user?.username}</p>
-          {getStatusBadgeUser(user?.status)}
+          <StatusBadge status={user?.status || ""} />
         </div>
 
         <div className="space-y-3 text-sm">

@@ -15,7 +15,15 @@ import { DataTable } from "@/components/layout/admin/data-table";
 import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const BookCopyManagementPage = () => {
   const {
     bookCopies,
@@ -40,7 +48,80 @@ const BookCopyManagementPage = () => {
     handleSearchChange,
     handleClearSearch,
     searchQuery,
+    yearFilter,
+    statusFilter,
+    handleYearFilterChange,
+    handleStatusFilterChange,
   } = useBookCopyManagement();
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
+
+  const toolbarLeftContent = (
+    <>
+      <div className="relative w-full lg:w-[350px]">
+        <Input
+          placeholder="Search by location, copy number, title, ISBN"
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="w-full"
+        />
+
+        {searchQuery && (
+          <button
+            onClick={handleClearSearch}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded cursor-pointer"
+          >
+            <X className="h-4 w-4 text-gray-500" />
+          </button>
+        )}
+      </div>
+      <div className="flex gap-10">
+        <Select
+          value={yearFilter || "ALL"}
+          onValueChange={(val) =>
+            handleYearFilterChange(val === "ALL" ? "" : val)
+          }
+        >
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Select Year" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Year</SelectLabel>
+              <SelectItem value="ALL">All Years</SelectItem>
+              {years.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={statusFilter || "ALL"}
+          onValueChange={(val) =>
+            handleStatusFilterChange(val === "ALL" ? "" : val)
+          }
+        >
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Select Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Status</SelectLabel>
+              <SelectItem value="ALL">All Status</SelectItem>
+              <SelectItem value="AVAILABLE">Available</SelectItem>
+              <SelectItem value="ON_LOAN">Borrowed</SelectItem>
+              <SelectItem value="ON_HOLD">Reserved</SelectItem>
+              <SelectItem value="LOST">Lost</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -55,25 +136,6 @@ const BookCopyManagementPage = () => {
           <PlusIcon className="h-4 w-4" />
           Add Book Copy
         </Button>
-      </div>
-
-      <div className="mb-6 flex gap-2">
-        <div className="flex-1 relative">
-          <Input
-            placeholder="Search by location, copy number, title, ISBN"
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full"
-          />
-          {searchQuery && (
-            <button
-              onClick={handleClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-            >
-              <X className="h-4 w-4 text-gray-500" />
-            </button>
-          )}
-        </div>
       </div>
 
       <DataTable
@@ -93,6 +155,7 @@ const BookCopyManagementPage = () => {
           searchQuery ?? "No book copies found. Try a different search."
         }
         isLoading={isLoading}
+        toolbarLeftContent={toolbarLeftContent}
       />
 
       <BookCopyFormDialog

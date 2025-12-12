@@ -9,7 +9,7 @@ import {
   getNotificationsByUserIdAPI,
   putSingleNotificationAsReadAPI,
   putBulkNotificationAsReadAPI,
-} from "@/services/api";
+} from "@/lib/api";
 
 export default function NotificationList() {
   const { user } = useCurrentApp();

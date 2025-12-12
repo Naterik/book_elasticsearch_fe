@@ -8,23 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "available":
-      return "bg-green-100 text-green-800";
-    case "on_loan":
-      return "bg-yellow-100 text-yellow-800";
-    case "on_hold":
-      return "bg-blue-100 text-blue-800";
-    case "lost":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const getBookCopyColumns = (
   onEdit: (bookCopy: IBookCopy) => void,
@@ -66,7 +51,6 @@ export const getBookCopyColumns = (
     accessorKey: "yearPublished",
     header: "Year Published",
     cell: ({ row }) => {
-      console.log("row :>> ", row);
       return <span className="text-sm">{row.original.year_published}</span>;
     },
   },
@@ -82,11 +66,7 @@ export const getBookCopyColumns = (
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      return (
-        <Badge className={`${getStatusColor(status)} border-0`}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Badge>
-      );
+      return <StatusBadge status={status} />;
     },
   },
   {

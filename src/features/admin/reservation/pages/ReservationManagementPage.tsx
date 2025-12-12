@@ -55,8 +55,8 @@ const ReservationManagementPage = () => {
       <DataTable
         columns={columns}
         data={reservations}
-        searchKey="user.fullName"
-        searchPlaceholder="Search by member name..."
+        searchKey="id"
+        searchPlaceholder=""
         pageCount={totalPages}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

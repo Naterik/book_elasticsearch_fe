@@ -1,4 +1,4 @@
-import createInstanceAxios from "@/services/axios.customize";
+import createInstanceAxios from "@/lib/api/axios.customize";
 import type { IBookElasticIndex } from "@/types";
 import qs from "qs";
 

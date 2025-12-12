@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/helper";
-import { StatusBadgeUser } from "./StatusUser";
 import { Loader2 } from "lucide-react";
 
 interface UserDetailDialogProps {
@@ -20,14 +19,6 @@ interface UserDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   userId: number | null;
 }
-
-const getTypeBadge = (type: UserAccountType) => {
-  return type === "SYSTEM" ? (
-    <Badge variant="default">System</Badge>
-  ) : (
-    <Badge variant="secondary">Google</Badge>
-  );
-};
 
 const getInitials = (name: string | null) => {
   if (!name) return "U";
@@ -108,8 +99,6 @@ const UserDetailDialog = ({
                 </h3>
                 <p className="text-muted-foreground">{user.username}</p>
                 <div className="flex gap-2 pt-2 flex-wrap">
-                  {StatusBadgeUser(user.status as UserStatus)}
-                  {getTypeBadge(user.type as UserAccountType)}
                   <Badge variant="outline">{user.role.name}</Badge>
                 </div>
               </div>

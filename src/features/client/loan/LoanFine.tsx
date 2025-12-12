@@ -14,8 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency } from "@/helper";
-import { Badge } from "@/components/ui/badge";
 import LoanFineDialog from "./LoanFineDialog";
+import { StatusBadge } from "@/components/StatusBadge";
 
 interface Props {
   loanFine: IFine[] | null;
@@ -71,16 +71,7 @@ const LoanFine = ({ loanFine, onFinePaid }: Props) => {
                     <TableCell>{formatCurrency(fine.amount)}</TableCell>
                     <TableCell>{fine.reason}</TableCell>
                     <TableCell>
-                      {fine.isPaid ? (
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-600 text-white dark:bg-green-700"
-                        >
-                          Paid
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">Unpaid</Badge>
-                      )}
+                      <StatusBadge status={fine.isPaid} />
                     </TableCell>
                     <TableCell>
                       {fine.isPaid ? (

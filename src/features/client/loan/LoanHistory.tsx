@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { getStatusBadge } from "@/components/Statusbook";
+import { StatusBadge } from "@/components/StatusBadge";
 import { formatDate } from "@/helper";
 
 const LoanHistory = ({ loanHistory }: { loanHistory: ILoan[] }) => {
@@ -61,7 +61,9 @@ const LoanHistory = ({ loanHistory }: { loanHistory: ILoan[] }) => {
                   <TableCell>{formatDate(loan.dueDate)}</TableCell>
                   <TableCell>{formatDate(loan.returnDate!)}</TableCell>
 
-                  <TableCell>{getStatusBadge(loan.status)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={loan.status} />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

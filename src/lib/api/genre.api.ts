@@ -1,4 +1,4 @@
-import createInstanceAxios from "@/services/axios.customize";
+import createInstanceAxios from "@/lib/api/axios.customize";
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
 export const getAllGenreAPI = () => {

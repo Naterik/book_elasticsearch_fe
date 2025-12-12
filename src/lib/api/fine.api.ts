@@ -1,4 +1,4 @@
-import createInstanceAxios from "../axios.customize";
+import createInstanceAxios from "./axios.customize";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 

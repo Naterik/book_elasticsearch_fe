@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-import { StatusBadgeUser } from "@/features/admin/user/components/StatusUser";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const getUserColumns = (
   onEdit: (user: IAdminUser) => void,
@@ -66,7 +66,7 @@ export const getUserColumns = (
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return StatusBadgeUser(row.original.status as UserStatus);
+      return <StatusBadge status={row.original.status} />;
     },
   },
   {

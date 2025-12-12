@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { loginAPI, loginWithGoogleURL } from "@/services/api";
+import { loginAPI, loginWithGoogleURL } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";

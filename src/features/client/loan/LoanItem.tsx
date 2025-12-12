@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
-import { getStatusBadge } from "@/components/Statusbook";
+import { StatusBadge } from "@/components/StatusBadge";
 import { LoanActionDialogs } from "./LoanDialog";
-import { getOnLoanByIdAPI } from "@/services/api";
+import { getOnLoanByIdAPI } from "@/lib/api";
 
 interface LoanItemProps {
   loan: ILoan;
@@ -60,7 +60,7 @@ export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
               <h3 className="text-lg font-semibold text-primary">
                 {book.title}
               </h3>
-              {getStatusBadge(loan.status)}
+              <StatusBadge status={loan.status} />
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4 p-4 bg-muted/30 rounded-lg">

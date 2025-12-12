@@ -9,7 +9,7 @@ import {
   deleteHistorySearchByUserId,
   deleteAllHistorySearchUser,
   postMergeRecentSearchAsGuest,
-} from "@/services/api";
+} from "@/lib/api";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
 
@@ -116,7 +116,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
             );
             localStorage.removeItem(RECENT_KEY);
             setRecent(resMergeItem.data);
-          } catch (error: any) {
+          } catch (error) {
             toast.error("Failed to migrate search history");
             localStorage.removeItem(RECENT_KEY);
           }

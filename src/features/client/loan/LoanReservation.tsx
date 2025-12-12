@@ -17,10 +17,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/helper";
 import { Book, AlertCircle } from "lucide-react";
-import { getStatusVariant } from "@/components/Statusbook";
+import { StatusBadge } from "@/components/StatusBadge";
 import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router";
 interface LoanReservationProps {
@@ -87,12 +86,10 @@ const LoanReservation = ({
                         {reservation.book.title}
                       </h3>
 
-                      <Badge
-                        variant={getStatusVariant(reservation.status)}
+                      <StatusBadge
+                        status={reservation.status}
                         className="flex-shrink-0 w-fit"
-                      >
-                        {reservation.status.replace("_", " ")}
-                      </Badge>
+                      />
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
                       {reservation.book.authors.name}

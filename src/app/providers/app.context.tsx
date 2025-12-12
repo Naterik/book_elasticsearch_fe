@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { fetchAPI } from "@/services/api";
+import { fetchAPI } from "@/lib/api";
 
 interface IAppContext {
   isAuthenticated: boolean | null;

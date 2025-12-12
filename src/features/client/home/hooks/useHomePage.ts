@@ -6,7 +6,7 @@ import {
   getNewArrivalBooksAPI,
   getRecommendedBooksAPI,
   getTrendingBooksAPI,
-} from "@/services/api";
+} from "@/lib/api";
 import { toast } from "sonner";
 
 export const useHomePage = () => {

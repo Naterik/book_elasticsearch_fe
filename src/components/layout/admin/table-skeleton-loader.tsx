@@ -80,7 +80,7 @@ export const TableSkeletonLoader = ({
 
   // Default:
   return (
-    <div className="space-y-3">
+    <div className="w-full  space-y-3">
       <div className="flex gap-4 p-4 border rounded-lg bg-muted/30">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={`header-${i}`} className="h-5 flex-1" />

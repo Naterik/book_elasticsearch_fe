@@ -45,8 +45,8 @@ const PaymentManagementPage = () => {
       <DataTable
         columns={columns}
         data={payments}
-        searchKey="transactionId"
-        searchPlaceholder="Search by transaction ID..."
+        searchKey="status"
+        searchPlaceholder=""
         pageCount={totalPages}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}

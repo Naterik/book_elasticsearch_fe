@@ -3,10 +3,8 @@ import {
   BookDetailInfo,
   useBookDetail,
 } from "@/features/client/book-detail";
-import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const DetailPage = () => {
-  useScrollToTop();
   const {
     dataDetailBook,
     borrowDuration,

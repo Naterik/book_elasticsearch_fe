@@ -8,22 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDate } from "@/helper";
-
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "returned":
-      return "bg-green-200 text-green-800";
-    case "lost":
-      return "bg-red-200 text-red-800";
-    case "overdue":
-      return "bg-orange-200 text-orange-900";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+import { StatusBadge } from "@/components/StatusBadge";
 
 export const getLoanColumns = (
   onDelete: (loanId: number) => void,
@@ -104,12 +91,7 @@ export const getLoanColumns = (
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.status;
-      return (
-        <Badge className={`${getStatusColor(status)} border-0`}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Badge>
-      );
+      return <StatusBadge status={row.original.status} />;
     },
   },
   {

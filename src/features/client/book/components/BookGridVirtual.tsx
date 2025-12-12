@@ -5,7 +5,7 @@ import BookListCard from "./BookListCard";
 import type { IBookElasticIndex } from "@/types/models/book.model";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { ViewCard } from "@/types";
-import { useWindowWidth } from "@/hooks/use-responsive";
+import { useWindowWidth } from "@/hooks/useMobile";
 
 interface BookGridVirtualProps {
   dataBook: IBookElasticIndex[];

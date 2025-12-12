@@ -1,9 +1,9 @@
 import type { IBookElasticResponse } from "@/types/models/book.model";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router";
-import { getFilterBookElasticAPI } from "@/services/api";
+import { getFilterBookElasticAPI } from "@/lib/api";
 import { PRICE_BOUNDS, ViewCard, YEAR_BOUNDS, type FilterState } from "@/types";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export const useBookInfinite = ({

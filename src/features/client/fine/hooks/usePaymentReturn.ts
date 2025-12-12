@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { updatePaymentMemberAPI, updatePaymentFineAPI } from "@/services/api";
+import { updatePaymentMemberAPI, updatePaymentFineAPI } from "@/lib/api";
 
 type PaymentType = "membership" | "fine";
 type PaymentStatus = "PAYMENT_SUCCEED" | "PAYMENT_FAILED" | "processing";

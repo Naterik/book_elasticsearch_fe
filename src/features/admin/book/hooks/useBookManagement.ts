@@ -5,11 +5,11 @@ import {
   deleteBookAPI,
 } from "@/features/admin/book/services";
 import { getBookColumns } from "@/features/admin/book/book-columns";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const useBookManagement = () => {
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [books, setBooks] = useState<IBook[]>([]);
@@ -29,12 +29,13 @@ export const useBookManagement = () => {
     fetchBooks();
   }, [currentPage, debouncedSearchTerm, pageSize]);
 
-
   const fetchBooks = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllBooksAdminAPI(currentPage, debouncedSearchTerm);
-
+      const response = await getAllBooksAdminAPI(
+        currentPage,
+        debouncedSearchTerm
+      );
 
       if (response.data && response.data.result) {
         setBooks(response.data.result);

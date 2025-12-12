@@ -15,7 +15,7 @@ import {
   getLoanByUserIdAPI,
   getFineByUserIdAPI,
   getNotificationsByUserIdAPI,
-} from "@/services/api";
+} from "@/lib/api";
 import {
   getNotificationIcon,
   getNotificationIconColor,

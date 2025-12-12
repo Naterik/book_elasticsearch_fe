@@ -41,7 +41,7 @@ export default function Notifications() {
   };
 
   const handleNotificationClick = (notification: INotification) => {
-    const path = getNotificationPath(notification.type as any);
+    const path = getNotificationPath(notification.type as string);
     if (path) {
       navigate(path);
       if (!notification.isRead) {
@@ -97,12 +97,10 @@ export default function Notifications() {
       ) : (
         <ScrollArea className="max-h-80">
           <ul className="p-2 space-y-1">
-            {displayNotifications.map((notification) => {
-              const Icon = getNotificationIcon(notification.type as any);
-              const iconColor = getNotificationIconColor(
-                notification.type as any
-              );
-              const title = getNotificationTitle(notification.type as any);
+            {displayNotifications.map((notification: INotification) => {
+              const Icon = getNotificationIcon(notification.type);
+              const iconColor = getNotificationIconColor(notification.type);
+              const title = getNotificationTitle(notification.type);
               const content = formatNotificationContent(notification.content);
               const timeAgo = formatTimeAgo(notification.sentAt);
 

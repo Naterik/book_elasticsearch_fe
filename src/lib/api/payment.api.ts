@@ -1,4 +1,4 @@
-import createInstanceAxios from "@/services/axios.customize";
+import createInstanceAxios from "@/lib/api/axios.customize";
 
 const axiosPayment = createInstanceAxios(
   import.meta.env.VITE_BACKEND_PAYMENT_URL
