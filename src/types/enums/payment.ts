@@ -1,8 +1,7 @@
 export const PaymentStatus = {
-  PENDING: "PENDING",
+  PAID: "PAID",
   PAYMENT_SUCCEED: "PAYMENT_SUCCEED",
-  PAYMENT_FAILED: "PAYMENT_FAILED",
-  CANCELLED: "CANCELLED",
+  FAILED: "FAILED",
 } as const;
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
@@ -14,8 +13,8 @@ export const PaymentMethod = {
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
 export const PaymentType = {
-  MEMBERSHIP: "membership",
-  FINE: "fine",
+  MEMBERSHIP_FEE: "MEMBERSHIP_FEE",
+  FINE_PAYMENT: "FINE_PAYMENT",
 } as const;
 
 export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType];

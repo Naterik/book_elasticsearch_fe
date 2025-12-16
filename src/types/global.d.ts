@@ -1,40 +1,40 @@
 import { ISuggest } from "./api/response.types";
-import type * as Models from "./models";
+import type * as Entities from "./entities";
 import type * as Enums from "./enums";
-import type * as API from "./api";
+import type * as API from "./api/response.types";
 
 declare global {
   type IBackendRes<T> = API.IBackendRes<T>;
   type IModelPaginate<T> = API.IModelPaginate<T>;
-  type ILogin = API.ILogin;
-  type IRegister = API.IRegister;
+  type ILogin = Entities.ILogin;
+  type IRegister = Entities.IRegister;
   type IHistorySearch = API.IHistorySearch;
   type ISuggestElastic = API.ISuggestElastic;
   type ISuggest = API.ISuggest;
 
-  type IBook = Models.IBook;
-  type IAuthor = Models.IAuthor;
-  type IGenre = Models.IGenre;
-  type IGenreBook = Models.IGenreBook;
-  type IPublisher = Models.IPublisher;
-  type ILanguages = Models.ILanguages;
-  type IBookCopy = Models.IBookCopy;
+  type IBook = Entities.IBook;
+  type IAuthor = Entities.IAuthor;
+  type IGenre = Entities.IGenre;
+  type IGenreBook = Entities.IGenreBook;
+  type IPublisher = Entities.IPublisher;
+  type IAggregations = API.IAggregations;
+  type IBookCopy = Entities.IBookCopy;
 
-  type IUserBase = Models.IUserBase;
-  type IUser = Models.IUser;
-  type IUserInfo = Models.IUserInfo;
-  type IAdminUser = Models.IAdminUser;
-  type IAdminUserDetail = Models.IAdminUserDetail;
+  type IUserBase = Entities.IUserBase;
+  type IUser = Entities.IUser;
+  type IUserInfo = Entities.IUserInfo;
+  type IAdminUser = Entities.IAdminUser;
+  type IAdminUserDetail = Entities.IAdminUserDetail;
 
-  type ILoan = Models.ILoan;
-  type IReservation = Models.IReservation;
+  type ILoan = Entities.ILoan;
+  type IReservation = Entities.IReservation;
 
-  type IFine = Models.IFine;
-  type IFineDetail = Models.IFineDetail;
-  type IPayment = Models.IPayment;
+  type IFine = Entities.IFine;
+  type IFineDetail = Entities.IFineDetail;
+  type IPayment = Entities.IPayment;
 
-  type INotification = Models.INotification;
-  type IDashboardStats = Models.IDashboardStats;
+  type INotification = Entities.INotification;
+  type IDashboardSummary = Entities.IDashboardSummary;
 
   type UserStatus = keyof typeof Enums.UserStatus;
   type UserAccountType = keyof typeof Enums.UserAccountType;

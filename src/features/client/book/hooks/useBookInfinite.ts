@@ -1,4 +1,4 @@
-import type { IBookElasticResponse } from "@/types/models/book.model";
+import type { IBookElasticResponse } from "@/types/entities/book";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router";
 import { getFilterBookElasticAPI } from "@/lib/api";

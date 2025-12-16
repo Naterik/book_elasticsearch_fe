@@ -2,7 +2,8 @@
  * Payment & Fine Related Models
  */
 
-import type { IUserInfo } from "./user.model";
+import type { IUserInfo } from "./user";
+import type { IBook } from "./book";
 
 export interface IFine {
   id: number;

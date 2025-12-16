@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import type { IUserWithCard } from "@/types/dashboard";
+import type { IUserWithCard } from "@/types/entities/dashboard";
 import { formatDate } from "@/helper";
 
 interface UserWithCardTableProps {

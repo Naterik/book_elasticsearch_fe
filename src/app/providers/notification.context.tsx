@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import type { INotification } from "@/types/models/notification.model";
+import type { INotification } from "@/types/entities/notification";
 import { socketService } from "@/lib/api/socket";
 import { useCurrentApp } from "./app.context";
 import { getNotificationsByUserIdAPI } from "@/lib/api/notification.api";

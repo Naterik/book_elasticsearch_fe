@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { getFilterBookElasticAPI } from "@/lib/api";
 import type { FilterState, ViewCard } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
-import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book.enum";
+import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book";
 
 export const useBookData = ({
   priceRange,
@@ -49,9 +49,9 @@ export const useBookData = ({
         selectedLanguage
       );
       if (res.data !== null) {
-        const pagination = res.data.pagination;
+        const pagination = res?.data?.pagination;
         startTransition(() => {
-          setDataBook(res.data.result);
+          setDataBook(res?.data.result);
           setTotalPages(pagination.totalPages);
           setTotalItems(pagination.totalItems);
         });

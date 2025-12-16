@@ -5,6 +5,8 @@ import {
   getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
   deleteBookCopyAPI,
+  getCountBookCopiesByStatusAPI,
+  getCountBookCopiesYearPublishedAPI,
 } from "@/features/admin/book-copy/services";
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
 
@@ -23,16 +25,23 @@ export const useBookCopyManagement = () => {
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [yearFilter, setYearFilter] = useState<string>("");
+  const [yearPublished, setYearPublished] = useState<number>(1901);
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [dataCountYearPublished, setDataCountYearPublished] =
+    useState<IAggregations | null>(null);
+  const [dataCountStatus, setDataCountStatus] = useState<IAggregations | null>(
+    null
+  );
 
   useEffect(() => {
-    if (isSearching || yearFilter || statusFilter) {
+    if (isSearching) {
       fetchBookCopiesWithSearch();
     } else {
       fetchBookCopies();
+      fetchCountYearPublished();
+      fetchCountStatus();
     }
-  }, [currentPage, searchQuery, isSearching, yearFilter, statusFilter]);
+  }, [currentPage, searchQuery, isSearching, yearPublished, statusFilter]);
 
   const fetchBookCopies = async () => {
     setIsLoading(true);
@@ -54,21 +63,46 @@ export const useBookCopyManagement = () => {
       setIsLoading(false);
     }
   };
+
+  const fetchCountYearPublished = async () => {
+    try {
+      const resYear = await getCountBookCopiesYearPublishedAPI();
+      if (resYear.data) {
+        setDataCountYearPublished(resYear.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch year published count", error);
+      toast.error("Failed to fetch year published count");
+    }
+  };
+
+  const fetchCountStatus = async () => {
+    try {
+      const resStatus = await getCountBookCopiesByStatusAPI();
+      if (resStatus.data) {
+        setDataCountStatus(resStatus.data);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch status count");
+    }
+  };
+
   const fetchBookCopiesWithSearch = async () => {
     setIsLoading(true);
     try {
       const response = await getFilterBookCopyElasticAPI(
         currentPage,
         searchQuery,
-        yearFilter,
+        yearPublished,
         statusFilter
       );
 
       if (response.data && response.data.result) {
+        const paginationRes = response.data.pagination;
         setBookCopies(response.data.result);
-        setTotalPages(response.data.pagination.totalPages);
-        setTotalItems(response.data.pagination.totalItems);
-        setPageSize(response.data.pagination.pageSize);
+        setTotalPages(paginationRes.totalPages);
+        setTotalItems(paginationRes.totalItems);
+        setPageSize(paginationRes.pageSize);
       } else {
         toast.error(response.message);
         setBookCopies([]);
@@ -155,11 +189,10 @@ export const useBookCopyManagement = () => {
     setSearchQuery("");
     setIsSearching(false);
     setCurrentPage(1);
-    // useEffect will trigger and fetch all items
   };
 
-  const handleYearFilterChange = (year: string) => {
-    setYearFilter(year);
+  const handleYearPublishedChange = (year: number) => {
+    setYearPublished(year);
     setCurrentPage(1);
   };
 
@@ -182,6 +215,11 @@ export const useBookCopyManagement = () => {
     columns,
     isLoading,
 
+    dataCountYearPublished,
+    dataCountStatus,
+    setDataCountStatus,
+    setDataCountYearPublished,
+
     isFormDialogOpen,
     setIsFormDialogOpen,
     selectedBookCopy,
@@ -201,9 +239,9 @@ export const useBookCopyManagement = () => {
     handleSearchChange,
     handleClearSearch,
     isSearching,
-    yearFilter,
+    yearPublished,
     statusFilter,
-    handleYearFilterChange,
+    handleYearPublishedChange,
     handleStatusFilterChange,
   };
 };

@@ -2,7 +2,7 @@ import { useMemo, useRef, useEffect, memo } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import BookCard from "./BookCard";
 import BookListCard from "./BookListCard";
-import type { IBookElasticIndex } from "@/types/models/book.model";
+import type { IBookElasticIndex } from "@/types/entities/book";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { ViewCard } from "@/types";
 import { useWindowWidth } from "@/hooks/useMobile";

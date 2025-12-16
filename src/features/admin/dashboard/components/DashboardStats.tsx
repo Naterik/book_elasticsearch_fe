@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/helper";
 import { cn } from "@/lib/utils";
-import type { IDashboardSummary, IDashboardMetric } from "@/types/dashboard";
+import type {
+  IDashboardSummary,
+  IDashboardMetric,
+} from "@/types/entities/dashboard";
 import {
   AlertCircle,
   BadgeDollarSign,

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { getAllGenreAPI, getAllLanguagesElasticAPI } from "@/lib/api";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book.enum";
+import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book";
 import { useSearchParams } from "react-router";
 
 export const useBookFilter = () => {
@@ -16,7 +16,7 @@ export const useBookFilter = () => {
     return genresParam ? genresParam.split(",") : [];
   });
 
-  const [languages, setLanguages] = useState<ILanguages[]>([]);
+  const [languages, setLanguages] = useState<IAggregations[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(
     () => {
       return searchParams.get("lang") || null;

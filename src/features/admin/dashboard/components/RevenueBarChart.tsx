@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import type { IRevenueChartData } from "@/types/dashboard";
+import type { IRevenueChartData } from "@/types/entities/dashboard";
 
 interface RevenueBarChartProps {
   data: IRevenueChartData[];

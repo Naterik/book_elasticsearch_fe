@@ -25,7 +25,7 @@ type Props = {
   onToggleGenre: (value: any, checked: boolean) => void;
   selectedLanguage: string | null;
   onChangeLanguage: (value: string | null) => void;
-  languagesAll: ILanguages[] | undefined;
+  languagesAll: IAggregations[] | undefined;
 
   priceRange: readonly [number, number];
   priceBounds: readonly [number, number];

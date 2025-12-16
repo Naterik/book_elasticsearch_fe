@@ -1,20 +1,7 @@
-export interface IAuthor {
-  id: number;
-  name: string;
-  bio?: string | null;
-}
-
-export interface IGenre {
-  id: number;
-  name: string;
-  description?: string;
-}
-
-export interface IPublisher {
-  id: number;
-  name: string;
-  description?: string;
-}
+import type { IPagination } from "../api/response.types";
+import type { IAuthor } from "./author";
+import type { IGenre } from "./genre";
+import type { IPublisher } from "./publisher";
 
 export interface IBook {
   id: number;
@@ -41,13 +28,6 @@ export interface IBookElasticIndex extends IBook {
   score: null;
 }
 
-export interface IPagination {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
-  totalItems: number;
-}
-
 export interface IBookElasticResponse {
   result: IBookElasticIndex[];
   pagination: IPagination;
@@ -57,26 +37,9 @@ export interface IGenreBook {
   genres: IGenre;
 }
 
-export interface IBookCopy {
-  id: number;
-  year_published: number;
-  copyNumber: string;
-  status: string;
-  location: string;
-  heldByUserId: number | null;
-  holdExpiryDate: string | null;
-  bookId: number;
-  books: IBook;
-}
-
 export interface FilterState {
   selectedGenres: string[];
   selectedLanguage: string | null;
   priceRange: [number, number];
   yearRange: [number, number];
-}
-
-export interface ILanguages {
-  key: string;
-  doc_count: number;
 }

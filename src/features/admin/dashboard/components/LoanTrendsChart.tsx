@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ILoanTrend } from "@/types/dashboard";
+import type { ILoanTrend } from "@/types/entities/dashboard";
 
 interface LoanTrendsChartProps {
   data: ILoanTrend[];

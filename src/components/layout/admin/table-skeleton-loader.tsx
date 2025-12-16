@@ -80,7 +80,7 @@ export const TableSkeletonLoader = ({
 
   // Default:
   return (
-    <div className="w-full  space-y-3">
+    <div className="w-full space-y-1">
       <div className="flex gap-4 p-4 border rounded-lg bg-muted/30">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={`header-${i}`} className="h-5 flex-1" />
@@ -94,13 +94,13 @@ export const TableSkeletonLoader = ({
         </div>
       ))}
       <div className="flex gap-2 justify-between items-center p-4 border rounded-lg bg-muted/30">
-        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-4 w-32" />
         <div className="flex gap-2">
-          <Skeleton className="h-8 w-8" />
-          <Skeleton className="h-8 w-8" />
-          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-8" />
         </div>
-        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-4 w-32" />
       </div>
     </div>
   );

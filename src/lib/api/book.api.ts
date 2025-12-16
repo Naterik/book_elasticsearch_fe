@@ -25,7 +25,7 @@ export const getFilterBookAPI = (
   language: string | null
 ) => {
   const urlBackend = "/api/v1/books/filter";
-  return axios.get(urlBackend, {
+  return axios.get<IBackendRes<IModelPaginate<IBook>>>(urlBackend, {
     params: { page, yearRange, priceRange, search, order, genres, language },
     paramsSerializer: {
       serialize: (params) =>
@@ -47,7 +47,7 @@ export const getFilterBookElasticAPI = (
   language: string | null
 ) => {
   const urlBackend = "/api/v1/filter/elastic";
-  return axios.get<IBackendRes<IBookElasticIndex>>(urlBackend, {
+  return axios.get<IBackendRes<IModelPaginate<IBookElasticIndex>>>(urlBackend, {
     params: {
       page,
       yearRange,

@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import type { ISearchTermsChartData } from "@/types/dashboard";
+import type { ISearchTermsChartData } from "@/types/entities/dashboard";
 
 interface SearchTermsBarChartProps {
   data: ISearchTermsChartData[];

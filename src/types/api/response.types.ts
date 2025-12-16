@@ -1,7 +1,7 @@
 export interface IBackendRes<T> {
   error?: string;
   message: string;
-  data?: T;
+  data: T;
 }
 
 export interface IModelPaginate<T> {
@@ -21,25 +21,6 @@ export interface IPagination {
   totalItems: number;
 }
 
-export interface ILogin {
-  access_token: string;
-  user: {
-    id: number;
-    email: string;
-    fullName: string | null;
-    avatar: string;
-    status: string;
-    role: string;
-    cardNumber: string | null;
-  };
-}
-
-export interface IRegister {
-  id: number;
-  email: string;
-  fullName: string | null;
-}
-
 export interface IHistorySearch {
   id: number;
   term: string;
@@ -51,4 +32,9 @@ export interface ISuggestElastic {
 
 export interface ISuggest {
   text: string;
+}
+
+export interface IAggregations {
+  key: string;
+  doc_count: number;
 }

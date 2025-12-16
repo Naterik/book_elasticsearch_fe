@@ -16,7 +16,7 @@ import type {
   ISearchTermsChartData,
   IPendingReservation,
   IUserWithCard,
-} from "@/types/dashboard";
+} from "@/types/entities/dashboard";
 import { DashboardStats } from "@/features/admin/dashboard/components/DashboardStats";
 import { BookCopiesDonutChart } from "@/features/admin/dashboard/components/BookCopiesDonutChart";
 import { LoanTrendsChart } from "@/features/admin/dashboard/components/LoanTrendsChart";

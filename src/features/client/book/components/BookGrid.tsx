@@ -1,11 +1,12 @@
 import { Card, CardTitle } from "@/components/ui/card";
 import BookCard from "./BookCard";
 import BookListCard from "./BookListCard";
-import { useIsMobile } from "@/hooks/use-responsive";
+
 import { memo } from "react";
-import type { IBook, IBookElasticIndex } from "@/types/models/book.model";
+import type { IBook, IBookElasticIndex } from "@/types/entities/book";
 import BookCardSkeleton from "./BookCardSkeleton";
 import type { ViewCard } from "@/types";
+import { useIsMobile } from "@/hooks/useMobile";
 
 type Props = {
   items: (IBook | IBookElasticIndex)[] | undefined;

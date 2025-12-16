@@ -7,57 +7,43 @@ import type {
   ISearchTermsChartData,
   IPendingReservation,
   IUserWithCard,
-} from "@/types/dashboard";
+} from "@/types/entities/dashboard";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
 const getSummary = () => {
   const urlBackend = "/api/v1/dashboard/summary";
-  return axios.get<IBackendRes<IDashboardSummary>>(urlBackend) as Promise<
-    IBackendRes<IDashboardSummary>
-  >;
+  return axios.get<IBackendRes<IDashboardSummary>>(urlBackend);
 };
 
 const getChartForBookCopiesStatus = () => {
   const urlBackend = "/api/v1/dashboard/chart/book-copies-status";
-  return axios.get<IBackendRes<IBookCopiesStatusChartData[]>>(
-    urlBackend
-  ) as Promise<IBackendRes<IBookCopiesStatusChartData[]>>;
+  return axios.get<IBackendRes<IBookCopiesStatusChartData[]>>(urlBackend);
 };
 
 const getChartForLoanTrends = (timeframe: string) => {
   const urlBackend = `/api/v1/dashboard/chart/loan-trends?timeframe=${timeframe}`;
-  return axios.get<IBackendRes<ILoanTrend[]>>(urlBackend) as Promise<
-    IBackendRes<ILoanTrend[]>
-  >;
+  return axios.get<IBackendRes<ILoanTrend[]>>(urlBackend);
 };
 
 const getChartForRevenue = () => {
   const urlBackend = "/api/v1/dashboard/chart/revenue";
-  return axios.get<IBackendRes<IRevenueChartData[]>>(urlBackend) as Promise<
-    IBackendRes<IRevenueChartData[]>
-  >;
+  return axios.get<IBackendRes<IRevenueChartData[]>>(urlBackend);
 };
 
 const getChartForSearchTerms = () => {
   const urlBackend = "/api/v1/dashboard/chart/search-terms";
-  return axios.get<IBackendRes<ISearchTermsChartData[]>>(urlBackend) as Promise<
-    IBackendRes<ISearchTermsChartData[]>
-  >;
+  return axios.get<IBackendRes<ISearchTermsChartData[]>>(urlBackend);
 };
 
 const getPendingReservations = () => {
   const urlBackend = "/api/v1/dashboard/pending-reservations";
-  return axios.get<IBackendRes<IPendingReservation[]>>(urlBackend) as Promise<
-    IBackendRes<IPendingReservation[]>
-  >;
+  return axios.get<IBackendRes<IPendingReservation[]>>(urlBackend);
 };
 
 const getUserWithCard = (timeframe: string) => {
   const urlBackend = `/api/v1/dashboard/user-with-card?timeframe=${timeframe}`;
-  return axios.get<IBackendRes<IUserWithCard[]>>(urlBackend) as Promise<
-    IBackendRes<IUserWithCard[]>
-  >;
+  return axios.get<IBackendRes<IUserWithCard[]>>(urlBackend);
 };
 
 export {

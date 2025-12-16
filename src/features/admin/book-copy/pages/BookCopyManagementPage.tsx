@@ -24,6 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  getCountBookCopiesByStatusAPI,
+  getCountBookCopiesYearPublishedAPI,
+} from "../services";
+import { toast } from "sonner";
 const BookCopyManagementPage = () => {
   const {
     bookCopies,
@@ -48,20 +53,18 @@ const BookCopyManagementPage = () => {
     handleSearchChange,
     handleClearSearch,
     searchQuery,
-    yearFilter,
+    yearPublished,
     statusFilter,
-    handleYearFilterChange,
+    handleYearPublishedChange,
     handleStatusFilterChange,
   } = useBookCopyManagement();
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
 
   const toolbarLeftContent = (
     <>
       <div className="relative w-full lg:w-[350px]">
         <Input
-          placeholder="Search by location, copy number, title, ISBN"
+          placeholder="Search by location, copy number, title"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="w-full"
@@ -78,10 +81,8 @@ const BookCopyManagementPage = () => {
       </div>
       <div className="flex gap-10">
         <Select
-          value={yearFilter || "ALL"}
-          onValueChange={(val) =>
-            handleYearFilterChange(val === "ALL" ? "" : val)
-          }
+          value={`${yearPublished} `}
+          onValueChange={(val) => handleYearPublishedChange(+val)}
         >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Select Year" />
@@ -89,12 +90,12 @@ const BookCopyManagementPage = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Year</SelectLabel>
-              <SelectItem value="ALL">All Years</SelectItem>
-              {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
+              <SelectItem value="all">All Years</SelectItem>
+              {/* {years.map((year) => (
+                <SelectItem key={year} value={year}>
                   {year}
                 </SelectItem>
-              ))}
+              ))} */}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -109,14 +110,14 @@ const BookCopyManagementPage = () => {
             <SelectValue placeholder="Select Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectGroup>
+            {/* <SelectGroup>
               <SelectLabel>Status</SelectLabel>
               <SelectItem value="ALL">All Status</SelectItem>
               <SelectItem value="AVAILABLE">Available</SelectItem>
               <SelectItem value="ON_LOAN">Borrowed</SelectItem>
               <SelectItem value="ON_HOLD">Reserved</SelectItem>
               <SelectItem value="LOST">Lost</SelectItem>
-            </SelectGroup>
+            </SelectGroup> */}
           </SelectContent>
         </Select>
       </div>

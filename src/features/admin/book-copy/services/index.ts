@@ -11,12 +11,12 @@ export const getAllBookCopiesAdminAPI = (page: number = 1) => {
 export const getFilterBookCopyElasticAPI = (
   page: number = 1,
   search: string = "",
-  year: string = "",
-  status: string = ""
+  yearPublished: number,
+  status: string
 ) => {
-  const urlBackend = "/api/v1/book-copies/elastic";
+  const urlBackend = "/api/v1/book-copies/filter";
   return axios.get<IBackendRes<IModelPaginate<IBookCopy>>>(urlBackend, {
-    params: { page, search, year, status },
+    params: { page, search, yearPublished, status },
     paramsSerializer: {
       serialize: (params) =>
         qs.stringify(params, {
@@ -58,4 +58,14 @@ export const updateBookCopyAPI = (data: {
 export const deleteBookCopyAPI = (id: number) => {
   const urlBackend = `/api/v1/book-copies/${id}`;
   return axios.delete<IBackendRes<void>>(urlBackend);
+};
+
+export const getCountBookCopiesByStatusAPI = () => {
+  const urlBackend = `/api/v1/book-copies/count-status`;
+  return axios.get<IBackendRes<IAggregations>>(urlBackend);
+};
+
+export const getCountBookCopiesYearPublishedAPI = () => {
+  const urlBackend = `/api/v1/book-copies/count-year-published`;
+  return axios.get<IBackendRes<IAggregations>>(urlBackend);
 };

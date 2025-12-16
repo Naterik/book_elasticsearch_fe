@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import type { IBookCopiesStatusChartData } from "@/types/dashboard";
+import type { IBookCopiesStatusChartData } from "@/types/entities/dashboard";
 import { TrendingUp } from "lucide-react";
 
 interface BookCopiesDonutChartProps {
