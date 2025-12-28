@@ -1,9 +1,9 @@
 import BookToolbar from "@/features/client/book/components/BookToolbar";
-import BookGrid from "@/features/client/book/components/BookGrid";
-import BookPagination from "@/features/client/book/components/BookPagination";
+// import BookGrid from "@/features/client/book/components/BookGrid";
+// import BookPagination from "@/features/client/book/components/BookPagination";
 import BookFilter from "@/features/client/book/components/BookFilter";
 import BookSelectedFilters from "@/features/client/book/components/BookSelectedFilters";
-import { useBookData, useBookFilter } from "@/features/client/book";
+import { useBookFilter } from "@/features/client/book";
 import SearchBar from "@/components/Search";
 import {
   Sheet,
@@ -118,7 +118,7 @@ const BookPage = () => {
               </SheetHeader>
               <div className="px-4 sm:px-6 py-4">
                 <BookFilter
-                  genresAll={genres as any}
+                  genresAll={genres}
                   genresSelected={selectedGenres}
                   onToggleGenre={toggleGenre}
                   selectedLanguage={selectedLanguage}
@@ -143,7 +143,7 @@ const BookPage = () => {
           <aside className="hidden lg:block w-full lg:w-[280px] lg:shrink-0">
             <div className="lg:sticky lg:top-24">
               <BookFilter
-                genresAll={genres as any}
+                genresAll={genres}
                 genresSelected={selectedGenres}
                 onToggleGenre={toggleGenre}
                 selectedLanguage={selectedLanguage}

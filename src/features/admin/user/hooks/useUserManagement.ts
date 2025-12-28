@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { useCurrentApp } from "@/app/providers/app.context";
 import { getAllUsersAPI, deleteUserAPI } from "@/features/admin/user/services";
 import { getUserColumns } from "../user-columns";
 

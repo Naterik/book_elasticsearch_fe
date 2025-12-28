@@ -1,6 +1,6 @@
 export interface IBackendRes<T> {
   error?: string;
-  message: string;
+  message?: string;
   data: T;
 }
 
@@ -29,6 +29,8 @@ export interface IHistorySearch {
 export interface ISuggestElastic {
   data: ISuggest[];
 }
+
+export type ISuggestResult = ISuggest[];
 
 export interface ISuggest {
   text: string;

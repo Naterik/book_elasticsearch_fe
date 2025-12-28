@@ -27,8 +27,8 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
   const { isAuthenticated, user } = useCurrentApp();
   const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
-  const [searchResult, setSearchResult] = useState<ISuggestElastic>([]);
-  const [recent, setRecent] = useState<IHistorySearch[] | Array<string>>([]);
+  const [searchResult, setSearchResult] = useState<ISuggestResult>([]);
+  const [recent, setRecent] = useState<IHistorySearch[]>([]);
   const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -97,11 +97,15 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
 
   const saveToLocalStorage = (term: string) => {
     const filtered = recent.filter(
-      (r) => r.toLowerCase() !== term.toLowerCase()
+      (r) => r.term.toLowerCase() !== term.toLowerCase()
     );
-    const next = [term, ...filtered].slice(0, MAX_RECENT);
+    const newEntry: IHistorySearch = { id: Date.now(), term };
+    const next = [newEntry, ...filtered].slice(0, MAX_RECENT);
     setRecent(next);
-    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    localStorage.setItem(
+      RECENT_KEY,
+      JSON.stringify(next.map((item) => item.term))
+    );
   };
 
   const loginUserHistorySearch = async () => {
@@ -124,7 +128,9 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
       } else {
         if (localRecent) {
           const parsed = JSON.parse(localRecent);
-          setRecent(parsed);
+          setRecent(
+            parsed.map((term: string, index: number) => ({ id: index, term }))
+          );
         } else {
           setRecent([]);
         }
@@ -184,7 +190,10 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
         setRecent(updated);
       } else {
         setRecent(updated);
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+        localStorage.setItem(
+          RECENT_KEY,
+          JSON.stringify(updated.map((item) => item.term))
+        );
       }
     } catch (error: any) {
       toast.error("Failed to remove search", error);
@@ -284,7 +293,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
             </>
           ) : (
             <>
-              {recent.length > 0 && localRecent && (
+              {recent.length > 0 && (
                 <>
                   <div className="px-4 py-3 bg-gray-50/80 flex justify-between border-b border-gray-100 sticky top-0">
                     <div className="flex items-start gap-2">
@@ -303,44 +312,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
                   <div className="divide-y divide-gray-100">
                     {recent.map((searchRecent, index) => (
                       <div
-                        key={`recent-${index}`}
-                        className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between gap-5"
-                        onClick={() => commitSearch(searchRecent)}
-                      >
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <p className="text-sm text-gray-700 line-clamp-1 flex-1 text-left">
-                          {searchRecent}
-                        </p>
-                        <X
-                          onClick={(e) => handleRemove(e, index)}
-                          className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {recent.length > 0 && isAuthenticated && (
-                <>
-                  <div className="px-4 py-3 bg-gray-50/80 flex justify-between border-b border-gray-100 sticky top-0">
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Recent Searches
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={clearRecentSearches}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                    >
-                      Clear All
-                    </button>
-                  </div>
-                  <div className="divide-y divide-gray-100">
-                    {recent.map((searchRecent, index) => (
-                      <div
-                        key={searchRecent.id}
+                        key={searchRecent.id || index}
                         className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between gap-5"
                         onClick={() => commitSearch(searchRecent.term)}
                       >

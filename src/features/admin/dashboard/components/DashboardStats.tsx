@@ -12,7 +12,6 @@ import {
   Calendar,
   Clock,
   CreditCard,
-  DollarSign,
   TrendingDown,
   TrendingUp,
   Users,

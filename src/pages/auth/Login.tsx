@@ -1,6 +1,6 @@
 // src/pages/LoginPage.tsx
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";

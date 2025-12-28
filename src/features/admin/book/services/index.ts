@@ -2,12 +2,15 @@ import createInstanceAxios from "@/lib/api/axios.customize";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-// Book Management APIs
-export const getAllBooksAdminAPI = (
-  page: number = 1,
-  mainText: string = ""
-) => {
-  const urlBackend = `/api/v1/books?page=${page}&mainText=${mainText}`;
+export const getBookSelectOptionsAdminAPI = (search?: string) => {
+  const urlBackend = `/api/v1/books/select-name`;
+  return axios.get<IBackendRes<ISelectBookOption[]>>(urlBackend, {
+    params: { search },
+  });
+};
+
+export const getAllBooksAdminAPI = (page: number = 1) => {
+  const urlBackend = `/api/v1/books?page=${page}`;
   return axios.get<IBackendRes<IModelPaginate<IBook>>>(urlBackend);
 };
 

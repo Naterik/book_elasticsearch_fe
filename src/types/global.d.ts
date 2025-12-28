@@ -10,6 +10,7 @@ declare global {
   type IRegister = Entities.IRegister;
   type IHistorySearch = API.IHistorySearch;
   type ISuggestElastic = API.ISuggestElastic;
+  type ISuggestResult = API.ISuggestResult;
   type ISuggest = API.ISuggest;
 
   type IBook = Entities.IBook;
@@ -19,6 +20,7 @@ declare global {
   type IPublisher = Entities.IPublisher;
   type IAggregations = API.IAggregations;
   type IBookCopy = Entities.IBookCopy;
+  type ISelectBookOption = Entities.ISelectBookOption;
 
   type IUserBase = Entities.IUserBase;
   type IUser = Entities.IUser;

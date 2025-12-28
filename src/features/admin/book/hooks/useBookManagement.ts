@@ -32,10 +32,7 @@ export const useBookManagement = () => {
   const fetchBooks = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllBooksAdminAPI(
-        currentPage,
-        debouncedSearchTerm
-      );
+      const response = await getAllBooksAdminAPI(currentPage);
 
       if (response.data && response.data.result) {
         setBooks(response.data.result);

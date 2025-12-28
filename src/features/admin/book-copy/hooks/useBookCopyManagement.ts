@@ -1,21 +1,23 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
-// import { useCurrentApp } from "@/app/providers/app.context";
 import {
-  getAllBookCopiesAdminAPI,
   getFilterBookCopyElasticAPI,
   deleteBookCopyAPI,
   getCountBookCopiesByStatusAPI,
   getCountBookCopiesYearPublishedAPI,
 } from "@/features/admin/book-copy/services";
 import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
+import { useDebounce } from "@/hooks/useDebounce";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const useBookCopyManagement = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [bookCopies, setBookCopies] = useState<IBookCopy[]>([]);
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
   const [selectedBookCopy, setSelectedBookCopy] = useState<IBookCopy | null>(
@@ -23,183 +25,126 @@ export const useBookCopyManagement = () => {
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookCopyToDelete, setBookCopyToDelete] = useState<number | null>(null);
+  // Filter State
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [yearPublished, setYearPublished] = useState<number>(1901);
+  const [yearPublished, setYearPublished] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [dataCountYearPublished, setDataCountYearPublished] =
-    useState<IAggregations | null>(null);
-  const [dataCountStatus, setDataCountStatus] = useState<IAggregations | null>(
-    null
-  );
+  const debouncedSearchQuery = useDebounce(searchQuery);
 
-  useEffect(() => {
-    if (isSearching) {
-      fetchBookCopiesWithSearch();
-    } else {
-      fetchBookCopies();
-      fetchCountYearPublished();
-      fetchCountStatus();
-    }
-  }, [currentPage, searchQuery, isSearching, yearPublished, statusFilter]);
-
-  const fetchBookCopies = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getAllBookCopiesAdminAPI(currentPage);
-
-      if (response.data && response.data.result) {
-        const paginationRes = response.data.pagination;
-        setBookCopies(response.data.result);
-        setTotalPages(paginationRes.totalPages);
-        setTotalItems(paginationRes.totalItems);
-        setPageSize(paginationRes.pageSize);
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch book copies");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchCountYearPublished = async () => {
-    try {
-      const resYear = await getCountBookCopiesYearPublishedAPI();
-      if (resYear.data) {
-        setDataCountYearPublished(resYear.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch year published count", error);
-      toast.error("Failed to fetch year published count");
-    }
-  };
-
-  const fetchCountStatus = async () => {
-    try {
-      const resStatus = await getCountBookCopiesByStatusAPI();
-      if (resStatus.data) {
-        setDataCountStatus(resStatus.data);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch status count");
-    }
-  };
-
-  const fetchBookCopiesWithSearch = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getFilterBookCopyElasticAPI(
+  const { data: bookCopiesData, isLoading } = useQuery({
+    queryKey: [
+      "book-copies",
+      {
+        page: currentPage,
+        pageSize: +pageSize,
+        search: debouncedSearchQuery,
+        year: yearPublished,
+        status: statusFilter,
+      },
+    ],
+    queryFn: async () =>
+      await getFilterBookCopyElasticAPI(
         currentPage,
-        searchQuery,
+        debouncedSearchQuery,
         yearPublished,
         statusFilter
-      );
+      ),
+    placeholderData: keepPreviousData,
+  });
 
-      if (response.data && response.data.result) {
-        const paginationRes = response.data.pagination;
-        setBookCopies(response.data.result);
-        setTotalPages(paginationRes.totalPages);
-        setTotalItems(paginationRes.totalItems);
-        setPageSize(paginationRes.pageSize);
-      } else {
-        toast.error(response.message);
-        setBookCopies([]);
-      }
-    } catch (error) {
-      toast.error("Failed to search book copies");
-      setBookCopies([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: aggregationsData } = useQuery({
+    queryKey: ["book-copy-aggregations"],
+    queryFn: async () => {
+      const [resStatus, resYear] = await Promise.all([
+        getCountBookCopiesByStatusAPI(),
+        getCountBookCopiesYearPublishedAPI(),
+      ]);
+      return {
+        resStatus: resStatus.data,
+        resYear: resYear.data,
+      };
+    },
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+  });
 
-  const handleCreateBookCopy = () => {
-    setSelectedBookCopy(null);
-    setIsFormDialogOpen(true);
-  };
+  const resBookCopyData = bookCopiesData?.data;
+  const bookCopies = resBookCopyData?.result || [];
+  const totalPages = resBookCopyData?.pagination.totalPages || 1;
+  const totalItems = resBookCopyData?.pagination.totalItems || 0;
+  const dataCountYearPublished = aggregationsData?.resYear || [];
+  const dataCountStatus = aggregationsData?.resStatus || [];
 
-  const handleEditBookCopy = (bookCopy: IBookCopy) => {
-    setSelectedBookCopy(bookCopy);
-    setIsFormDialogOpen(true);
-  };
-
-  const handleDeleteClick = (bookCopyId: number) => {
-    setBookCopyToDelete(bookCopyId);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!bookCopyToDelete) return;
-    setIsLoading(true);
-    try {
-      const response = await deleteBookCopyAPI(bookCopyToDelete);
-
-      if (response.message) {
-        toast.error(response.message);
-      } else {
-        toast.success("Book copy deleted successfully");
-        fetchBookCopies();
-      }
-    } catch (error) {
-      console.error("Error deleting book copy:", error);
-      toast.error("Failed to delete book copy");
-    } finally {
-      setIsLoading(false);
+  const deleteMutation = useMutation({
+    mutationFn: (bookCopyId: number) => deleteBookCopyAPI(bookCopyId),
+    onSuccess: () => {
+      toast.success("Book copy deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["book-copies"] });
+      queryClient.invalidateQueries({ queryKey: ["book-copy-aggregations"] });
       setIsDeleteDialogOpen(false);
       setBookCopyToDelete(null);
-    }
+    },
+    onError: () => {
+      toast.error("Failed to delete book copy. Please try again.");
+    },
+  });
+
+  const handleCreateBookCopy = useCallback(() => {
+    // setSelectedBookCopy(null);
+    setIsFormDialogOpen(true);
+  }, []);
+
+  const handleEditBookCopy = useCallback((bookCopy: IBookCopy) => {
+    setSelectedBookCopy(bookCopy);
+    setIsFormDialogOpen(true);
+  }, []);
+
+  const handleDeleteClick = useCallback((bookCopyId: number) => {
+    setBookCopyToDelete(bookCopyId);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = () => {
+    deleteMutation.mutate(bookCopyToDelete!);
   };
 
   const handleFormSuccess = () => {
     setIsFormDialogOpen(false);
     setSelectedBookCopy(null);
-    fetchBookCopies();
+    queryClient.invalidateQueries({ queryKey: ["book-copies"] });
+    queryClient.invalidateQueries({ queryKey: ["book-copy-aggregations"] });
   };
 
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handlePageSizeChange = (size: number) => {
+  const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setCurrentPage(1);
+  }, []);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   // Handle search input change - trigger Elasticsearch search
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-
-    if (query.trim()) {
-      // Start searching
-      setIsSearching(true);
-      setCurrentPage(1); // Reset to page 1 on new search
-    } else {
-      // Clear search - show all items
-      setIsSearching(false);
-      setCurrentPage(1);
-    }
+    setCurrentPage(1);
   };
 
   // Clear search and show all
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchQuery("");
-    setIsSearching(false);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleYearPublishedChange = (year: number) => {
+  const handleYearPublishedChange = useCallback((year: number | null) => {
     setYearPublished(year);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleStatusFilterChange = (status: string) => {
+  const handleStatusFilterChange = useCallback((status: string) => {
     setStatusFilter(status);
     setCurrentPage(1);
-  };
+  }, []);
 
   const columns = useMemo(
     () => getBookCopyColumns(handleEditBookCopy, handleDeleteClick),
@@ -217,8 +162,6 @@ export const useBookCopyManagement = () => {
 
     dataCountYearPublished,
     dataCountStatus,
-    setDataCountStatus,
-    setDataCountYearPublished,
 
     isFormDialogOpen,
     setIsFormDialogOpen,
@@ -231,14 +174,13 @@ export const useBookCopyManagement = () => {
     handleDeleteClick,
     handleConfirmDelete,
     handleFormSuccess,
-    handlePageChange,
     handlePageSizeChange,
 
     // Search handlers
+    handlePageChange,
     searchQuery,
     handleSearchChange,
     handleClearSearch,
-    isSearching,
     yearPublished,
     statusFilter,
     handleYearPublishedChange,

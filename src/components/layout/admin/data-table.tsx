@@ -73,7 +73,7 @@ export function DataTable<TData, TValue>({
   showPagination = true,
   showSearch = true,
   customToolbar,
-  emptyMessage = "No results found.",
+  emptyMessage = "No results found. Try again with different value.",
   enableSorting = true,
   enableFiltering = true,
   isLoading = false,
@@ -231,7 +231,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
+                  className="h-24 text-center text-muted-foreground text-xl font-bold"
                 >
                   {emptyMessage}
                 </TableCell>

@@ -85,5 +85,7 @@ export const getRecommendedBooksAPI = (userId: number) => {
 
 export const getSuggestAPI = (q: string, size = 5) => {
   const urlBackend = "/api/v1/suggest/elastic";
-  return axios.get(urlBackend, { params: { q, size } });
+  return axios.get<IBackendRes<ISuggestResult>>(urlBackend, {
+    params: { q, size },
+  });
 };

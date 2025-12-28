@@ -10,7 +10,7 @@ export const useBookFilter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [genres, setGenres] = useState<string[]>([]);
+  const [genres, setGenres] = useState<IGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(() => {
     const genresParam = searchParams.get("genres");
     return genresParam ? genresParam.split(",") : [];

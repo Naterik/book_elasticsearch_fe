@@ -1,4 +1,5 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { BookCopyFormValues } from "@/lib/validators/book-copy";
 import qs from "qs";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
@@ -11,7 +12,7 @@ export const getAllBookCopiesAdminAPI = (page: number = 1) => {
 export const getFilterBookCopyElasticAPI = (
   page: number = 1,
   search: string = "",
-  yearPublished: number,
+  yearPublished: number | null,
   status: string
 ) => {
   const urlBackend = "/api/v1/book-copies/filter";
@@ -32,25 +33,12 @@ export const getBookCopyByIdAdminAPI = (id: number) => {
   return axios.get<IBackendRes<IBookCopy>>(urlBackend);
 };
 
-export const createBookCopyAPI = (data: {
-  year_published: number;
-  copyNumber: string;
-  status: string;
-  location: string;
-  bookId: number;
-}) => {
+export const createBookCopyAPI = (data:BookCopyFormValues ) => {
   const urlBackend = "/api/v1/book-copies";
   return axios.post<IBackendRes<IBookCopy>>(urlBackend, data);
 };
 
-export const updateBookCopyAPI = (data: {
-  id: number;
-  year_published: number;
-  copyNumber: string;
-  status: string;
-  location: string;
-  bookId: number;
-}) => {
+export const updateBookCopyAPI = (data: Omit<IBookCopy, "heldByUserId" | "holdExpiryDate" | "books">) => {
   const urlBackend = `/api/v1/book-copies`;
   return axios.put<IBackendRes<IBookCopy>>(urlBackend, data);
 };
@@ -62,10 +50,10 @@ export const deleteBookCopyAPI = (id: number) => {
 
 export const getCountBookCopiesByStatusAPI = () => {
   const urlBackend = `/api/v1/book-copies/count-status`;
-  return axios.get<IBackendRes<IAggregations>>(urlBackend);
+  return axios.get<IBackendRes<IAggregations[]>>(urlBackend);
 };
 
 export const getCountBookCopiesYearPublishedAPI = () => {
   const urlBackend = `/api/v1/book-copies/count-year-published`;
-  return axios.get<IBackendRes<IAggregations>>(urlBackend);
+  return axios.get<IBackendRes<IAggregations[]>>(urlBackend);
 };

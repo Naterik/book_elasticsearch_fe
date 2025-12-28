@@ -73,7 +73,7 @@ const GenreFormDialog = ({
         response = await updateGenreAPI({
           name: values.name,
           description: values.description || "",
-          id: `${genre.id}`,
+          id: genre.id,
         });
       } else {
         response = await createGenreAPI({

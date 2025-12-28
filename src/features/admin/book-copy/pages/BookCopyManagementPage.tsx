@@ -20,15 +20,10 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  getCountBookCopiesByStatusAPI,
-  getCountBookCopiesYearPublishedAPI,
-} from "../services";
-import { toast } from "sonner";
+
 const BookCopyManagementPage = () => {
   const {
     bookCopies,
@@ -53,12 +48,11 @@ const BookCopyManagementPage = () => {
     handleSearchChange,
     handleClearSearch,
     searchQuery,
-    yearPublished,
-    statusFilter,
     handleYearPublishedChange,
     handleStatusFilterChange,
+    dataCountYearPublished,
+    dataCountStatus,
   } = useBookCopyManagement();
-
 
   const toolbarLeftContent = (
     <>
@@ -79,45 +73,40 @@ const BookCopyManagementPage = () => {
           </button>
         )}
       </div>
-      <div className="flex gap-10">
-        <Select
-          value={`${yearPublished} `}
-          onValueChange={(val) => handleYearPublishedChange(+val)}
-        >
+      <div className="flex gap-2  md:gap-6 lg:gap-10">
+        <Select onValueChange={(val) => handleYearPublishedChange(+val)}>
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Select Year" />
+            <SelectValue placeholder="Select a year" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>Year</SelectLabel>
-              <SelectItem value="all">All Years</SelectItem>
-              {/* {years.map((year) => (
-                <SelectItem key={year} value={year}>
-                  {year}
+              {dataCountYearPublished?.map((year: IAggregations) => (
+                <SelectItem key={year.key} value={year.key}>
+                  {year.key}{" "}
+                  <span className=" text-gray-600 font-light">
+                    ({year.doc_count})
+                  </span>
                 </SelectItem>
-              ))} */}
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
 
-        <Select
-          value={statusFilter || "ALL"}
-          onValueChange={(val) =>
-            handleStatusFilterChange(val === "ALL" ? "" : val)
-          }
-        >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Select Status" />
+        <Select onValueChange={(val) => handleStatusFilterChange(val)}>
+          <SelectTrigger className="min-w-40">
+            <SelectValue placeholder="Select status" />
           </SelectTrigger>
           <SelectContent>
-            {/* <SelectGroup>
-              <SelectLabel>Status</SelectLabel>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="AVAILABLE">Available</SelectItem>
-              <SelectItem value="ON_LOAN">Borrowed</SelectItem>
-              <SelectItem value="ON_HOLD">Reserved</SelectItem>
-              <SelectItem value="LOST">Lost</SelectItem>
-            </SelectGroup> */}
+            <SelectGroup>
+              {dataCountStatus?.map((status: IAggregations) => (
+                <SelectItem key={status.key} value={status.key}>
+                  {status.key}{" "}
+                  <span className=" text-gray-600 font-light">
+                    ({status.doc_count})
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>
@@ -152,9 +141,6 @@ const BookCopyManagementPage = () => {
         showColumnToggle={true}
         showPagination={true}
         showSearch={false}
-        emptyMessage={
-          searchQuery ?? "No book copies found. Try a different search."
-        }
         isLoading={isLoading}
         toolbarLeftContent={toolbarLeftContent}
       />

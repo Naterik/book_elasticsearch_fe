@@ -35,7 +35,7 @@ export const updatePaymentFineAPI = (
 
 export const getHistorySearchByUserId = (userId: number) => {
   const urlBackend = `/api/v1/history-searches/full/${userId}`;
-  return axios.get<IBackendRes<IHistorySearch>>(urlBackend);
+  return axios.get<IBackendRes<IHistorySearch[]>>(urlBackend);
 };
 
 export const postHistorySearchByUserId = (userId: number, term: string) => {
@@ -51,7 +51,7 @@ export const postMergeRecentSearchAsGuest = (
   terms: Array<string>
 ) => {
   const urlBackend = `/api/v1/history-searches/merge`;
-  return axios.post<IBackendRes<IHistorySearch>>(urlBackend, {
+  return axios.post<IBackendRes<IHistorySearch[]>>(urlBackend, {
     userId,
     terms,
   });

@@ -98,9 +98,10 @@ export default function Notifications() {
         <ScrollArea className="max-h-80">
           <ul className="p-2 space-y-1">
             {displayNotifications.map((notification: INotification) => {
-              const Icon = getNotificationIcon(notification.type);
-              const iconColor = getNotificationIconColor(notification.type);
-              const title = getNotificationTitle(notification.type);
+              const notificationType = notification.type;
+              const Icon = getNotificationIcon(notificationType);
+              const iconColor = getNotificationIconColor(notificationType);
+              const title = getNotificationTitle(notificationType);
               const content = formatNotificationContent(notification.content);
               const timeAgo = formatTimeAgo(notification.sentAt);
 

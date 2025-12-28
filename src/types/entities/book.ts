@@ -43,3 +43,11 @@ export interface FilterState {
   priceRange: [number, number];
   yearRange: [number, number];
 }
+
+export interface ISelectBookOption {
+  id: number;
+  title: string;
+  isbn: string;
+  image: string;
+  authors: IAuthor;
+}

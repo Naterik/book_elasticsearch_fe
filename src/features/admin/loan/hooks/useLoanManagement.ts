@@ -71,7 +71,7 @@ export const useLoanManagement = () => {
     try {
       const response = await deleteLoanAPI(loanToDelete);
 
-      if (response.data) {
+      if (!response.error) {
         toast.success("Loan deleted successfully");
       } else {
         toast.error(response.message);

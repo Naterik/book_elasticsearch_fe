@@ -31,13 +31,28 @@ import {
   createBookCopyAPI,
   updateBookCopyAPI,
 } from "@/features/admin/book-copy/services";
-import { getAllBooksAdminAPI } from "@/features/admin/book/services";
+
 import {
   bookCopyFormSchema,
   type BookCopyFormValues,
 } from "@/lib/validators/book-copy";
-import { Loader2 } from "lucide-react";
-
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { getBookSelectOptionsAdminAPI } from "../../book/services";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
 interface BookCopyFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -51,52 +66,60 @@ const BookCopyFormDialog = ({
   bookCopy,
   onSuccess,
 }: BookCopyFormDialogProps) => {
-  const [books, setBooks] = useState<IBook[]>([]);
-
+  const [openCombobox, setOpenCombobox] = useState(false);
+  const [bookOptions, setBookOptions] = useState<ISelectBookOption[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loadingBooks, setLoadingBooks] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const isEditMode = !!bookCopy;
 
   const form = useForm<BookCopyFormValues>({
     resolver: zodResolver(bookCopyFormSchema),
     defaultValues: {
       copyNumber: "",
-      year_published: new Date().getFullYear().toString(),
-      status: "available",
+      year_published: new Date().getFullYear(),
+      status: "",
       location: "",
-      bookId: "",
+      bookId: 100,
     },
   });
 
   useEffect(() => {
     if (open) {
-      fetchBooks();
       if (bookCopy) {
         form.reset({
           copyNumber: bookCopy.copyNumber,
-          year_published: String(bookCopy.year_published),
+          year_published: bookCopy.year_published,
           status: bookCopy.status,
           location: bookCopy.location,
-          bookId: String(bookCopy.bookId),
+          bookId: bookCopy.bookId,
         });
       } else {
         form.reset({
           copyNumber: "",
-          year_published: String(new Date().getFullYear()),
-          status: "available",
+          year_published: new Date().getFullYear(),
+          status: "",
           location: "",
-          bookId: "",
+          bookId: 100,
         });
       }
     }
   }, [open, bookCopy, form]);
 
-  const fetchBooks = async () => {
+  useEffect(() => {
+    fetchBooks(debouncedSearch);
+  }, [debouncedSearch]);
+
+  const fetchBooks = async (query: string) => {
     try {
-      const res = await getAllBooksAdminAPI(1);
-      if (res.data && res.data.result) {
-        setBooks(res.data.result);
+      const res = await getBookSelectOptionsAdminAPI(query);
+      if (res.data && res.data) {
+        setBookOptions(res.data);
       }
     } catch (error) {
       toast.error("Failed to load books");
+    } finally {
+      setLoadingBooks(false);
     }
   };
 
@@ -107,7 +130,7 @@ const BookCopyFormDialog = ({
         year_published: +values.year_published,
         status: values.status,
         location: values.location,
-        bookId: parseInt(values.bookId),
+        bookId: +values.bookId,
       };
 
       let response;
@@ -134,10 +157,11 @@ const BookCopyFormDialog = ({
       );
     }
   };
-
+  const selectedBookId = form.watch("bookId");
+  const selectedBook = bookOptions.find((book) => book.id === +selectedBookId);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] ">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Book Copy" : "Create New Book Copy"}
@@ -150,30 +174,91 @@ const BookCopyFormDialog = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
             <FormField
               control={form.control}
               name="bookId"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Book *</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                <FormItem className="flex flex-col min-w-50">
+                  <FormLabel>Book</FormLabel>
+                  <Popover
+                    open={openCombobox}
+                    onOpenChange={setOpenCombobox}
+                    modal={true}
                   >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a book" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {books.map((book) => (
-                        <SelectItem key={book.id} value={book.id.toString()}>
-                          {book.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openCombobox}
+                          disabled={isEditMode}
+                          className={cn(
+                            "w-112  justify-between disabled:bg-gray-200 disabled:font-semibold",
+                            !field.value && "text-muted-foreground "
+                          )}
+                        >
+                          <span className="truncate">
+                            {selectedBook
+                              ? selectedBook.title
+                              : bookCopy && !selectedBook // Trường hợp edit nhưng book chưa load vào list
+                              ? `Book : ${bookCopy.books.title}` // Hoặc hiển thị title từ props nếu có
+                              : "Select a book"}
+                          </span>
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[450px] p-0 " align="start">
+                      {/* shouldFilter={false} để tắt lọc client-side của cmkd */}
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search book by title or ISBN..."
+                          value={searchQuery}
+                          onValueChange={setSearchQuery}
+                        />
+                        <CommandList className="max-h-[300px] overflow-y-auto">
+                          {loadingBooks && (
+                            <div className="py-6 text-center text-sm text-muted-foreground">
+                              Loading books...
+                            </div>
+                          )}
+                          {!loadingBooks && bookOptions.length === 0 && (
+                            <CommandEmpty>No book found.</CommandEmpty>
+                          )}
+                          <CommandGroup>
+                            {bookOptions.map((book) => (
+                              <CommandItem
+                                value={book.isbn}
+                                key={book.id}
+                                onSelect={() => {
+                                  form.setValue("bookId", book.id);
+                                  setOpenCombobox(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    book.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {book.title}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    ISBN: {book.isbn} - {book.authors?.name}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
@@ -184,7 +269,7 @@ const BookCopyFormDialog = ({
               name="copyNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Copy Number *</FormLabel>
+                  <FormLabel>Copy Number </FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., COPY-001" {...field} />
                   </FormControl>
@@ -198,7 +283,7 @@ const BookCopyFormDialog = ({
               name="year_published"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Year Published *</FormLabel>
+                  <FormLabel>Year Published </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -217,7 +302,7 @@ const BookCopyFormDialog = ({
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location *</FormLabel>
+                  <FormLabel>Location </FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Shelf A1" {...field} />
                   </FormControl>
@@ -231,11 +316,8 @@ const BookCopyFormDialog = ({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status *</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <FormLabel>Status </FormLabel>
+                  <Select onValueChange={field.onChange} value={field?.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a status" />
