@@ -16,6 +16,12 @@ import {
 import { formatCurrency } from "@/helper";
 import LoanFineDialog from "./LoanFineDialog";
 import { StatusBadge } from "@/components/StatusBadge";
+import { IMAGE_DEFAULT } from "@/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   loanFine: IFine[] | null;
@@ -51,19 +57,35 @@ const LoanFine = ({ loanFine, onFinePaid }: Props) => {
                       <div className="flex items-center gap-3">
                         <img
                           src={
-                            fine.loan?.bookCopy.books.image ||
-                            "https://placehold.co/56x72?text=Book"
+                            fine?.loan?.bookCopy.books.image || IMAGE_DEFAULT
                           }
-                          alt={fine.loan?.bookCopy.books.title || "Book cover"}
-                          className="w-14 h-18 object-cover rounded"
+                          alt={fine?.loan?.bookCopy.books.title}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (target.src !== IMAGE_DEFAULT) {
+                              target.src = IMAGE_DEFAULT;
+                            }
+                          }}
+                          className="w-[60px] h-[80px] object-cover rounded flex-shrink-0"
                         />
                         <div>
-                          <div className="font-medium">
-                            {fine.loan?.bookCopy.books.title || "Unknown title"}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {fine.loan?.bookCopy.books.authors.name ||
-                              "Unknown author"}
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <div className="font-medium max-w-35">
+                                <p className="truncate">
+                                  {fine?.loan?.bookCopy.books.title}
+                                </p>
+                              </div>
+                              <TooltipContent>
+                                {fine?.loan?.bookCopy.books.title} <br />
+                                {fine?.loan?.bookCopy.books.authors.name}
+                              </TooltipContent>
+                            </TooltipTrigger>
+                          </Tooltip>
+                          <div className="text-sm text-muted-foreground max-w-35 ">
+                            <p className="truncate">
+                              {fine?.loan?.bookCopy.books.authors.name}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -74,13 +96,7 @@ const LoanFine = ({ loanFine, onFinePaid }: Props) => {
                       <StatusBadge status={fine.isPaid} />
                     </TableCell>
                     <TableCell>
-                      {fine.isPaid ? (
-                        <span className="text-sm text-muted-foreground">
-                          Payment completed
-                        </span>
-                      ) : (
-                        <LoanFineDialog fine={fine} onSuccess={onFinePaid} />
-                      )}
+                      <LoanFineDialog fine={fine} onSuccess={onFinePaid} />
                     </TableCell>
                   </TableRow>
                 ))

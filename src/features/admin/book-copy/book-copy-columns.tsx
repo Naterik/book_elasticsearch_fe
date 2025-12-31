@@ -54,13 +54,7 @@ export const getBookCopyColumns = (
       return <span className="text-sm">{row.original.year_published}</span>;
     },
   },
-  {
-    accessorKey: "location",
-    header: "Location",
-    cell: ({ row }) => {
-      return <span className="text-sm">{row.original.location}</span>;
-    },
-  },
+
   {
     accessorKey: "status",
     header: "Status",

@@ -16,6 +16,12 @@ import {
 
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDate } from "@/helper";
+import { IMAGE_DEFAULT } from "@/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const LoanHistory = ({ loanHistory }: { loanHistory: ILoan[] }) => {
   return (
@@ -44,15 +50,33 @@ const LoanHistory = ({ loanHistory }: { loanHistory: ILoan[] }) => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <img
-                        src={loan.bookCopy.books.image}
-                        className="w-8 h-10 object-cover rounded"
+                        src={loan.bookCopy.books.image || IMAGE_DEFAULT}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== IMAGE_DEFAULT) {
+                            target.src = IMAGE_DEFAULT;
+                          }
+                        }}
+                        className="w-[60px] h-[80px] object-cover rounded flex-shrink-0"
                       />
                       <div>
-                        <div className="font-medium">
-                          {loan.bookCopy.books.title}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {loan.bookCopy.books.authors.name}
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="font-medium max-w-35">
+                              <p className="truncate">
+                                {loan.bookCopy.books.title}
+                              </p>
+                            </div>
+                            <TooltipContent>
+                              {loan.bookCopy.books.title} <br />
+                              {loan.bookCopy.books.authors.name}
+                            </TooltipContent>
+                          </TooltipTrigger>
+                        </Tooltip>
+                        <div className="text-sm text-muted-foreground max-w-35 ">
+                          <p className="truncate">
+                            {loan.bookCopy.books.authors.name}
+                          </p>
                         </div>
                       </div>
                     </div>

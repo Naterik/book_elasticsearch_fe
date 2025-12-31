@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/helper";
 import { DetailRow } from "./DetailRow";
+import { IMAGE_DEFAULT } from "@/types";
 
 interface LoanActionDialogsProps {
   loan: ILoan;
@@ -68,12 +69,7 @@ export const LoanActionDialogs: React.FC<LoanActionDialogsProps> = ({
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <img
-              src={
-                book.image ||
-                `https://placehold.co/100x140/e2e8f0/64748b?text=${encodeURIComponent(
-                  book.title
-                )}`
-              }
+              src={book.image || IMAGE_DEFAULT}
               alt={book.title}
               className="w-24 h-36 object-cover rounded-md self-center sm:self-start"
             />

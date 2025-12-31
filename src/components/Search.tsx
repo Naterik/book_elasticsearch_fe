@@ -54,7 +54,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
           setSearchResult(res.data);
         }
       } catch (error: any) {
-        toast.error("Failed to fetch search suggestions", error.message);
+        // toast.error("Failed to fetch search suggestions", error.message);
       } finally {
         setLoading(false);
       }
@@ -86,10 +86,10 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
       const updatedRes = await getHistorySearchByUserId(user!.id);
       if (updatedRes?.data) {
         setRecent(updatedRes.data);
-        toast.success("Search saved");
+        // toast.success("Search saved");
       }
     } catch (error) {
-      toast.error("Failed to save search");
+      // toast.error("Failed to save search");
       const reverted = recent.filter((r) => r.term !== term);
       setRecent(reverted);
     }

@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency } from "@/helper";
+import { IMAGE_DEFAULT } from "@/types";
 
 export const getBookColumns = (
   onEdit: (book: IBook) => void,
@@ -38,10 +39,7 @@ export const getBookColumns = (
       const book = row.original;
       return book.image ? (
         <img
-          src={
-            book.image ||
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTt_R8ZDAp9kjtZyNyxjKHoZ_rrKoU1gH3pA&s"
-          }
+          src={book.image || IMAGE_DEFAULT}
           alt={book.title}
           className="w-12 h-16 object-cover rounded"
         />

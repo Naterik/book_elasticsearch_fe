@@ -5,8 +5,10 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
 import { StatusBadge } from "@/components/StatusBadge";
-import { LoanActionDialogs } from "./LoanDialog";
+
 import { getOnLoanByIdAPI } from "@/lib/api";
+import { IMAGE_DEFAULT } from "@/types";
+import { LoanActionDialogs } from "./LoanDialog";
 
 interface LoanItemProps {
   loan: ILoan;
@@ -45,12 +47,7 @@ export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
       <CardContent className="p-6">
         <div className="flex gap-4">
           <img
-            src={
-              book.image ||
-              `/placeholder.svg?height=120&width=90&query=book+cover+${
-                encodeURIComponent(book.title) || "/placeholder.svg"
-              }`
-            }
+            src={book.image || IMAGE_DEFAULT}
             alt={book.title}
             className="w-16 h-20 object-cover rounded shadow-sm"
           />

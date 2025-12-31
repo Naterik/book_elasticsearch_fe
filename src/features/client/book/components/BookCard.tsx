@@ -1,6 +1,6 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card } from "@/components/ui/card";
-import type { IBookElasticIndex } from "@/types";
+import { IMAGE_DEFAULT, type IBookElasticIndex } from "@/types";
 import { TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,8 +17,14 @@ const BookCard = ({ item }: { item: IBook | IBookElasticIndex }) => {
     >
       <AspectRatio ratio={3 / 4}>
         <img
-          src={item.image || placeholderImage}
+          src={item.image || IMAGE_DEFAULT}
           alt={item.title}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== IMAGE_DEFAULT) {
+              target.src = IMAGE_DEFAULT;
+            }
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           draggable={false}
         />

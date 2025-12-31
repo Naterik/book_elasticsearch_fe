@@ -29,3 +29,7 @@ export type YearBounds = typeof YEAR_BOUNDS;
 
 export const ViewCard = ["List", "Kanban"] as const;
 export type ViewCard = (typeof ViewCard)[number];
+
+export const IMAGE_DEFAULT =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTt_R8ZDAp9kjtZyNyxjKHoZ_rrKoU1gH3pA&s" as const;
+export type ImageDefault = typeof IMAGE_DEFAULT;

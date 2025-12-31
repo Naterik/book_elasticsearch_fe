@@ -1,6 +1,7 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { IMAGE_DEFAULT } from "@/types";
 import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -89,10 +90,7 @@ const BookCarousel = ({ title, books, onBookClick }: any) => {
               >
                 <AspectRatio ratio={3 / 4}>
                   <img
-                    src={
-                      book.image ||
-                      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop"
-                    }
+                    src={book.image || IMAGE_DEFAULT}
                     alt={book.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

@@ -2,8 +2,9 @@ import Statistical from "@/components/Statistical";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LoanCurrent from "@/features/client/loan/LoanCurrent";
-import LoanFine from "@/features/client/loan/LoanFine";
+import { LoanCurrent } from "@/features/client/loan";
+
+import LoanFine from "@/features/client/loan/components/LoanFine";
 import LoanHistory from "@/features/client/loan/LoanHistory";
 import LoanReservation from "@/features/client/loan/LoanReservation";
 import { useLoanPage } from "@/features/client/loan/hooks/useLoanPage";

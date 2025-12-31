@@ -17,6 +17,7 @@ import {
   Receipt,
   Loader2,
   ShieldAlert,
+  Eye,
 } from "lucide-react";
 import { getVNPayUrlAPI, postCreateFinePaymentAPI } from "@/lib/api";
 import { toast } from "sonner";
@@ -32,10 +33,6 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
   const [isPaying, setIsPaying] = useState(false);
 
   const book = fine.loan?.bookCopy?.books;
-
-  if (fine.isPaid) {
-    return null;
-  }
 
   const handleConfirmPayment = async () => {
     const paymentRef = uuidv4();
@@ -78,16 +75,32 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
-          <CreditCard className="h-4 w-4 mr-2" />
-          Pay Fine
+        <Button
+          variant={fine.isPaid ? "secondary" : "outline"}
+          size="sm"
+          className={
+            fine.isPaid
+              ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-200"
+              : ""
+          }
+        >
+          {fine.isPaid ? (
+            <Eye className="h-4 w-4 mr-2" />
+          ) : (
+            <CreditCard className="h-4 w-4 mr-2" />
+          )}
+          {fine.isPaid ? "View Info" : "Pay Fine"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Confirm Fine Payment</DialogTitle>
+          <DialogTitle>
+            {fine.isPaid ? "Fine Details" : "Confirm Fine Payment"}
+          </DialogTitle>
           <DialogDescription>
-            Review the details below before proceeding to the payment gateway.
+            {fine.isPaid
+              ? "Details of the settled fine."
+              : "Review the details below before proceeding to the payment gateway."}
           </DialogDescription>
         </DialogHeader>
 
@@ -97,7 +110,7 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
               icon={Receipt}
               label="Fine Amount"
               value={formatCurrency(fine.amount)}
-              valueClassName="text-red-600"
+              valueClassName={fine.isPaid ? "text-green-600" : "text-red-600"}
             />
             <DetailRow icon={ShieldAlert} label="Reason" value={fine.reason} />
             {book && (
@@ -107,26 +120,38 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
         </div>
 
         <DialogFooter className="sm:justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setIsOpen(false)}
-            disabled={isPaying}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleConfirmPayment}
-            disabled={isPaying}
-          >
-            {isPaying ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <CreditCard className="h-4 w-4 mr-2" />
-            )}
-            {isPaying ? "Processing..." : "Proceed to Pay"}
-          </Button>
+          {fine.isPaid ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                disabled={isPaying}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmPayment}
+                disabled={isPaying}
+              >
+                {isPaying ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CreditCard className="h-4 w-4 mr-2" />
+                )}
+                {isPaying ? "Processing..." : "Proceed to Pay"}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { placeholderImage } from "@/config";
-import type { IBookElasticIndex } from "@/types";
+import { IMAGE_DEFAULT, type IBookElasticIndex } from "@/types";
 
 export default function BookListCard({
   item,
@@ -20,8 +20,14 @@ export default function BookListCard({
         <div className="w-full sm:w-24 md:w-28 flex-shrink-0">
           <AspectRatio ratio={3 / 4} className="overflow-hidden rounded-md">
             <img
-              src={item.image || placeholderImage}
+              src={item.image || IMAGE_DEFAULT}
               alt={item.title}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (target.src !== IMAGE_DEFAULT) {
+                  target.src = IMAGE_DEFAULT;
+                }
+              }}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               draggable={false}
             />
@@ -67,25 +73,33 @@ export default function BookListCard({
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0">
-            <div className="flex items-center justify-between gap-2 flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-auto pt-3 border-t border-slate-100">
+            <div className="flex items-center gap-3">
               <Badge
                 variant={isAvailable ? "default" : "destructive"}
-                className="text-xs whitespace-nowrap"
+                className={`text-xs whitespace-nowrap px-2.5 py-0.5 shadow-none ${
+                  isAvailable
+                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200"
+                    : "bg-red-100 text-red-700 hover:bg-red-200 border-red-200"
+                }`}
               >
                 {isAvailable ? "Available" : "Out of Stock"}
               </Badge>
-              <span className="text-xs text-gray-500 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
+
+              <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+
+              <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
                 {item.borrowed} borrowed
               </span>
             </div>
+
             <Button
               size="sm"
-              className="w-full sm:w-auto text-xs sm:text-sm"
+              className="w-full sm:w-auto text-xs sm:text-sm font-medium shadow-sm"
               onClick={() => navigate(`/book/${item.id}`)}
             >
-              <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <BookOpen className="h-3.5 w-3.5 mr-1.5" />
               View Details
             </Button>
           </div>

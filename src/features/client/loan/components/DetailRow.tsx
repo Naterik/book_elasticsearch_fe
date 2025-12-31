@@ -14,7 +14,9 @@ const DetailRow = ({
       <Icon className="h-4 w-4 mr-2" />
       <span>{label}</span>
     </div>
-    <span className={`font-medium text-right ${valueClassName}`}>{value}</span>
+    <span className={`font-medium text-right max-w-50 ${valueClassName}`}>
+      {value}
+    </span>
   </div>
 );
 
