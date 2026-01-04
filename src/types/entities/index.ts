@@ -1,7 +1,3 @@
-/**
- * Entities Barrel Export
- */
-
 export * from "./book";
 export * from "./book-copy";
 export * from "./author";
@@ -14,3 +10,4 @@ export * from "./notification";
 export * from "./reservation";
 export * from "./auth";
 export * from "./dashboard";
+export * from "./digital";

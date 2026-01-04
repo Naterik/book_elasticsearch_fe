@@ -1,5 +1,6 @@
 import type { IPagination } from "../api/response.types";
 import type { IAuthor } from "./author";
+import type { IDigitalBook } from "./digital";
 import type { IGenre } from "./genre";
 import type { IPublisher } from "./publisher";
 
@@ -21,6 +22,7 @@ export interface IBook {
   authors: IAuthor;
   genres: IGenreBook[];
   publishers: IPublisher;
+  digitalBook: IDigitalBook | null;
 }
 
 export interface IBookElasticIndex extends IBook {
