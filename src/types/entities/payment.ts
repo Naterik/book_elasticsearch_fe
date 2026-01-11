@@ -2,8 +2,8 @@
  * Payment & Fine Related Models
  */
 
-import type { IUserInfo } from "./user";
 import type { IBook } from "./book";
+import type { IUserInfo } from "./user";
 
 export interface IFine {
   id: number;
@@ -28,8 +28,6 @@ export interface IPayment {
   id: number;
   amount: number;
   paymentDate: string;
-  paymentMethod: string;
-  transactionId: string;
   status: string;
   fineId: number;
   userId: number;

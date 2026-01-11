@@ -10,7 +10,7 @@ import React, {
 import type { INotification } from "@/types/entities/notification";
 import { socketService } from "@/lib/api/socket";
 import { useCurrentApp } from "./app.context";
-import { getNotificationsByUserIdAPI } from "@/lib/api/notification.api";
+import NotificationService from "@/features/client/notification/services";
 
 interface INotificationContext {
   notifications: INotification[];
@@ -57,7 +57,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     // 📥 Fetch initial notifications from server
     const fetchInitialNotifications = async () => {
       try {
-        const res = await getNotificationsByUserIdAPI(user.id);
+        const res = await NotificationService.getNotificationsByUserId(user.id);
         if (res.data) {
           setNotifications(res.data);
           const unreadCount = res.data.filter(

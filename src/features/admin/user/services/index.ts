@@ -1,36 +1,46 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
+import type { IAdminUser, IAdminUserDetail } from "@/types/entities/user";
+import { userByIdUrl, usersUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-export const getAllUsersAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/users?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<IAdminUser>>>(urlBackend);
+export const getAllUsers = (page: number = 1) => {
+  return axios.get<IBackendRes<IModelPaginate<IAdminUser>>>(usersUrl, {
+    params: { page },
+  });
 };
 
-export const getUserByIdAPI = (id: number) => {
-  const urlBackend = `/api/v1/users/${id}`;
-  return axios.get<IBackendRes<IAdminUserDetail>>(urlBackend);
+export const getUserById = (id: number) => {
+  return axios.get<IBackendRes<IAdminUserDetail>>(userByIdUrl(id));
 };
 
-export const createUserAPI = (formData: FormData) => {
-  const urlBackend = "/api/v1/users";
-  return axios.post<IBackendRes<IAdminUser>>(urlBackend, formData, {
+export const createUser = (formData: FormData) => {
+  return axios.post<IBackendRes<IAdminUser>>(usersUrl, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
 };
 
-export const updateUserAPI = (formData: FormData) => {
-  const urlBackend = `/api/v1/users`;
-  return axios.put<IBackendRes<IAdminUser>>(urlBackend, formData, {
+export const updateUser = (formData: FormData) => {
+  return axios.put<IBackendRes<IAdminUser>>(usersUrl, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
 };
 
-export const deleteUserAPI = (id: number) => {
-  const urlBackend = `/api/v1/users/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
+export const deleteUser = (id: number) => {
+  return axios.delete<IBackendRes<void>>(userByIdUrl(id));
 };
+
+const UserService = {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+};
+
+export default UserService;

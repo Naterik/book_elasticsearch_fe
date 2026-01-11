@@ -1,16 +1,14 @@
-import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
+import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-import { StatusBadge } from "@/components/StatusBadge";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export const getUserColumns = (
   onEdit: (user: IAdminUser) => void,
@@ -22,12 +20,15 @@ export const getUserColumns = (
     header: "#ID",
     cell: ({ row }) => {
       return (
-        <button
-          onClick={() => onView(row.original.id)}
-          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            onView(row.original.id);
+          }}
+          className="cursor-pointer font-bold text-blue-600 no-underline hover:no-underline"
         >
           #{row.original.id}
-        </button>
+        </a>
       );
     },
   },
@@ -55,11 +56,7 @@ export const getUserColumns = (
     accessorKey: "role",
     header: "Role",
     cell: ({ row }) => {
-      return (
-        <Badge variant="outline" className="font-medium">
-          {row.original.role.name}
-        </Badge>
-      );
+      return <span className="font-medium">{row.original.role.name}</span>;
     },
   },
   {
@@ -74,22 +71,22 @@ export const getUserColumns = (
     header: "Card Number",
     cell: ({ row }) => {
       return row.original.cardNumber ? (
-        <code className="text-xs bg-muted px-2 py-1 rounded">
+        <code className="block truncate rounded bg-gray-200/50 px-2 py-1 text-xs">
           {row.original.cardNumber}
         </code>
       ) : (
-        <span className="text-muted-foreground text-sm">-</span>
+        <span className="text-muted-foreground truncate text-sm">-</span>
       );
     },
   },
   {
     id: "actions",
-    header: () => <div className="text-right">Actions</div>,
+    header: "Actions",
     cell: ({ row }) => {
       const user = row.original;
 
       return (
-        <div className="text-right">
+        <div className="text-left">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -97,20 +94,18 @@ export const getUserColumns = (
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => onView(user.id)}>
-                <Eye className="mr-2 h-4 w-4" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(user)}>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                onClick={() => onEdit(user)}
+                className="cursor-pointer"
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit User
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(user.id)}
-                className="text-destructive"
+                className="text-destructive cursor-pointer"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete User

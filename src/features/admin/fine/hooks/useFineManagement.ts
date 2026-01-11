@@ -1,11 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
-import {
-  getAllFinesAdminAPI,
-  deleteFineAPI,
-} from "@/features/admin/fine/services";
-import { getFineColumns } from "@/features/admin/fine/fine-columns";
+import { getFineColumns } from "@admin/fine/fine-columns";
+import FineService from "@admin/fine/services";
 
 export const useFineManagement = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -16,7 +13,9 @@ export const useFineManagement = () => {
   const [pageSize, setPageSize] = useState<number>(12);
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedFine, setSelectedFine] = useState<IFine | null>(null);
+  const [selectedFineId, setSelectedFineId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [fineToDelete, setFineToDelete] = useState<number | null>(null);
 
@@ -27,7 +26,7 @@ export const useFineManagement = () => {
   const fetchFines = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllFinesAdminAPI(currentPage);
+      const response = await FineService.getAllFines(currentPage);
 
       if (response.data && response.data.result) {
         setFines(response.data.result);
@@ -55,6 +54,11 @@ export const useFineManagement = () => {
     setIsFormDialogOpen(true);
   };
 
+  const handleViewFine = (fineId: number) => {
+    setSelectedFineId(fineId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleDeleteClick = (fineId: number) => {
     setFineToDelete(fineId);
     setIsDeleteDialogOpen(true);
@@ -64,7 +68,7 @@ export const useFineManagement = () => {
     if (!fineToDelete) return;
     setIsLoading(true);
     try {
-      const response = await deleteFineAPI(fineToDelete);
+      const response = await FineService.deleteFine(fineToDelete);
 
       if (response.message) {
         toast.error(response.message);
@@ -100,7 +104,7 @@ export const useFineManagement = () => {
   };
 
   const columns = useMemo(
-    () => getFineColumns(handleEditFine, handleDeleteClick),
+    () => getFineColumns(handleEditFine, handleDeleteClick, handleViewFine),
     []
   );
 
@@ -111,10 +115,13 @@ export const useFineManagement = () => {
     totalItems,
     pageSize,
     columns,
-
+    isLoading,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedFine,
+    selectedFineId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 

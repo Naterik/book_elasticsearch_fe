@@ -1,8 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -26,15 +28,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { createUserAPI, updateUserAPI } from "@/features/admin/user/services";
-import { Upload, X, Loader2 } from "lucide-react";
 import {
   userFormSchema,
   type UserFormValues,
   type UserStatusType,
 } from "@/lib/validators/user";
+import UserService from "@admin/user/services";
+import { Loader2, Upload, X } from "lucide-react";
 
 export type CreateUserPayload = Pick<
   IUserBase,
@@ -172,9 +172,9 @@ const UserFormDialog = ({
         if (user?.id) {
           formData.append("id", user.id.toString());
         }
-        response = await updateUserAPI(formData);
+        response = await UserService.updateUser(formData);
       } else {
-        response = await createUserAPI(formData);
+        response = await UserService.createUser(formData);
       }
       if (response?.message) {
         toast.error(response.message);
@@ -196,7 +196,7 @@ const UserFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit User" : "Create New User"}
@@ -359,7 +359,7 @@ const UserFormDialog = ({
                           <img
                             src={avatarPreview}
                             alt="Avatar preview"
-                            className="w-24 h-24 rounded-full object-cover border-2 border-border"
+                            className="border-border h-24 w-24 rounded-full border-2 object-cover"
                           />
                           <Button
                             type="button"
@@ -381,9 +381,9 @@ const UserFormDialog = ({
                           onChange={handleAvatarChange}
                           className="cursor-pointer"
                         />
-                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <Upload className="text-muted-foreground h-4 w-4" />
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         Max file size: 5MB. Supported formats: JPG, PNG, GIF
                       </p>
                     </div>

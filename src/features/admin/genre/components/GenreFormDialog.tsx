@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -21,9 +17,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { createGenreAPI, updateGenreAPI } from "../services";
 import { genreFormSchema, type GenreFormValues } from "@/lib/validators/genre";
+import GenreService from "@admin/genre/services";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface GenreFormDialogProps {
   open: boolean;
@@ -70,13 +70,13 @@ const GenreFormDialog = ({
     try {
       let response;
       if (isEditMode && genre) {
-        response = await updateGenreAPI({
+        response = await GenreService.updateGenre({
           name: values.name,
           description: values.description || "",
           id: genre.id,
         });
       } else {
-        response = await createGenreAPI({
+        response = await GenreService.createGenre({
           name: values.name,
           description: values.description || "",
         });
@@ -162,7 +162,7 @@ const GenreFormDialog = ({
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {isEditMode ? "Updating..." : "Creating..."}
                   </>
                 ) : (

@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import GenreService from "@admin/genre/services";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { getGenresAPI, deleteGenreAPI } from "../services";
 import { getGenreColumns } from "../genre-columns";
 
 export const useGenreManagement = () => {
@@ -11,7 +11,9 @@ export const useGenreManagement = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<IGenre | null>(null);
+  const [selectedGenreId, setSelectedGenreId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export const useGenreManagement = () => {
   const fetchGenres = async () => {
     setIsLoading(true);
     try {
-      const response = await getGenresAPI({ page: currentPage });
+      const response = await GenreService.getGenres({ page: currentPage });
       if (response.data && response.data.result) {
         setGenres(response.data.result);
         setTotalPages(response.data.pagination.totalPages);
@@ -48,6 +50,11 @@ export const useGenreManagement = () => {
     setIsFormDialogOpen(true);
   };
 
+  const handleViewGenre = (genreId: number) => {
+    setSelectedGenreId(genreId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleDeleteClick = (genre: IGenre) => {
     setSelectedGenre(genre);
     setIsDeleteDialogOpen(true);
@@ -57,7 +64,7 @@ export const useGenreManagement = () => {
     if (!selectedGenre) return;
     setIsLoading(true);
     try {
-      const response = await deleteGenreAPI(+selectedGenre.id);
+      const response = await GenreService.deleteGenre(+selectedGenre.id);
       if (response.message) {
         toast.error(response.message);
       } else {
@@ -91,7 +98,7 @@ export const useGenreManagement = () => {
   };
 
   const columns = useMemo(
-    () => getGenreColumns(handleEditGenre, handleDeleteClick),
+    () => getGenreColumns(handleEditGenre, handleDeleteClick, handleViewGenre),
     []
   );
 
@@ -102,9 +109,13 @@ export const useGenreManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading, // Ensure isLoading is exported if used in page, otherwise remove. It seems used in page? Yes.
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedGenre,
+    selectedGenreId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreateGenre,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useTransition } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
-import { getFilterBookElasticAPI } from "@/lib/api";
+import { BookService } from "@/lib/api";
 import type { FilterState, ViewCard } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book";
@@ -33,7 +33,7 @@ export const useBookData = ({
   const fetchBookData = async () => {
     setIsLoading(true);
     try {
-      const res = await getFilterBookElasticAPI(
+      const res = await BookService.getFilterBooksElastic(
         currentPage,
         debouncedYear[0] !== YEAR_BOUNDS[0] ||
           debouncedYear[1] !== YEAR_BOUNDS[1]

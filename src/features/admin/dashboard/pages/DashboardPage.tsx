@@ -1,29 +1,21 @@
-import { useEffect, useState } from "react";
-import {
-  getSummary,
-  getChartForBookCopiesStatus,
-  getChartForLoanTrends,
-  getChartForRevenue,
-  getChartForSearchTerms,
-  getPendingReservations,
-  getUserWithCard,
-} from "@/features/admin/dashboard/services";
-import type {
-  IDashboardSummary,
-  IBookCopiesStatusChartData,
-  ILoanTrend,
-  IRevenueChartData,
-  ISearchTermsChartData,
-  IPendingReservation,
-  IUserWithCard,
-} from "@/types/entities/dashboard";
-import { DashboardStats } from "@/features/admin/dashboard/components/DashboardStats";
 import { BookCopiesDonutChart } from "@/features/admin/dashboard/components/BookCopiesDonutChart";
 import { LoanTrendsChart } from "@/features/admin/dashboard/components/LoanTrendsChart";
+import { PendingReservationsTable } from "@/features/admin/dashboard/components/PendingReservationsTable";
 import { RevenueBarChart } from "@/features/admin/dashboard/components/RevenueBarChart";
 import { SearchTermsBarChart } from "@/features/admin/dashboard/components/SearchTermsBarChart";
-import { PendingReservationsTable } from "@/features/admin/dashboard/components/PendingReservationsTable";
 import { UserWithCardTable } from "@/features/admin/dashboard/components/UserWithCardTable";
+import type {
+  IBookCopiesStatusChartData,
+  IDashboardSummary,
+  ILoanTrend,
+  IPendingReservation,
+  IRevenueChartData,
+  ISearchTermsChartData,
+  IUserWithCard,
+} from "@/types/entities/dashboard";
+import { DashboardStats } from "@admin/dashboard/components/DashboardStats";
+import DashboardService from "@admin/dashboard/services";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Dashboard = () => {
@@ -64,13 +56,13 @@ const Dashboard = () => {
         pendingReservationsRes,
         userWithCardRes,
       ] = await Promise.all([
-        getSummary(),
-        getChartForBookCopiesStatus(),
-        getChartForRevenue(),
-        getChartForSearchTerms(),
-        getChartForLoanTrends(timeframe),
-        getPendingReservations(),
-        getUserWithCard(timeframe),
+        DashboardService.getSummary(),
+        DashboardService.getChartForBookCopiesStatus(),
+        DashboardService.getChartForRevenue(),
+        DashboardService.getChartForSearchTerms(),
+        DashboardService.getChartForLoanTrends(timeframe),
+        DashboardService.getPendingReservations(),
+        DashboardService.getUserWithCard(timeframe),
       ]);
       if (summaryRes.data) {
         setSummary(summaryRes.data);
@@ -93,7 +85,7 @@ const Dashboard = () => {
 
   const fetchLoanTrendsData = async (tf: string) => {
     try {
-      const res = await getChartForLoanTrends(tf);
+      const res = await DashboardService.getChartForLoanTrends(tf);
       if (res.data) {
         setLoanTrendsData(res.data);
       }
@@ -104,18 +96,18 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="h-32 rounded-xl bg-muted/50 animate-pulse"
+              className="bg-muted/50 h-32 animate-pulse rounded-xl"
             />
           ))}
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <div className="col-span-4 h-[300px] rounded-xl bg-muted/50 animate-pulse" />
-          <div className="col-span-3 h-[300px] rounded-xl bg-muted/50 animate-pulse" />
+          <div className="bg-muted/50 col-span-4 h-[300px] animate-pulse rounded-xl" />
+          <div className="bg-muted/50 col-span-3 h-[300px] animate-pulse rounded-xl" />
         </div>
       </div>
     );

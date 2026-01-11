@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
-import { getAllGenreAPI, getAllLanguagesElasticAPI } from "@/lib/api";
+import { BookService } from "@/lib/api";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book";
 import { useSearchParams } from "react-router";
@@ -137,8 +137,8 @@ export const useBookFilter = () => {
       try {
         setIsLoading(true);
         const [allGenres, allLanguages] = await Promise.all([
-          getAllGenreAPI(),
-          getAllLanguagesElasticAPI(),
+          BookService.getAllGenres(),
+          BookService.getAllLanguagesElastic(),
         ]);
         if (allGenres.data && allLanguages.data) {
           setGenres(allGenres.data);

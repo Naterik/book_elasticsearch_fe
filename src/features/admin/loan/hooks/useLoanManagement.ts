@@ -1,12 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
-import {
-  getAllLoansAdminAPI,
-  deleteLoanAPI,
-  returnBookApproveAPI,
-} from "@/features/admin/loan/services";
-import { getLoanColumns } from "@/features/admin/loan/loan-columns";
+import { getLoanColumns } from "@admin/loan/loan-columns";
+import LoanService from "@admin/loan/services";
 
 export const useLoanManagement = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -15,6 +11,9 @@ export const useLoanManagement = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
+
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
+  const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [loanToDelete, setLoanToDelete] = useState<number | null>(null);
@@ -26,7 +25,7 @@ export const useLoanManagement = () => {
   const fetchLoans = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllLoansAdminAPI(currentPage);
+      const response = await LoanService.getAllLoans(currentPage);
 
       if (response.data && response.data.result) {
         setLoans(response.data.result);
@@ -48,10 +47,15 @@ export const useLoanManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleViewLoan = (loanId: number) => {
+    setSelectedLoanId(loanId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleReturnBook = async (loanId: number, userId: number) => {
     setIsLoading(true);
     try {
-      const res = await returnBookApproveAPI(loanId, userId);
+      const res = await LoanService.returnBookApprove(loanId, userId);
       if (res.data) {
         toast.success("Book return approved successfully");
         fetchLoans();
@@ -69,7 +73,7 @@ export const useLoanManagement = () => {
     if (!loanToDelete) return;
     setIsLoading(true);
     try {
-      const response = await deleteLoanAPI(loanToDelete);
+      const response = await LoanService.deleteLoan(loanToDelete);
 
       if (!response.error) {
         toast.success("Loan deleted successfully");
@@ -99,7 +103,7 @@ export const useLoanManagement = () => {
   };
 
   const columns = useMemo(
-    () => getLoanColumns(handleDeleteClick, handleReturnBook),
+    () => getLoanColumns(handleDeleteClick, handleReturnBook, handleViewLoan),
     []
   );
 
@@ -110,6 +114,10 @@ export const useLoanManagement = () => {
     totalItems,
     pageSize,
     columns,
+
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
+    selectedLoanId,
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,

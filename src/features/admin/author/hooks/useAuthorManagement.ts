@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
-import { getAuthorsAPI, deleteAuthorAPI } from "../services";
+import AuthorService from "@admin/author/services";
 import { getAuthorColumns } from "../author-columns";
 
 export const useAuthorManagement = () => {
@@ -14,7 +14,9 @@ export const useAuthorManagement = () => {
   const [pageSize, setPageSize] = useState<number>(12);
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedAuthor, setSelectedAuthor] = useState<IAuthor | null>(null);
+  const [selectedAuthorId, setSelectedAuthorId] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [authorToDelete, setAuthorToDelete] = useState<number | null>(null);
   useEffect(() => {
@@ -24,7 +26,7 @@ export const useAuthorManagement = () => {
   const fetchAuthors = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await getAuthorsAPI(page);
+      const response = await AuthorService.getAuthors(page);
 
       if (response.data && response.data.result) {
         setAuthors(response.data.result);
@@ -52,6 +54,11 @@ export const useAuthorManagement = () => {
     setIsFormDialogOpen(true);
   };
 
+  const handleViewAuthor = (authorId: number) => {
+    setSelectedAuthorId(authorId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleDeleteClick = (authorId: number) => {
     setAuthorToDelete(authorId);
     setIsDeleteDialogOpen(true);
@@ -62,7 +69,7 @@ export const useAuthorManagement = () => {
 
     setIsLoading(true);
     try {
-      const response = await deleteAuthorAPI(authorToDelete);
+      const response = await AuthorService.deleteAuthor(authorToDelete);
       if (response.message) {
         toast.error(response.message);
       } else {
@@ -96,7 +103,8 @@ export const useAuthorManagement = () => {
   };
 
   const columns = useMemo(
-    () => getAuthorColumns(handleEditAuthor, handleDeleteClick),
+    () =>
+      getAuthorColumns(handleEditAuthor, handleDeleteClick, handleViewAuthor),
     []
   );
 
@@ -107,9 +115,13 @@ export const useAuthorManagement = () => {
     totalItems,
     pageSize,
     columns,
+    isLoading,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedAuthor,
+    selectedAuthorId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreateAuthor,

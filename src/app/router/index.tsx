@@ -1,33 +1,33 @@
-import { createBrowserRouter, Outlet } from "react-router";
-import { RouterProvider } from "react-router/dom";
-import AboutPage from "@/pages/client/About";
-import HomePage from "@/pages/client/Home";
-import LoginPage from "@/pages/auth/Login";
-import RegisterPage from "@/pages/auth/Register";
-import BookPage from "@/pages/client/Book";
-import DetailPage from "@/pages/client/BookDetail";
-import InfoPage from "@/pages/client/Info";
-import LoanPage from "@/pages/client/Loan";
-import MemberPage from "@/pages/client/Member";
-import ReturnPayment from "@/pages/client/ReturnPayment";
-import NotificationsPage from "@/pages/client/Notifications";
-import ClientLayout from "@/layout/ClientLayout";
-import BookManagement from "@/features/admin/book/pages/BookManagementPage";
+import AuthCallback from "@/features/auth/pages/AuthCallbackPage";
+import LoginPage from "@/features/auth/pages/LoginPage";
+import RegisterPage from "@/features/auth/pages/RegisterPage";
 import AdminLayout from "@/layout/AdminLayout";
-import { DashboardPage } from "@/features/admin/dashboard";
-import UserManagement from "@/features/admin/user/pages/UserManagementPage";
+import ClientLayout from "@/layout/ClientLayout";
+import ProtectedRoute from "@/layout/ProtectedRoute";
 import ForbiddenPage from "@/pages/403";
 import NotFoundPage from "@/pages/404";
-import AuthCallback from "@/pages/auth/AuthCallback";
-import AuthorManagementPage from "@/features/admin/author/pages/AuthorManagementPage";
-import PublisherManagementPage from "@/features/admin/publisher/pages/PublisherManagementPage";
-import GenreManagementPage from "@/features/admin/genre/pages/GenreManagementPage";
-import BookCopyManagementPage from "@/features/admin/book-copy/pages/BookCopyManagementPage";
-import LoanManagementPage from "@/features/admin/loan/pages/LoanManagementPage";
-import ReservationManagementPage from "@/features/admin/reservation/pages/ReservationManagementPage";
-import FineManagementPage from "@/features/admin/fine/pages/FineManagementPage";
-import PaymentManagementPage from "@/features/admin/payment/pages/PaymentManagementPage";
-import ProtectedRoute from "@/layout/ProtectedRoute";
+import AuthorManagementPage from "@admin/author/pages/AuthorManagementPage";
+import BookCopyManagementPage from "@admin/book-copy/pages/BookCopyManagementPage";
+import BookManagement from "@admin/book/pages/BookManagementPage";
+import { DashboardPage } from "@admin/dashboard";
+import FineManagementPage from "@admin/fine/pages/FineManagementPage";
+import GenreManagementPage from "@admin/genre/pages/GenreManagementPage";
+import LoanManagementPage from "@admin/loan/pages/LoanManagementPage";
+import PaymentManagementPage from "@admin/payment/pages/PaymentManagementPage";
+import PublisherManagementPage from "@admin/publisher/pages/PublisherManagementPage";
+import ReservationManagementPage from "@admin/reservation/pages/ReservationManagementPage";
+import UserManagement from "@admin/user/pages/UserManagementPage";
+import AboutPage from "@client/about/pages/AboutPage";
+import DetailPage from "@client/book/pages/BookDetailPage";
+import BookPage from "@client/book/pages/BookPage";
+import HomePage from "@client/home/pages/HomePage";
+import InfoPage from "@client/info/pages/InfoPage";
+import LoanPage from "@client/loan/pages/LoanPage";
+import MemberPage from "@client/member/pages/MemberPage";
+import NotificationsPage from "@client/notification/pages/NotificationPage";
+import ReturnPayment from "@client/payment/pages/ReturnPaymentPage";
+import { createBrowserRouter, Outlet } from "react-router";
+import { RouterProvider } from "react-router/dom";
 
 const router = createBrowserRouter([
   {
@@ -55,7 +55,6 @@ const router = createBrowserRouter([
           },
           { path: "info", Component: InfoPage },
           { path: "loan", Component: LoanPage },
-          { path: "fine", Component: LoanPage },
           { path: "notifications", Component: NotificationsPage },
         ],
       },

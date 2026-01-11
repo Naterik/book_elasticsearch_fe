@@ -19,7 +19,7 @@ import {
   ShieldAlert,
   Eye,
 } from "lucide-react";
-import { getVNPayUrlAPI, postCreateFinePaymentAPI } from "@/lib/api";
+import { PaymentService, LoanService } from "@/lib/api";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -39,7 +39,7 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
     setIsPaying(true);
 
     try {
-      const response = await postCreateFinePaymentAPI(fine.id, paymentRef);
+      const response = await LoanService.createFinePayment(fine.id, paymentRef);
       if (!response.data?.payment) {
         throw new Error(response.message || "Failed to create payment record.");
       }
@@ -49,7 +49,7 @@ const LoanFineDialog: React.FC<LoanFineDialogProps> = ({ fine, onSuccess }) => {
 
       toast.success("Redirecting to payment gateway...");
 
-      const paymentUrlRes = await getVNPayUrlAPI(
+      const paymentUrlRes = await PaymentService.getVNPayUrl(
         payment.amount,
         "vn",
         currentPaymentRef,

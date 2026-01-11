@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +9,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import FineDetailDialog from "@admin/fine/components/FineDetailDialog";
+import FineFormDialog from "@admin/fine/components/FineFormDialog";
+import { useFineManagement } from "@admin/fine/hooks/useFineManagement";
 import { PlusIcon } from "lucide-react";
-import FineFormDialog from "@/features/admin/fine/components/FineFormDialog";
-import { DataTable } from "@/components/layout/admin/data-table";
-import { useFineManagement } from "@/features/admin/fine/hooks/useFineManagement";
 
 const FineManagementPage = () => {
   const {
@@ -26,7 +27,10 @@ const FineManagementPage = () => {
 
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedFine,
+    selectedFineId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
@@ -39,7 +43,7 @@ const FineManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Fines Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -75,6 +79,12 @@ const FineManagementPage = () => {
         onOpenChange={setIsFormDialogOpen}
         fine={selectedFine}
         onSuccess={handleFormSuccess}
+      />
+
+      <FineDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        fineId={selectedFineId}
       />
 
       <AlertDialog

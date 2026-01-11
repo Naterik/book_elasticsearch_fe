@@ -33,7 +33,6 @@ export interface IAdminUser extends IUserBase {
   membershipStart: string | null;
   membershipEnd: string | null;
   role: {
-    id: number;
     name: string;
   };
 }

@@ -1,4 +1,4 @@
-import * as React from "react";
+import { IconChevronDown, IconLayoutColumns } from "@tabler/icons-react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { IconLayoutColumns, IconChevronDown } from "@tabler/icons-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -29,7 +30,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "./pagination";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
         customToolbar ||
         toolbarLeftContent) && (
         <div className="flex items-center justify-between gap-10">
-          <div className="flex flex-1 items-center space-x-3 justify-between ">
+          <div className="flex flex-1 items-center justify-between space-x-3">
             {showSearch && searchKey && (
               <Input
                 placeholder={searchPlaceholder}
@@ -187,7 +187,14 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      style={{
+                        width: header.column.getSize()
+                          ? header.column.getSize()
+                          : "auto",
+                      }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -231,7 +238,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground text-xl font-bold"
+                  className="text-muted-foreground h-24 text-center text-xl font-bold"
                 >
                   {emptyMessage}
                 </TableCell>

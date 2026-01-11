@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -25,17 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  createReservationAPI,
-  updateReservationAPI,
-} from "@/features/admin/reservation/services";
-import { getAllBooksAdminAPI } from "@/features/admin/book/services";
 import {
   reservationFormSchema,
   type ReservationFormValues,
 } from "@/lib/validators/reservation";
+import BookService from "@admin/book/services";
+import ReservationService from "@admin/reservation/services";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface ReservationFormDialogProps {
   open: boolean;
@@ -80,7 +77,7 @@ const ReservationFormDialog = ({
 
   const fetchBooks = async () => {
     try {
-      const res = await getAllBooksAdminAPI(1);
+      const res = await BookService.getAllBooks(1);
       if (res.data && res.data.result) {
         setBooks(res.data.result);
       }
@@ -94,12 +91,12 @@ const ReservationFormDialog = ({
     try {
       let response;
       if (isEditMode && reservation?.id) {
-        response = await updateReservationAPI(reservation.id, {
+        response = await ReservationService.updateReservation(reservation.id, {
           bookId: parseInt(values.bookId),
           userId: parseInt(values.userId),
         });
       } else {
-        response = await createReservationAPI({
+        response = await ReservationService.createReservation({
           bookId: parseInt(values.bookId),
           userId: parseInt(values.userId),
         });
@@ -179,7 +176,7 @@ const ReservationFormDialog = ({
                     <input
                       type="number"
                       placeholder="Enter user ID"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.value)}
                     />

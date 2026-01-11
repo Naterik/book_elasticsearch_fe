@@ -2,14 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search as SearchIcon, X, Clock, Book } from "lucide-react";
-import {
-  getSuggestAPI,
-  postHistorySearchByUserId,
-  getHistorySearchByUserId,
-  deleteHistorySearchByUserId,
-  deleteAllHistorySearchUser,
-  postMergeRecentSearchAsGuest,
-} from "@/lib/api";
+import { BookService, InfoService } from "@/lib/api";
 import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
 
@@ -49,7 +42,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     setLoading(true);
     timer.current = setTimeout(async () => {
       try {
-        const res = await getSuggestAPI(q, 6);
+        const res = await BookService.getSuggest(q, 6);
         if (res.data) {
           setSearchResult(res.data);
         }
@@ -79,11 +72,11 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
 
   const saveToBackend = async (term: string) => {
     try {
-      const res = await postHistorySearchByUserId(user!.id, term);
+      const res = await InfoService.postHistorySearchByUserId(user!.id, term);
       if (res?.message) {
         toast.error(res.message);
       }
-      const updatedRes = await getHistorySearchByUserId(user!.id);
+      const updatedRes = await InfoService.getHistorySearchByUserId(user!.id);
       if (updatedRes?.data) {
         setRecent(updatedRes.data);
         // toast.success("Search saved");
@@ -114,7 +107,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
         if (localRecent) {
           try {
             const localTerms = JSON.parse(localRecent);
-            const resMergeItem = await postMergeRecentSearchAsGuest(
+            const resMergeItem = await InfoService.postMergeRecentSearchAsGuest(
               user.id,
               localTerms
             );
@@ -155,7 +148,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
   const clearRecentSearches = async () => {
     try {
       if (isAuthenticated && user?.id) {
-        const res = await deleteAllHistorySearchUser();
+        const res = await InfoService.deleteAllHistorySearchUser();
         if (res?.message) {
           toast.error(res.message);
         }
@@ -183,7 +176,7 @@ function SearchBar({ initialQuery = "", onSearch, onClear }: SearchBarProps) {
     try {
       if (isAuthenticated && user?.id) {
         const searchId = recent[itemIndex]?.id;
-        const res = await deleteHistorySearchByUserId(searchId);
+        const res = await InfoService.deleteHistorySearchByUserId(searchId);
         if (res?.message) {
           toast.error(res.message);
         }

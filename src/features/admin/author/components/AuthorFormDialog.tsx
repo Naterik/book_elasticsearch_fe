@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,14 +16,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { createAuthorAPI, updateAuthorAPI } from "../services";
 import {
   authorFormSchema,
   type AuthorFormValues,
 } from "@/lib/validators/author";
+import AuthorService from "@admin/author/services";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface AuthorFormDialogProps {
   open: boolean;
@@ -71,9 +71,9 @@ const AuthorFormDialog = ({
     try {
       let response;
       if (isEditMode && author) {
-        response = await updateAuthorAPI(+author.id, values);
+        response = await AuthorService.updateAuthor(+author.id, values);
       } else {
-        response = await createAuthorAPI(values);
+        response = await AuthorService.createAuthor(values);
       }
 
       if (response?.message) {

@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { DataTable } from "@/components/layout/admin/data-table";
 import { useLoanManagement } from "@/features/admin/loan/hooks/useLoanManagement";
+import LoanDetailDialog from "../components/LoanDetailDialog";
 
 const LoanManagementPage = () => {
   const {
@@ -21,6 +22,10 @@ const LoanManagementPage = () => {
     columns,
     isLoading,
 
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
+    selectedLoanId,
+
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
@@ -31,7 +36,7 @@ const LoanManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Loan Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -56,6 +61,12 @@ const LoanManagementPage = () => {
         showSearch={true}
         emptyMessage="No loans found."
         isLoading={isLoading}
+      />
+
+      <LoanDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        loanId={selectedLoanId}
       />
 
       <AlertDialog
