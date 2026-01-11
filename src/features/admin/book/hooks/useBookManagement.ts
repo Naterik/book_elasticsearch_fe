@@ -1,11 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
-import { toast } from "sonner";
-import {
-  getAllBooksAdminAPI,
-  deleteBookAPI,
-} from "@/features/admin/book/services";
-import { getBookColumns } from "@/features/admin/book/book-columns";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getBookColumns } from "@admin/book/book-columns";
+import BookService from "@admin/book/services";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export const useBookManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -26,13 +23,43 @@ export const useBookManagement = () => {
   const [bookToDelete, setBookToDelete] = useState<number | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchBooks = async () => {
+      setIsLoading(true);
+      try {
+        const response = await BookService.getAllBooks(currentPage);
+
+        if (isMounted && response.data && response.data.result) {
+          setBooks(response.data.result);
+          setTotalPages(response.data.pagination.totalPages);
+          setTotalItems(response.data.pagination.totalItems);
+          setPageSize(response.data.pagination.pageSize);
+        } else if (isMounted && response.message) {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        if (isMounted) {
+          toast.error("Failed to fetch books");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     fetchBooks();
+
+    return () => {
+      isMounted = false;
+    };
   }, [currentPage, debouncedSearchTerm, pageSize]);
 
-  const fetchBooks = async () => {
+  const refetchBooks = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllBooksAdminAPI(currentPage);
+      const response = await BookService.getAllBooks(currentPage);
 
       if (response.data && response.data.result) {
         setBooks(response.data.result);
@@ -73,13 +100,13 @@ export const useBookManagement = () => {
     if (!bookToDelete) return;
     setIsLoading(true);
     try {
-      const response = await deleteBookAPI(bookToDelete);
+      const response = await BookService.deleteBook(bookToDelete);
 
       if (response.message) {
         toast.error(response.message);
       } else {
         toast.success("Book deleted successfully");
-        fetchBooks();
+        refetchBooks();
       }
     } catch (error) {
       console.error("Error deleting book:", error);
@@ -94,7 +121,7 @@ export const useBookManagement = () => {
   const handleFormSuccess = () => {
     setIsFormDialogOpen(false);
     setSelectedBook(null);
-    fetchBooks();
+    refetchBooks();
   };
 
   const handlePageChange = (page: number) => {

@@ -5,12 +5,7 @@ export interface IBackendRes<T> {
 }
 
 export interface IModelPaginate<T> {
-  pagination: {
-    currentPage: number;
-    pageSize: number;
-    totalPages: number;
-    totalItems: number;
-  };
+  pagination: IPagination;
   result: T[];
 }
 

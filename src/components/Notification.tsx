@@ -1,20 +1,20 @@
-import { useState } from "react";
-import { CheckCheck, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useNotificationRealtime } from "@/features/client/notification/hooks/useNotificationRealtime";
 import {
-  getNotificationIcon,
-  getNotificationIconColor,
-  getNotificationTitle,
   formatNotificationContent,
   formatTimeAgo,
+  getNotificationIcon,
+  getNotificationIconColor,
   getNotificationPath,
+  getNotificationTitle,
 } from "@/helper/notificationUtils";
+import { useNotificationRealtime } from "@client/notification/hooks/useNotificationRealtime";
+import { CheckCheck, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Notifications() {
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ export default function Notifications() {
   return (
     <>
       <div className="flex items-center justify-between px-4 py-3">
-        <div className="font-medium text-sm">
+        <div className="text-sm font-medium">
           Notifications
           {unreadCount > 0 && (
             <Badge variant="destructive" className="ml-2">
@@ -91,12 +91,12 @@ export default function Notifications() {
       <Separator />
 
       {notifications.length === 0 ? (
-        <div className="p-4 text-sm text-muted-foreground text-center">
+        <div className="text-muted-foreground p-4 text-center text-sm">
           No notifications
         </div>
       ) : (
         <ScrollArea className="max-h-80">
-          <ul className="p-2 space-y-1">
+          <ul className="space-y-1 p-2">
             {displayNotifications.map((notification: INotification) => {
               const notificationType = notification.type;
               const Icon = getNotificationIcon(notificationType);
@@ -108,8 +108,7 @@ export default function Notifications() {
               return (
                 <li
                   key={notification.id}
-                  className={`rounded-lg px-3 py-2 text-sm hover:bg-muted/60 cursor-pointer transition-colors
-                    ${!notification.isRead ? "bg-muted/40 font-medium" : ""}`}
+                  className={`hover:bg-muted/60 cursor-pointer rounded-lg px-3 py-2 text-sm transition-colors ${!notification.isRead ? "bg-muted/40 font-medium" : ""}`}
                   onClick={() => handleNotificationClick(notification)}
                   role="button"
                   tabIndex={0}
@@ -120,13 +119,13 @@ export default function Notifications() {
                   }}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex gap-2 min-w-0 flex-1">
-                      <div className="flex-shrink-0 mt-0.5">
+                    <div className="flex min-w-0 flex-1 gap-2">
+                      <div className="mt-0.5 flex-shrink-0">
                         <Icon className={`h-4 w-4 ${iconColor}`} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-xs truncate">{title}</p>
-                        <p className="text-muted-foreground line-clamp-2 text-xs mt-0.5">
+                        <p className="truncate text-xs font-medium">{title}</p>
+                        <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">
                           {content}
                         </p>
                         <div className="mt-1 flex items-center gap-2">
@@ -135,7 +134,7 @@ export default function Notifications() {
                               New
                             </Badge>
                           )}
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-muted-foreground text-xs">
                             {timeAgo}
                           </span>
                         </div>
@@ -151,7 +150,7 @@ export default function Notifications() {
 
       <Separator />
       <div className="p-2">
-        <Link to="/user/notifications" className="w-full block">
+        <Link to="/user/notifications" className="block w-full">
           <Button variant="outline" className="w-full text-xs">
             View all {notifications.length > 0 && `(${notifications.length})`}
           </Button>

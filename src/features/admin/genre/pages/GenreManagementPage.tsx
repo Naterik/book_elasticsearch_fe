@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +9,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { DataTable } from "@/components/layout/admin/data-table";
-import { useGenreManagement } from "../hooks/useGenreManagement";
+import GenreDetailDialog from "../components/GenreDetailDialog";
 import GenreFormDialog from "../components/GenreFormDialog";
+import { useGenreManagement } from "../hooks/useGenreManagement";
 
 const GenreManagementPage = () => {
   const {
@@ -24,7 +25,10 @@ const GenreManagementPage = () => {
     columns,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedGenre,
+    selectedGenreId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreateGenre,
@@ -37,7 +41,7 @@ const GenreManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Genre Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -73,6 +77,12 @@ const GenreManagementPage = () => {
         onOpenChange={setIsFormDialogOpen}
         genre={selectedGenre}
         onSuccess={handleFormSuccess}
+      />
+
+      <GenreDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        genreId={selectedGenreId}
       />
 
       <AlertDialog

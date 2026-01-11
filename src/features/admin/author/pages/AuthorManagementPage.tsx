@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +9,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { DataTable } from "@/components/layout/admin/data-table";
-import { useAuthorManagement } from "../hooks/useAuthorManagement";
+import AuthorDetailDialog from "../components/AuthorDetailDialog";
 import AuthorFormDialog from "../components/AuthorFormDialog";
+import { useAuthorManagement } from "../hooks/useAuthorManagement";
 
 const AuthorManagementPage = () => {
   const {
@@ -24,7 +25,10 @@ const AuthorManagementPage = () => {
     columns,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedAuthor,
+    selectedAuthorId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreateAuthor,
@@ -37,7 +41,7 @@ const AuthorManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Author Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -73,6 +77,12 @@ const AuthorManagementPage = () => {
         onOpenChange={setIsFormDialogOpen}
         author={selectedAuthor}
         onSuccess={handleFormSuccess}
+      />
+
+      <AuthorDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        authorId={selectedAuthorId}
       />
 
       <AlertDialog

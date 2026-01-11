@@ -11,11 +11,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  getNotificationsByUserIdAPI,
-  putSingleNotificationAsReadAPI,
-  putBulkNotificationAsReadAPI,
-} from "@/lib/api";
+import { NotificationService } from "@/lib/api";
 
 export default function NotificationList() {
   const { user } = useCurrentApp();
@@ -28,7 +24,7 @@ export default function NotificationList() {
 
     setIsLoading(true);
     try {
-      const res = await getNotificationsByUserIdAPI(user.id);
+      const res = await NotificationService.getNotificationsByUserId(user.id);
       if (res.data) {
         setNotifications(res.data);
       }
@@ -47,7 +43,7 @@ export default function NotificationList() {
   const handleMarkAsRead = async (id: number) => {
     if (!user?.id) return;
     try {
-      await putSingleNotificationAsReadAPI(user.id, id);
+      await NotificationService.putSingleNotificationAsRead(user.id, id);
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, isRead: true } : notif
@@ -64,7 +60,7 @@ export default function NotificationList() {
 
     setIsMarkingAll(true);
     try {
-      await putBulkNotificationAsReadAPI(user.id);
+      await NotificationService.putBulkNotificationAsRead(user.id);
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, isRead: true }))
       );

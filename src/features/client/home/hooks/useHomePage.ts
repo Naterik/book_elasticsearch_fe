@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentApp } from "@/app/providers/app.context";
-import {
-  getMostBorrowedBooksAPI,
-  getNewArrivalBooksAPI,
-  getRecommendedBooksAPI,
-  getTrendingBooksAPI,
-} from "@/lib/api";
+import { BookService } from "@/lib/api";
 import { toast } from "sonner";
 
 export const useHomePage = () => {
@@ -25,9 +20,9 @@ export const useHomePage = () => {
   const fetchHomePageData = async () => {
     try {
       const [trending, newBooks, mostBorrowed] = await Promise.all([
-        getTrendingBooksAPI(),
-        getNewArrivalBooksAPI(),
-        getMostBorrowedBooksAPI(),
+        BookService.getTrendingBooks(),
+        BookService.getNewArrivalBooks(),
+        BookService.getMostBorrowedBooks(),
       ]);
 
       if (trending.data && newBooks.data && mostBorrowed.data) {
@@ -49,7 +44,7 @@ export const useHomePage = () => {
 
   const fetchUserData = async (userId: number) => {
     try {
-      const recommended = await getRecommendedBooksAPI(userId);
+      const recommended = await BookService.getRecommendedBooks(userId);
       if (recommended.data) {
         setRecommendedBooks(recommended.data);
       }

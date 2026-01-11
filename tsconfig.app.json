@@ -17,7 +17,9 @@
       "types/*": ["./src/types/*"],
       "styles/*": ["./src/styles/*"],
       "features/*": ["./src/features/*"],
-      "hooks/*": ["./src/hooks/*"]
+      "hooks/*": ["./src/hooks/*"],
+      "@admin/*": ["./src/features/admin/*"],
+      "@client/*": ["./src/features/client/*"]
     },
 
     /* Bundler mode */

@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -25,12 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createFineAPI, updateFineAPI } from "@/features/admin/fine/services";
 import { fineFormSchema, type FineFormValues } from "@/lib/validators/fine";
+import FineService from "@admin/fine/services";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface FineFormDialogProps {
   open: boolean;
@@ -92,14 +92,14 @@ const FineFormDialog = ({
 
       let response;
       if (isEditMode && fine) {
-        response = await updateFineAPI({
+        response = await FineService.updateFine({
           id: fine.id,
           amount: submitData.amount,
           reason: submitData.reason,
           isPaid: submitData.isPaid,
         });
       } else {
-        response = await createFineAPI({
+        response = await FineService.createFine({
           amount: submitData.amount,
           reason: submitData.reason,
           loanId: submitData.loanId,

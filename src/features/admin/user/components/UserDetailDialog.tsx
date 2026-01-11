@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -7,12 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getUserByIdAPI } from "@/features/admin/user/services";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/helper";
+import UserService from "@admin/user/services";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface UserDetailDialogProps {
   open: boolean;
@@ -36,7 +36,7 @@ const UserDetailDialog = ({
   userId,
 }: UserDetailDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<IAdminUser | null>(null);
+  const [user, setUser] = useState<IAdminUserDetail | null>(null);
   useEffect(() => {
     if (open && userId) {
       fetchUserDetails();
@@ -48,7 +48,7 @@ const UserDetailDialog = ({
     if (!userId) return;
     setIsLoading(true);
     try {
-      const response = await getUserByIdAPI(userId);
+      const response = await UserService.getUserById(userId);
 
       if (response.data) {
         setUser(response.data);
@@ -59,7 +59,6 @@ const UserDetailDialog = ({
         onOpenChange(false);
       }
     } catch (error) {
-      console.error("Error fetching user details:", error);
       toast.error("Failed to fetch user details");
       onOpenChange(false);
     } finally {
@@ -69,7 +68,7 @@ const UserDetailDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>User Details</DialogTitle>
           <DialogDescription>
@@ -78,8 +77,8 @@ const UserDetailDialog = ({
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
           </div>
         ) : user ? (
           <div className="space-y-6">
@@ -98,35 +97,35 @@ const UserDetailDialog = ({
                   {user.fullName || "No Name Provided"}
                 </h3>
                 <p className="text-muted-foreground">{user.username}</p>
-                <div className="flex gap-2 pt-2 flex-wrap">
+                <div className="flex flex-wrap gap-2 pt-2">
                   <Badge variant="outline">{user.role.name}</Badge>
                 </div>
               </div>
             </div>
             <Separator />
             <div className="space-y-4">
-              <h4 className="font-semibold text-sm text-muted-foreground uppercase">
+              <h4 className="text-muted-foreground text-sm font-semibold uppercase">
                 Account Information
               </h4>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">User ID</p>
+                  <p className="text-muted-foreground text-sm">User ID</p>
                   <p className="font-medium">#{user.id}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Role</p>
+                  <p className="text-muted-foreground text-sm">Role</p>
                   <p className="font-medium">{user.role.name}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Account Type</p>
+                  <p className="text-muted-foreground text-sm">Account Type</p>
                   <p className="font-medium">{user.type}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="text-muted-foreground text-sm">Status</p>
                   <p className="font-medium">{user.status}</p>
                 </div>
               </div>
@@ -136,23 +135,23 @@ const UserDetailDialog = ({
 
             {/* Contact Information */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-sm text-muted-foreground uppercase">
+              <h4 className="text-muted-foreground text-sm font-semibold uppercase">
                 Contact Information
               </h4>
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="text-muted-foreground text-sm">Email</p>
                   <p className="font-medium">{user.username}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="text-muted-foreground text-sm">Phone</p>
                   <p className="font-medium">{user.phone || "Not provided"}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Address</p>
+                  <p className="text-muted-foreground text-sm">Address</p>
                   <p className="font-medium">
                     {user.address || "Not provided"}
                   </p>
@@ -168,13 +167,13 @@ const UserDetailDialog = ({
               user.membershipEnd) && (
               <>
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-sm text-muted-foreground uppercase">
+                  <h4 className="text-muted-foreground text-sm font-semibold uppercase">
                     Membership Information
                   </h4>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Card Number
                       </p>
                       <p className="font-medium">
@@ -183,7 +182,7 @@ const UserDetailDialog = ({
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Membership Start
                       </p>
                       <p className="font-medium">
@@ -192,7 +191,7 @@ const UserDetailDialog = ({
                     </div>
 
                     <div className="col-span-2">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Membership End
                       </p>
                       <p className="font-medium">
@@ -206,7 +205,7 @@ const UserDetailDialog = ({
             )}
           </div>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-muted-foreground py-12 text-center">
             No user data available
           </div>
         )}

@@ -1,12 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
-import {
-  getAllReservationsAdminAPI,
-  deleteReservationAPI,
-  updateReservationStatusAPI,
-} from "@/features/admin/reservation/services";
-import { getReservationColumns } from "@/features/admin/reservation/reservation-columns";
+import { getReservationColumns } from "@admin/reservation/reservation-columns";
+import ReservationService from "@admin/reservation/services";
 
 export const useReservationManagement = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -17,8 +13,12 @@ export const useReservationManagement = () => {
   const [pageSize, setPageSize] = useState<number>(12);
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedReservation, setSelectedReservation] =
     useState<IReservation | null>(null);
+  const [selectedReservationId, setSelectedReservationId] = useState<
+    number | null
+  >(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [reservationToDelete, setReservationToDelete] = useState<number | null>(
     null
@@ -31,7 +31,7 @@ export const useReservationManagement = () => {
   const fetchReservations = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllReservationsAdminAPI(currentPage);
+      const response = await ReservationService.getAllReservations(currentPage);
 
       if (response.data && response.data.result) {
         setReservations(response.data.result);
@@ -59,6 +59,11 @@ export const useReservationManagement = () => {
     setIsFormDialogOpen(true);
   };
 
+  const handleViewReservation = (reservationId: number) => {
+    setSelectedReservationId(reservationId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleDeleteClick = (reservationId: number) => {
     setReservationToDelete(reservationId);
     setIsDeleteDialogOpen(true);
@@ -68,7 +73,8 @@ export const useReservationManagement = () => {
     if (!reservationToDelete) return;
     setIsLoading(true);
     try {
-      const response = await deleteReservationAPI(reservationToDelete);
+      const response =
+        await ReservationService.deleteReservation(reservationToDelete);
 
       if (response.message) {
         toast.error(response.message);
@@ -92,7 +98,7 @@ export const useReservationManagement = () => {
   ) => {
     setIsLoading(true);
     try {
-      const response = await updateReservationStatusAPI(
+      const response = await ReservationService.updateReservationStatus(
         reservationId,
         newStatus
       );
@@ -133,7 +139,8 @@ export const useReservationManagement = () => {
       getReservationColumns(
         handleEditReservation,
         handleDeleteClick,
-        handleStatusChange
+        handleStatusChange,
+        handleViewReservation
       ),
     []
   );
@@ -148,7 +155,10 @@ export const useReservationManagement = () => {
 
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedReservation,
+    selectedReservationId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 

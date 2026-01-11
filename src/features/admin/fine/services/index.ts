@@ -1,39 +1,49 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
+import type { IFine } from "@/types/entities/payment";
+import { fineByIdUrl, finesUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
 // Fine Management APIs
-export const getAllFinesAdminAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/fines?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<IFine>>>(urlBackend);
+export const getAllFines = (page: number = 1) => {
+  return axios.get<IBackendRes<IModelPaginate<IFine>>>(finesUrl, {
+    params: { page },
+  });
 };
 
-export const getFineByIdAdminAPI = (id: number) => {
-  const urlBackend = `/api/v1/fines/${id}`;
-  return axios.get<IBackendRes<IFine>>(urlBackend);
+export const getFineById = (id: number) => {
+  return axios.get<IBackendRes<IFine>>(fineByIdUrl(id));
 };
 
-export const createFineAPI = (data: {
+export const createFine = (data: {
   amount: number;
   reason: string;
   loanId: number;
   userId: number;
 }) => {
-  const urlBackend = "/api/v1/fines";
-  return axios.post<IBackendRes<IFine>>(urlBackend, data);
+  return axios.post<IBackendRes<IFine>>(finesUrl, data);
 };
 
-export const updateFineAPI = (data: {
+export const updateFine = (data: {
   id: number;
   amount: number;
   reason: string;
   isPaid: boolean;
 }) => {
-  const urlBackend = `/api/v1/fines`;
-  return axios.put<IBackendRes<IFine>>(urlBackend, data);
+  return axios.put<IBackendRes<IFine>>(finesUrl, data);
 };
 
-export const deleteFineAPI = (id: number) => {
-  const urlBackend = `/api/v1/fines/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
+export const deleteFine = (id: number) => {
+  return axios.delete<IBackendRes<void>>(fineByIdUrl(id));
 };
+
+const FineService = {
+  getAllFines,
+  getFineById,
+  createFine,
+  updateFine,
+  deleteFine,
+};
+
+export default FineService;

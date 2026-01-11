@@ -9,7 +9,7 @@ import {
   memberRegistrationSchema,
   type MemberRegistrationSchema,
 } from "@/lib/validators/member";
-import { getVNPayUrlAPI, postCreateMemberCardAPI } from "@/lib/api";
+import { PaymentService, MemberService } from "@/lib/api";
 export const DURATION_COST = {
   "6": 50000,
   "12": 100000,
@@ -47,13 +47,13 @@ export const useMemberRegistration = () => {
       }
 
       if (values.duration === "COD" || !paymentRef) {
-        res = await postCreateMemberCardAPI({ ...values, userId });
+        res = await MemberService.postCreateMemberCard({ ...values, userId });
         if (res.data) {
           toast.success("Registration successful! Please wait for approval.");
           navigate("/");
         }
       } else {
-        res = await postCreateMemberCardAPI({
+        res = await MemberService.postCreateMemberCard({
           ...values,
           userId,
           paymentRef,
@@ -61,7 +61,7 @@ export const useMemberRegistration = () => {
       }
 
       if (res.data && values.duration !== "COD") {
-        const r = await getVNPayUrlAPI(
+        const r = await PaymentService.getVNPayUrl(
           res.data.amount,
           "vn",
           res.data.paymentRef,

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getBookByIdAdminAPI } from "@/features/admin/book/services";
-import { Calendar, User, Building2, Tag, Globe, BookOpen } from "lucide-react";
+import BookService from "@admin/book/services";
+import { BookOpen, Building2, Calendar, Globe, Tag, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface BookDetailDialogProps {
   open: boolean;
@@ -28,30 +28,40 @@ const BookDetailDialog = ({
   const [book, setBook] = useState<IBook | null>(null);
 
   useEffect(() => {
-    if (open && bookId) {
-      fetchBookDetails();
+    if (!open || !bookId) {
+      setBook(null);
+      return;
     }
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchBookDetails = async () => {
+      setIsLoading(true);
+      try {
+        const response = await BookService.getBookById(bookId);
+
+        // Chỉ update state nếu component vẫn mounted và bookId không đổi
+        if (isMounted && response.data) {
+          setBook(response.data);
+        }
+        if (isMounted && response?.message) {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch book details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookDetails();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, [open, bookId]);
-
-  const fetchBookDetails = async () => {
-    if (!bookId) return;
-
-    setIsLoading(true);
-    try {
-      const response = await getBookByIdAdminAPI(bookId);
-
-      if (response.data) {
-        setBook(response.data);
-      }
-      if (response?.message) {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch book details");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (!book) {
     return null;
@@ -59,7 +69,7 @@ const BookDetailDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Book Details</DialogTitle>
           <DialogDescription>
@@ -74,14 +84,14 @@ const BookDetailDialog = ({
                 <img
                   src={book.image}
                   alt={book.title}
-                  className="w-40 h-60 rounded-lg object-cover border shadow-md"
+                  className="h-60 w-40 rounded-lg border object-cover shadow-md"
                 />
               </div>
             )}
             <div className="flex-1 space-y-3">
               <div>
                 <h3 className="text-xl font-bold">{book.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm">
                   ISBN: {book.isbn}
                 </p>
               </div>
@@ -95,7 +105,7 @@ const BookDetailDialog = ({
               </div>
 
               {book.shortDesc && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {book.shortDesc}
                 </p>
               )}
@@ -106,56 +116,56 @@ const BookDetailDialog = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
-              <User className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <User className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Author</p>
-                <p className="text-sm text-muted-foreground ">
+                <p className="text-muted-foreground text-sm">
                   {book.authors.name}
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <Building2 className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Publisher</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {book.publishers.name}
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <Calendar className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Publish Date</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {new Date(book.publishDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Globe className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <Globe className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Language</p>
-                <p className="text-sm text-muted-foreground">{book.language}</p>
+                <p className="text-muted-foreground text-sm">{book.language}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <BookOpen className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <BookOpen className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Pages</p>
-                <p className="text-sm text-muted-foreground">{book.pages}</p>
+                <p className="text-muted-foreground text-sm">{book.pages}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Tag className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <Tag className="text-muted-foreground mt-0.5 h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Price</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   ${book.price.toFixed(2)}
                 </p>
               </div>
@@ -164,20 +174,20 @@ const BookDetailDialog = ({
 
           <Separator />
 
-          <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+          <div className="bg-muted grid grid-cols-3 gap-4 rounded-lg p-4">
             <div className="text-center">
               <p className="text-2xl font-bold">{book.quantity}</p>
-              <p className="text-xs text-muted-foreground">Total Copies</p>
+              <p className="text-muted-foreground text-xs">Total Copies</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold">{book.borrowed}</p>
-              <p className="text-xs text-muted-foreground">Borrowed</p>
+              <p className="text-muted-foreground text-xs">Borrowed</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold">
                 {book.quantity - book.borrowed}
               </p>
-              <p className="text-xs text-muted-foreground">Available</p>
+              <p className="text-muted-foreground text-xs">Available</p>
             </div>
           </div>
 
@@ -185,8 +195,8 @@ const BookDetailDialog = ({
             <>
               <Separator />
               <div>
-                <h4 className="font-semibold mb-2">Description</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h4 className="mb-2 font-semibold">Description</h4>
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {book.detailDesc}
                 </p>
               </div>

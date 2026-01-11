@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -28,12 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { createLoanAPI, updateLoanAPI } from "@/features/admin/loan/services";
-import { getAllBookCopiesAdminAPI } from "@/features/admin/book-copy/services";
+import { getAllBookCopies } from "@/features/admin/book-copy/services";
+import LoanService from "@/features/admin/loan/services";
 import { loanFormSchema, type LoanFormValues } from "@/lib/validators/loan";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface LoanFormDialogProps {
   open: boolean;
@@ -85,7 +85,7 @@ const LoanFormDialog = ({
 
   const fetchBookCopies = async () => {
     try {
-      const res = await getAllBookCopiesAdminAPI(1);
+      const res = await getAllBookCopies(1);
       if (res.data && res.data.result) {
         setBookCopies(res.data.result);
       }
@@ -99,12 +99,12 @@ const LoanFormDialog = ({
     try {
       let response;
       if (isEditMode && loan?.id) {
-        response = await updateLoanAPI(loan.id, {
+        response = await LoanService.updateLoan(loan.id, {
           dueDate: values.dueDate,
           status: values.status,
         });
       } else {
-        response = await createLoanAPI({
+        response = await LoanService.createLoan({
           bookId: parseInt(values.bookId),
           userId: user?.id || 1,
           dueDate: values.dueDate,

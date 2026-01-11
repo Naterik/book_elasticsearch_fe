@@ -1,52 +1,61 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes } from "@/types/api/response.types";
 import type {
-  IDashboardSummary,
   IBookCopiesStatusChartData,
+  IDashboardSummary,
   ILoanTrend,
+  IPendingReservation,
   IRevenueChartData,
   ISearchTermsChartData,
-  IPendingReservation,
   IUserWithCard,
 } from "@/types/entities/dashboard";
+import {
+  chartBookCopiesStatusUrl,
+  chartLoanTrendsUrl,
+  chartRevenueUrl,
+  chartSearchTermsUrl,
+  pendingReservationsUrl,
+  summaryUrl,
+  userWithCardUrl,
+} from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
 const getSummary = () => {
-  const urlBackend = "/api/v1/dashboard/summary";
-  return axios.get<IBackendRes<IDashboardSummary>>(urlBackend);
+  return axios.get<IBackendRes<IDashboardSummary>>(summaryUrl);
 };
 
 const getChartForBookCopiesStatus = () => {
-  const urlBackend = "/api/v1/dashboard/chart/book-copies-status";
-  return axios.get<IBackendRes<IBookCopiesStatusChartData[]>>(urlBackend);
+  return axios.get<IBackendRes<IBookCopiesStatusChartData[]>>(
+    chartBookCopiesStatusUrl
+  );
 };
 
 const getChartForLoanTrends = (timeframe: string) => {
-  const urlBackend = `/api/v1/dashboard/chart/loan-trends?timeframe=${timeframe}`;
-  return axios.get<IBackendRes<ILoanTrend[]>>(urlBackend);
+  return axios.get<IBackendRes<ILoanTrend[]>>(chartLoanTrendsUrl, {
+    params: { timeframe },
+  });
 };
 
 const getChartForRevenue = () => {
-  const urlBackend = "/api/v1/dashboard/chart/revenue";
-  return axios.get<IBackendRes<IRevenueChartData[]>>(urlBackend);
+  return axios.get<IBackendRes<IRevenueChartData[]>>(chartRevenueUrl);
 };
 
 const getChartForSearchTerms = () => {
-  const urlBackend = "/api/v1/dashboard/chart/search-terms";
-  return axios.get<IBackendRes<ISearchTermsChartData[]>>(urlBackend);
+  return axios.get<IBackendRes<ISearchTermsChartData[]>>(chartSearchTermsUrl);
 };
 
 const getPendingReservations = () => {
-  const urlBackend = "/api/v1/dashboard/pending-reservations";
-  return axios.get<IBackendRes<IPendingReservation[]>>(urlBackend);
+  return axios.get<IBackendRes<IPendingReservation[]>>(pendingReservationsUrl);
 };
 
 const getUserWithCard = (timeframe: string) => {
-  const urlBackend = `/api/v1/dashboard/user-with-card?timeframe=${timeframe}`;
-  return axios.get<IBackendRes<IUserWithCard[]>>(urlBackend);
+  return axios.get<IBackendRes<IUserWithCard[]>>(userWithCardUrl, {
+    params: { timeframe },
+  });
 };
 
-export {
+const DashboardService = {
   getSummary,
   getChartForBookCopiesStatus,
   getChartForLoanTrends,
@@ -55,3 +64,5 @@ export {
   getPendingReservations,
   getUserWithCard,
 };
+
+export default DashboardService;

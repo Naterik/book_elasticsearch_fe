@@ -4,8 +4,7 @@ export interface IBookCopy {
   id: number;
   year_published: number;
   copyNumber: string;
-  status: string;
-  location: string;
+  status: BookCopyStatus;
   heldByUserId: number | null;
   holdExpiryDate: string | null;
   bookId: number;

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +9,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ReservationDetailDialog from "@/features/admin/reservation/components/ReservationDetailDialog";
 import ReservationFormDialog from "@/features/admin/reservation/components/ReservationFormDialog";
-import { DataTable } from "@/components/layout/admin/data-table";
 import { useReservationManagement } from "@/features/admin/reservation/hooks/useReservationManagement";
+import { PlusIcon } from "lucide-react";
 
 const ReservationManagementPage = () => {
   const {
@@ -26,7 +27,10 @@ const ReservationManagementPage = () => {
 
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedReservation,
+    selectedReservationId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
 
@@ -39,7 +43,7 @@ const ReservationManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Reservation Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -75,6 +79,12 @@ const ReservationManagementPage = () => {
         onOpenChange={setIsFormDialogOpen}
         reservation={selectedReservation}
         onSuccess={handleFormSuccess}
+      />
+
+      <ReservationDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        reservationId={selectedReservationId}
       />
 
       <AlertDialog

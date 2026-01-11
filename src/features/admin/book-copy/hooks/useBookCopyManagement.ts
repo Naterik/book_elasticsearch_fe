@@ -1,19 +1,14 @@
-import { useState, useMemo, useCallback } from "react";
-import { toast } from "sonner";
-import {
-  getFilterBookCopyElasticAPI,
-  deleteBookCopyAPI,
-  getCountBookCopiesByStatusAPI,
-  getCountBookCopiesYearPublishedAPI,
-} from "@/features/admin/book-copy/services";
-import { getBookCopyColumns } from "@/features/admin/book-copy/book-copy-columns";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getBookCopyColumns } from "@admin/book-copy/book-copy-columns";
+import BookCopyService from "@admin/book-copy/services";
 import {
   keepPreviousData,
   useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export const useBookCopyManagement = () => {
   const queryClient = useQueryClient();
@@ -43,7 +38,7 @@ export const useBookCopyManagement = () => {
       },
     ],
     queryFn: async () =>
-      await getFilterBookCopyElasticAPI(
+      await BookCopyService.getFilterBookCopy(
         currentPage,
         debouncedSearchQuery,
         yearPublished,
@@ -56,8 +51,8 @@ export const useBookCopyManagement = () => {
     queryKey: ["book-copy-aggregations"],
     queryFn: async () => {
       const [resStatus, resYear] = await Promise.all([
-        getCountBookCopiesByStatusAPI(),
-        getCountBookCopiesYearPublishedAPI(),
+        BookCopyService.getCountBookCopiesByStatus(),
+        BookCopyService.getCountBookCopiesYearPublished(),
       ]);
       return {
         resStatus: resStatus.data,
@@ -76,7 +71,8 @@ export const useBookCopyManagement = () => {
   const dataCountStatus = aggregationsData?.resStatus || [];
 
   const deleteMutation = useMutation({
-    mutationFn: (bookCopyId: number) => deleteBookCopyAPI(bookCopyId),
+    mutationFn: (bookCopyId: number) =>
+      BookCopyService.deleteBookCopy(bookCopyId),
     onSuccess: () => {
       toast.success("Book copy deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["book-copies"] });
@@ -90,7 +86,7 @@ export const useBookCopyManagement = () => {
   });
 
   const handleCreateBookCopy = useCallback(() => {
-    // setSelectedBookCopy(null);
+    setSelectedBookCopy(null);
     setIsFormDialogOpen(true);
   }, []);
 
@@ -98,7 +94,6 @@ export const useBookCopyManagement = () => {
     setSelectedBookCopy(bookCopy);
     setIsFormDialogOpen(true);
   }, []);
-
   const handleDeleteClick = useCallback((bookCopyId: number) => {
     setBookCopyToDelete(bookCopyId);
     setIsDeleteDialogOpen(true);
@@ -148,7 +143,7 @@ export const useBookCopyManagement = () => {
 
   const columns = useMemo(
     () => getBookCopyColumns(handleEditBookCopy, handleDeleteClick),
-    []
+    [handleEditBookCopy, handleDeleteClick]
   );
 
   return {

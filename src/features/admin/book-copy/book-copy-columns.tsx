@@ -1,15 +1,19 @@
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { ColumnDef } from "@tanstack/react-table";
-import { StatusBadge } from "@/components/StatusBadge";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export const getBookCopyColumns = (
   onEdit: (bookCopy: IBookCopy) => void,
@@ -28,11 +32,18 @@ export const getBookCopyColumns = (
     cell: ({ row }) => {
       const bookCopy = row.original;
       return (
-        <div className="max-w-xs">
-          <div className="font-medium text-sm truncate">
-            {bookCopy.books?.title || "-"}
-          </div>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="max-w-xs hover:cursor-pointer">
+              <div className="truncate text-sm font-medium">
+                {bookCopy.books?.title || "-"}
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span>{bookCopy.books?.title || "-"}</span>
+          </TooltipContent>
+        </Tooltip>
       );
     },
   },
@@ -41,7 +52,7 @@ export const getBookCopyColumns = (
     header: "Copy Number",
     cell: ({ row }) => {
       return (
-        <code className="text-xs bg-muted px-2 py-1 rounded">
+        <code className="bg-muted rounded px-2 py-1 text-xs">
           {row.original.copyNumber}
         </code>
       );
@@ -70,32 +81,33 @@ export const getBookCopyColumns = (
       const bookCopy = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onEdit(bookCopy)}
-              className="cursor-pointer"
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(bookCopy.id)}
-              className="cursor-pointer text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="text-left">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                onClick={() => onEdit(bookCopy)}
+                className="cursor-pointer"
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit Book Copy
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onDelete(bookCopy.id)}
+                className="text-destructive focus:text-destructive cursor-pointer"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Book Copy
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },

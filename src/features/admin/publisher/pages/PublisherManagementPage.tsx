@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +9,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { DataTable } from "@/components/layout/admin/data-table";
-import { usePublisherManagement } from "../hooks/usePublisherManagement";
+import PublisherDetailDialog from "../components/PublisherDetailDialog";
 import PublisherFormDialog from "../components/PublisherFormDialog";
+import { usePublisherManagement } from "../hooks/usePublisherManagement";
 
 const PublisherManagementPage = () => {
   const {
@@ -24,7 +25,10 @@ const PublisherManagementPage = () => {
     columns,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedPublisher,
+    selectedPublisherId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreatePublisher,
@@ -37,7 +41,7 @@ const PublisherManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Publisher Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -73,6 +77,12 @@ const PublisherManagementPage = () => {
         onOpenChange={setIsFormDialogOpen}
         publisher={selectedPublisher}
         onSuccess={handleFormSuccess}
+      />
+
+      <PublisherDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        publisherId={selectedPublisherId}
       />
 
       <AlertDialog

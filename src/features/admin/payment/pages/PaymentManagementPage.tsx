@@ -11,7 +11,7 @@ import {
 
 import { DataTable } from "@/components/layout/admin/data-table";
 import { usePaymentManagement } from "@/features/admin/payment/hooks/usePaymentManagement";
-("@/components/layout/admin/data-table");
+import PaymentDetailDialog from "../components/PaymentDetailDialog";
 
 const PaymentManagementPage = () => {
   const {
@@ -25,6 +25,9 @@ const PaymentManagementPage = () => {
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
+    selectedPaymentId,
 
     handleConfirmDelete,
     handlePageChange,
@@ -33,7 +36,7 @@ const PaymentManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Payments Management</h1>
           <p className="text-muted-foreground mt-1">
@@ -58,6 +61,12 @@ const PaymentManagementPage = () => {
         showSearch={true}
         emptyMessage="No payments found."
         isLoading={isLoading}
+      />
+
+      <PaymentDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        paymentId={selectedPaymentId}
       />
 
       <AlertDialog

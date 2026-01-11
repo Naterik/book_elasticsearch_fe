@@ -1,8 +1,10 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -26,17 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { createBookAPI, updateBookAPI } from "@/features/admin/book/services";
-import { getAllAuthorsAPI } from "@/features/admin/author/services";
-import { getAllPublishersAPI } from "@/features/admin/publisher/services";
-import { getAllGenresAPI } from "@/features/admin/genre/services";
+import AuthorService from "@/features/admin/author/services";
+import BookService from "@/features/admin/book/services";
+import GenreService from "@/features/admin/genre/services";
+import PublisherService from "@/features/admin/publisher/services";
 
-import { Upload, X, Loader2 } from "lucide-react";
-import { bookFormSchema, type BookFormValues } from "@/lib/validators/book";
 import { Textarea } from "@/components/ui/textarea";
+import { bookFormSchema, type BookFormValues } from "@/lib/validators/book";
+import { Loader2, Upload, X } from "lucide-react";
 
 interface BookFormDialogProps {
   open: boolean;
@@ -78,8 +78,15 @@ const BookFormDialog = ({
   });
 
   useEffect(() => {
-    if (open) {
-      fetchDropdownData();
+    if (!open) return;
+
+    let isMounted = true;
+
+    const loadData = async () => {
+      await fetchDropdownData();
+
+      if (!isMounted) return;
+
       if (book) {
         form.reset({
           isbn: book.isbn,
@@ -117,15 +124,21 @@ const BookFormDialog = ({
         });
         setImagePreview(null);
       }
-    }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [open, book, form]);
 
   const fetchDropdownData = async () => {
     try {
       const [authorsRes, publishersRes, genresRes] = await Promise.all([
-        getAllAuthorsAPI(),
-        getAllPublishersAPI(),
-        getAllGenresAPI(),
+        AuthorService.getAllAuthors(),
+        PublisherService.getAllPublishers(),
+        GenreService.getAllGenres(),
       ]);
 
       if (authorsRes.data) {
@@ -208,9 +221,9 @@ const BookFormDialog = ({
         if (book?.id) {
           formData.append("id", book.id.toString());
         }
-        response = await updateBookAPI(formData);
+        response = await BookService.updateBook(formData);
       } else {
-        response = await createBookAPI(formData);
+        response = await BookService.createBook(formData);
       }
 
       if (response?.message) {
@@ -233,7 +246,7 @@ const BookFormDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Book" : "Create New Book"}
@@ -462,7 +475,7 @@ const BookFormDialog = ({
               render={() => (
                 <FormItem>
                   <FormLabel>Genres *</FormLabel>
-                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                  <div className="grid max-h-48 grid-cols-3 gap-2 overflow-y-auto rounded-md border p-3">
                     {genres.map((genre) => (
                       <FormField
                         key={genre.id}
@@ -472,7 +485,7 @@ const BookFormDialog = ({
                           return (
                             <FormItem
                               key={genre.id}
-                              className="flex flex-row items-start space-x-2 space-y-0"
+                              className="flex flex-row items-start space-y-0 space-x-2"
                             >
                               <FormControl>
                                 <Checkbox
@@ -494,7 +507,7 @@ const BookFormDialog = ({
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel className="font-normal text-sm cursor-pointer">
+                              <FormLabel className="cursor-pointer text-sm font-normal">
                                 {genre.name}
                               </FormLabel>
                             </FormItem>
@@ -521,7 +534,7 @@ const BookFormDialog = ({
                           <img
                             src={imagePreview}
                             alt="Book cover preview"
-                            className="w-32 h-48 rounded-md object-cover border-2 border-border"
+                            className="border-border h-48 w-32 rounded-md border-2 object-cover"
                           />
                           <Button
                             type="button"
@@ -543,9 +556,9 @@ const BookFormDialog = ({
                           onChange={handleImageChange}
                           className="cursor-pointer"
                         />
-                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <Upload className="text-muted-foreground h-4 w-4" />
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         Max file size: 5MB. Supported formats: JPG, PNG, GIF
                       </p>
                     </div>

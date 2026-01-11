@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { fetchAPI } from "@/lib/api";
+import { AuthService } from "@/lib/api";
 
 interface IAppContext {
   isAuthenticated: boolean | null;
@@ -43,7 +43,7 @@ export const AppProvider = (props: TProps) => {
       }
 
       try {
-        const response = await fetchAPI();
+        const response = await AuthService.fetchAccount();
         if (response.data) {
           setUser(response.data);
           setIsAuthenticated(true);

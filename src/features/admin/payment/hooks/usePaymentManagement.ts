@@ -1,11 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
-import {
-  getAllPaymentsAdminAPI,
-  deletePaymentAPI,
-} from "@/features/admin/payment/services";
-import { getPaymentColumns } from "@/features/admin/payment/payment-columns";
+import { getPaymentColumns } from "@admin/payment/payment-columns";
+import PaymentService from "@admin/payment/services";
 
 export const usePaymentManagement = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -18,6 +15,11 @@ export const usePaymentManagement = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [paymentToDelete, setPaymentToDelete] = useState<number | null>(null);
 
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(
+    null
+  );
+
   useEffect(() => {
     fetchPayments();
   }, [currentPage]);
@@ -25,7 +27,7 @@ export const usePaymentManagement = () => {
   const fetchPayments = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllPaymentsAdminAPI(currentPage);
+      const response = await PaymentService.getAllPayments(currentPage);
 
       if (response.data && response.data.result) {
         setPayments(response.data.result);
@@ -48,11 +50,16 @@ export const usePaymentManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleViewPayment = (paymentId: number) => {
+    setSelectedPaymentId(paymentId);
+    setIsDetailDialogOpen(true);
+  };
+
   const handleConfirmDelete = async () => {
     if (!paymentToDelete) return;
     setIsLoading(true);
     try {
-      const response = await deletePaymentAPI(paymentToDelete);
+      const response = await PaymentService.deletePayment(paymentToDelete);
 
       if (response.message) {
         toast.error(response.message);
@@ -81,7 +88,10 @@ export const usePaymentManagement = () => {
     setCurrentPage(1);
   };
 
-  const columns = useMemo(() => getPaymentColumns(handleDeleteClick), []);
+  const columns = useMemo(
+    () => getPaymentColumns(handleDeleteClick, handleViewPayment),
+    []
+  );
 
   return {
     payments,
@@ -94,6 +104,10 @@ export const usePaymentManagement = () => {
 
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
+
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
+    selectedPaymentId,
 
     handleDeleteClick,
     handleConfirmDelete,

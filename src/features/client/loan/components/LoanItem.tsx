@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate, getCountDate } from "@/helper/index";
 import { StatusBadge } from "@/components/StatusBadge";
 
-import { getOnLoanByIdAPI } from "@/lib/api";
+import { LoanService } from "@/lib/api";
 import { IMAGE_DEFAULT } from "@/types";
 import { LoanActionDialogs } from "./LoanDialog";
 
@@ -29,7 +29,7 @@ export const LoanItem = ({ loan, onRenew, renewingId }: LoanItemProps) => {
 
   useEffect(() => {
     const fetchOnLoanById = async () => {
-      const res = await getOnLoanByIdAPI(loan.id);
+      const res = await LoanService.getOnLoanById(loan.id);
       if (res.data) {
         setDataFine(res.data);
       }

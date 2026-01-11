@@ -1,43 +1,52 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
+import type { IReservation } from "@/types/entities/reservation";
+import { reservationByIdUrl, reservationsUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
 // Reservation Management APIs
-export const getAllReservationsAdminAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/reservations?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<IReservation>>>(urlBackend);
+export const getAllReservations = (page: number = 1) => {
+  return axios.get<IBackendRes<IModelPaginate<IReservation>>>(reservationsUrl, {
+    params: { page },
+  });
 };
 
-export const getReservationByIdAdminAPI = (id: number) => {
-  const urlBackend = `/api/v1/reservations/${id}`;
-  return axios.get<IBackendRes<IReservation>>(urlBackend);
+export const getReservationById = (id: number) => {
+  return axios.get<IBackendRes<IReservation>>(reservationByIdUrl(id));
 };
 
-export const createReservationAPI = (data: {
-  bookId: number;
-  userId: number;
-}) => {
-  const urlBackend = "/api/v1/reservations";
-  return axios.post<IBackendRes<IReservation>>(urlBackend, data);
+export const createReservation = (data: { bookId: number; userId: number }) => {
+  return axios.post<IBackendRes<IReservation>>(reservationsUrl, data);
 };
 
-export const updateReservationStatusAPI = (id: number, status: string) => {
-  const urlBackend = `/api/v1/reservations/${id}`;
-  return axios.put<IBackendRes<IReservation>>(urlBackend, { status });
+export const updateReservationStatus = (id: number, status: string) => {
+  return axios.put<IBackendRes<IReservation>>(reservationByIdUrl(id), {
+    status,
+  });
 };
 
-export const updateReservationAPI = (
+export const updateReservation = (
   id: number,
   data: {
     bookId: number;
     userId: number;
   }
 ) => {
-  const urlBackend = `/api/v1/reservations/${id}`;
-  return axios.put<IBackendRes<IReservation>>(urlBackend, data);
+  return axios.put<IBackendRes<IReservation>>(reservationByIdUrl(id), data);
 };
 
-export const deleteReservationAPI = (id: number) => {
-  const urlBackend = `/api/v1/reservations/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
+export const deleteReservation = (id: number) => {
+  return axios.delete<IBackendRes<void>>(reservationByIdUrl(id));
 };
+
+const ReservationService = {
+  getAllReservations,
+  getReservationById,
+  createReservation,
+  updateReservationStatus,
+  updateReservation,
+  deleteReservation,
+};
+
+export default ReservationService;

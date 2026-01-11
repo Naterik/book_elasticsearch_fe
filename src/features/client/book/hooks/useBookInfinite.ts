@@ -1,7 +1,7 @@
 import type { IBookElasticResponse } from "@/types/entities/book";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router";
-import { getFilterBookElasticAPI } from "@/lib/api";
+import { BookService } from "@/lib/api";
 import { PRICE_BOUNDS, ViewCard, YEAR_BOUNDS, type FilterState } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -92,7 +92,7 @@ export const useBookInfinite = ({
       selectedLanguage,
     ],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await getFilterBookElasticAPI(
+      const res = await BookService.getFilterBooksElastic(
         pageParam,
         debouncedYear[0] !== YEAR_BOUNDS[0] ||
           debouncedYear[1] !== YEAR_BOUNDS[1]
