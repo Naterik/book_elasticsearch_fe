@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 // import { useCurrentApp } from "@/app/providers/app.context";
@@ -20,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -34,7 +35,7 @@ import {
   type UserStatusType,
 } from "@/lib/validators/user";
 import UserService from "@admin/user/services";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export type CreateUserPayload = Pick<
   IUserBase,
@@ -53,7 +54,7 @@ export type UpdateUserPayload = Partial<Omit<CreateUserPayload, "password">> & {
 interface UserFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: IAdminUser | null;
+  user: IAdminUser;
   onSuccess: () => void;
 }
 
@@ -63,8 +64,6 @@ const UserFormDialog = ({
   user,
   onSuccess,
 }: UserFormDialogProps) => {
-  // const { setIsLoading } = useCurrentApp();
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const isEditMode = !!user;
 
   const form = useForm<UserFormValues>({
@@ -75,8 +74,8 @@ const UserFormDialog = ({
       fullName: "",
       address: "",
       phone: "",
-      roleId: "",
-      status: undefined,
+      roleId: "2",
+      status: "PENDING_CARD",
       avatar: undefined,
     },
   });
@@ -85,7 +84,7 @@ const UserFormDialog = ({
       if (user) {
         form.reset({
           username: user.username,
-          password: "",
+          password: user.password || "",
           fullName: user.fullName || "",
           address: user.address || "",
           phone: user.phone || "",
@@ -93,9 +92,6 @@ const UserFormDialog = ({
           status: user.status as UserStatusType,
           avatar: undefined,
         });
-        if (user.avatar) {
-          setAvatarPreview(user.avatar);
-        }
       } else {
         form.reset({
           username: "",
@@ -103,46 +99,15 @@ const UserFormDialog = ({
           fullName: "",
           address: "",
           phone: "",
-          roleId: "",
-          status: undefined,
+          roleId: "2",
+          status: "PENDING_CARD",
           avatar: undefined,
         });
-        setAvatarPreview(null);
       }
     }
   }, [open, user, form]);
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size must be less than 5MB");
-        return;
-      }
-      const previewUrl = URL.createObjectURL(file);
-      setAvatarPreview(previewUrl);
-      form.setValue("avatar", file);
-    }
-  };
-
-  const handleRemoveAvatar = () => {
-    setAvatarPreview(null);
-    form.setValue("avatar", undefined);
-    const fileInput = document.getElementById(
-      "avatar-input"
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = "";
-    }
-  };
-
   const onSubmit = async (values: UserFormValues) => {
-    // setIsLoading(true);
-
     try {
       const formData = new FormData();
       formData.append("username", values.username);
@@ -164,7 +129,7 @@ const UserFormDialog = ({
       if (values.status) {
         formData.append("status", values.status);
       }
-      if (values.avatar instanceof File) {
+      if (values.avatar) {
         formData.append("avatar", values.avatar);
       }
       let response;
@@ -185,12 +150,9 @@ const UserFormDialog = ({
         onSuccess();
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
       toast.error(
         isEditMode ? "Failed to update user" : "Failed to create user"
       );
-    } finally {
-      // setIsLoading(false);
     }
   };
 
@@ -215,7 +177,7 @@ const UserFormDialog = ({
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username (Email) *</FormLabel>
+                  <FormLabel>Email *</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="user@example.com"
@@ -227,32 +189,32 @@ const UserFormDialog = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Password {!isEditMode && "*"}
-                    {isEditMode && " (leave blank to keep current)"}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter password"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!isEditMode && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter password"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name *</FormLabel>
+                  <FormLabel>Full Name </FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
                   </FormControl>
@@ -265,14 +227,16 @@ const UserFormDialog = ({
               name="roleId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role *</FormLabel>
+                  <FormLabel>Role</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
+                    disabled={!isEditMode}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
+                        <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -349,44 +313,17 @@ const UserFormDialog = ({
             <FormField
               control={form.control}
               name="avatar"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Avatar</FormLabel>
                   <FormControl>
-                    <div className="space-y-2">
-                      {avatarPreview && (
-                        <div className="relative inline-block">
-                          <img
-                            src={avatarPreview}
-                            alt="Avatar preview"
-                            className="border-border h-24 w-24 rounded-full border-2 object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={handleRemoveAvatar}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="avatar-input"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleAvatarChange}
-                          className="cursor-pointer"
-                        />
-                        <Upload className="text-muted-foreground h-4 w-4" />
-                      </div>
-                      <p className="text-muted-foreground text-xs">
-                        Max file size: 5MB. Supported formats: JPG, PNG, GIF
-                      </p>
-                    </div>
+                    <ImageUpload
+                      value={field.value as File}
+                      onChange={field.onChange}
+                      existingImageUrl={user?.avatar}
+                      folder="users"
+                      label="avatar"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

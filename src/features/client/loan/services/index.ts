@@ -6,8 +6,7 @@ import {
   loanByIdUrl,
   loansUrl,
   renewalLoanUrl,
-  reservationByUserUrl,
-  reservationByIdUrl,
+
   fineByIdUrl,
   userPayFineUrl,
   userFineUpdateStatusUrl,
@@ -15,7 +14,7 @@ import {
 } from "./url";
 import type { IBackendRes } from "@/types/api/response.types";
 import type { ILoan } from "@/types/entities/loan";
-import type { IReservation } from "@/types/entities/reservation";
+
 import type { IFine, IFineDetail } from "@/types/entities/payment";
 import type { IPayment } from "@/types/entities/payment";
 
@@ -52,15 +51,7 @@ const renewalLoan = (loanId: number, userId: number) => {
   });
 };
 
-const getReservationByUser = (userId: number) => {
-  return axios.get<IBackendRes<IReservation[]>>(reservationByUserUrl(userId));
-};
 
-const cancelReservation = (reservationId: number) => {
-  return axios.put<IBackendRes<IReservation[]>>(
-    reservationByIdUrl(reservationId)
-  );
-};
 
 // --- Fine APIs ---
 
@@ -108,8 +99,7 @@ const LoanService = {
   getOnLoanById,
   createLoan,
   renewalLoan,
-  getReservationByUser,
-  cancelReservation,
+
   getFineById,
   userPayFine,
   userPaymentUpdateStatus,

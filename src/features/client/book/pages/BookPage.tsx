@@ -177,6 +177,8 @@ const BookPage = () => {
               onChangeSort={setSortBy}
               countFilter={countFilter}
               total={totalItems}
+              exactId={filterState.exactId}
+              onClearExactId={filterState.clearExactId}
             />
 
             <BookGridVirtual

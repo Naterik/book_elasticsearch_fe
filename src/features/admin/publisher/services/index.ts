@@ -1,13 +1,13 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
 import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
 import type { IPublisher } from "@/types/entities/publisher";
-import { publisherByIdUrl, publishersUrl } from "./url";
+import { publisherBooksUrl, publisherByIdUrl, publishersUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-export const getPublishers = (params?: { page?: number }) => {
+export const getPublishers = (page: number, name?: string) => {
   return axios.get<IBackendRes<IModelPaginate<IPublisher>>>(publishersUrl, {
-    params,
+    params: { page, name },
   });
 };
 
@@ -28,7 +28,7 @@ export const deletePublisher = (id: number) => {
 };
 
 export const getAllPublishers = () => {
-  return axios.get<IBackendRes<IPublisher[]>>(publishersUrl);
+  return axios.get<IBackendRes<IPublisher[]>>(publisherBooksUrl);
 };
 
 const PublisherService = {

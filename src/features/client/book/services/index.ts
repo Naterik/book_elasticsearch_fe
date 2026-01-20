@@ -1,20 +1,39 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
-import type { IBookElasticIndex, IDigitalBook } from "@/types";
+import type { IBook, IBookElasticIndex, IDigitalBook } from "@/types";
 import qs from "qs";
 import {
-  booksUrl,
   bookByIdUrl,
-  filterBooksUrl,
+  booksUrl,
+  digitalBookUrl,
   filterElasticUrl,
+  genresDisplayUrl,
+  languagesElasticUrl,
   mostBorrowedBooksUrl,
-  trendingBooksUrl,
   newArrivalBooksUrl,
   recommendBooksUrl,
   suggestElasticUrl,
-  genresDisplayUrl,
-  languagesElasticUrl,
-  digitalBookUrl,
+  trendingBooksUrl,
+  instantSearchUrl,
 } from "./url";
+
+export interface IInstantSearchResponse {
+  books: (IBook & {
+    highlight?: { title?: string[]; shortDesc?: string[]; detailDesc?: string[] };
+  })[];
+  suggestions: {
+    titles: (
+      | {
+          id: number | string;
+          text: string;
+          score: number;
+          author?: string;
+        }
+      | string
+    )[];
+  };
+  total: number;
+}
+
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
@@ -30,47 +49,30 @@ const getBookById = (id: number) => {
   return axios.get<IBackendRes<IBook>>(bookByIdUrl(id));
 };
 
-const getFilterBooks = (
-  page: number,
-  yearRange: number[],
-  priceRange: number[],
-  search: string,
-  order: string,
-  genres: string[],
-  language: string | null
-) => {
-  return axios.get<IBackendRes<IModelPaginate<IBook>>>(filterBooksUrl, {
-    params: { page, yearRange, priceRange, search, order, genres, language },
-    paramsSerializer: {
-      serialize: (params) =>
-        qs.stringify(params, {
-          arrayFormat: "repeat",
-          skipNulls: true,
-        }),
-    },
-  });
-};
-
 const getFilterBooksElastic = (
   page: number,
   yearRange: number[] | null,
   priceRange: number[] | null,
   search: string,
   order: string,
-  genres: string[] | null,
-  language: string | null
+  selectedGenres: string[] | null,
+  selectedLanguage: string | null,
+  exactId?: number | string | null,
+  limit: number = 10
 ) => {
   return axios.get<IBackendRes<IModelPaginate<IBookElasticIndex>>>(
     filterElasticUrl,
     {
       params: {
         page,
+        limit,
         yearRange,
         priceRange,
         search,
         order,
-        genres,
-        language,
+        genres: selectedGenres,
+        language: selectedLanguage,
+        exactId,
       },
       paramsSerializer: {
         serialize: (params) =>
@@ -121,10 +123,15 @@ const showDigitalBook = (isbn: string) => {
   return axios.get<IBackendRes<IDigitalBook>>(digitalBookUrl(isbn));
 };
 
+const getInstantSearch = (q: string) => {
+  return axios.get<IBackendRes<IInstantSearchResponse>>(instantSearchUrl, {
+    params: { q },
+  });
+};
+
 const BookService = {
   getAllBooks,
   getBookById,
-  getFilterBooks,
   getFilterBooksElastic,
   getMostBorrowedBooks,
   getTrendingBooks,
@@ -134,6 +141,7 @@ const BookService = {
   getAllGenres,
   getAllLanguagesElastic,
   showDigitalBook,
+  getInstantSearch,
 };
 
 export default BookService;

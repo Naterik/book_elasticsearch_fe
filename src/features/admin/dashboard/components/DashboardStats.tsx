@@ -9,8 +9,7 @@ import {
   AlertCircle,
   BadgeDollarSign,
   BookOpen,
-  Calendar,
-  Clock,
+
   CreditCard,
   TrendingDown,
   TrendingUp,
@@ -62,15 +61,7 @@ export function DashboardStats({ data }: DashboardStatsProps) {
       iconColor: "text-white",
       unitIcon: BookOpen,
     },
-    {
-      label: "Pending Reservations",
-      data: data.pendingReservations,
-      icon: Clock,
-      cardBg: "bg-orange-200/50 hover:bg-orange-300/50",
-      iconBg: "bg-orange-500 shadow-orange-200",
-      iconColor: "text-white",
-      unitIcon: Calendar,
-    },
+
   ];
 
   return (

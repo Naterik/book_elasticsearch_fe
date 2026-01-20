@@ -1,13 +1,13 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
 import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
 import type { IAuthor } from "@/types/entities/author";
-import { authorByIdUrl, authorsUrl } from "./url";
+import { authorByIdUrl, authorsAllBooksUrl, authorsUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-export const getAuthors = (page: number) => {
+export const getAuthors = (page: number, name?: string) => {
   return axios.get<IBackendRes<IModelPaginate<IAuthor>>>(authorsUrl, {
-    params: { page },
+    params: { page, name },
   });
 };
 
@@ -27,7 +27,7 @@ export const getAuthorById = (id: number) => {
 };
 
 export const getAllAuthors = () => {
-  return axios.get<IBackendRes<IAuthor[]>>(authorsUrl);
+  return axios.get<IBackendRes<IAuthor[]>>(authorsAllBooksUrl);
 };
 
 export const deleteAuthor = (id: number) => {

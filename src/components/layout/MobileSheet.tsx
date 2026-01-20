@@ -11,7 +11,7 @@ import { Info, LogOut, Menu } from "lucide-react";
 import { Link } from "react-router";
 import logo from "@/assets/logo-invenio-ils.svg";
 const NAV_ITEMS = [
-  { to: "/book", label: "Search" },
+  { to: "/books", label: "Search" },
   { to: "/about", label: "About" },
 ];
 const MobileSheet = () => {

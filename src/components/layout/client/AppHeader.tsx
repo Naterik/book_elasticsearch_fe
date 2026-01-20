@@ -30,7 +30,7 @@ import {
 import { Bell, History, Info, LogOut, ShieldUser, User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { to: "/book", label: "Search" },
+  { to: "/books", label: "Search" },
   { to: "/about", label: "About" },
   { to: "/login", label: "Login" },
   { to: "/register", label: "Register" },
@@ -40,7 +40,7 @@ export default function AppHeader() {
   const { setUser, setIsAuthenticated, setIsLoading, user, isAuthenticated } =
     useCurrentApp();
   const navigate = useNavigate();
-  const isAdmin = user?.role.includes("ADMIN");
+  const isAdmin = user?.role?.includes("ADMIN");
   const isLogin = user ? NAV_ITEMS.slice(0, 2) : NAV_ITEMS || NAV_ITEMS;
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -130,7 +130,7 @@ export default function AppHeader() {
                   className="flex gap-2 px-2 text-white items-center"
                 >
                   <Avatar className="h-7 w-7">
-                    <AvatarImage src={user.avatar} alt="@user" />
+                    <AvatarImage src={user.avatar || ""} alt="@user" />
                     <AvatarFallback>
                       <User className="h-4 w-4" />
                     </AvatarFallback>

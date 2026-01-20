@@ -25,6 +25,8 @@ type Props = {
   onChangeSort: (v: string) => void;
   countFilter: number;
   total: number;
+  exactId?: string | null;
+  onClearExactId?: () => void;
 };
 
 const BookToolbar = ({
@@ -34,14 +36,27 @@ const BookToolbar = ({
   onChangeSort,
   countFilter,
   total,
+  exactId,
+  onClearExactId,
 }: Props) => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
+    <div className="flex flex-col gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          {countFilter > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          {exactId ? (
+             <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 gap-1 pr-1 py-1 text-sm">
+                Specific Result
+                <button 
+                  onClick={onClearExactId}
+                  className="ml-1 hover:bg-blue-100 rounded-full p-0.5 transition-colors"
+                >
+                  <span className="sr-only">Clear</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+             </Badge>
+          ) : countFilter > 0 ? (
             <>
               <Badge variant="default" className="text-xs sm:text-sm">
                 {total}
@@ -50,6 +65,10 @@ const BookToolbar = ({
                 results found
               </span>
             </>
+          ) : (
+             <span className="text-xs sm:text-sm text-muted-foreground">
+                Showing all books
+             </span>
           )}
         </div>
 

@@ -1,6 +1,5 @@
 export { default as LoanCurrent } from "./components/LoanCurrent";
 export { default as LoanHistory } from "./components/LoanHistory";
-export { default as LoanReservation } from "./components/LoanReservation";
 export { default as LoanFine } from "./components/LoanFine";
 export { default as LoanFineDialog } from "./components/LoanFineDialog";
 export { LoanActionDialogs } from "./components/LoanDialog";

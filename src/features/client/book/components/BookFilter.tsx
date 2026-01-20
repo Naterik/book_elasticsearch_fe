@@ -8,6 +8,7 @@ import { LANGUAGE_FLAGS } from "@/helper/icon";
 import { useIsMobile } from "@/hooks/useMobile";
 import { cn } from "@/lib/utils";
 import { ITEMS_PER_SHOW } from "@/types";
+import { Input } from "@/components/ui/input";
 import {
   BookOpen,
   Calendar,
@@ -16,6 +17,7 @@ import {
   Filter,
   Globe,
   RotateCcw,
+  Search,
 } from "lucide-react";
 import { memo, useState } from "react";
 
@@ -60,10 +62,15 @@ const BookFilter = ({
   const isMobile = useIsMobile();
   const [visibleGenresCount, setVisibleGenresCount] = useState(10);
   const [visibleLanguagesCount, setVisibleLanguagesCount] = useState(10);
+  const [genreSearch, setGenreSearch] = useState("");
 
-  const visibleGenres = genresAll.slice(0, visibleGenresCount);
-  const hasMoreGenres = visibleGenresCount < genresAll.length;
-  const isAllGenresShown = visibleGenresCount >= genresAll.length;
+  const filteredGenres = genresAll.filter((g) =>
+    g.name.toLowerCase().includes(genreSearch.toLowerCase())
+  );
+
+  const visibleGenres = filteredGenres.slice(0, visibleGenresCount);
+  const hasMoreGenres = visibleGenresCount < filteredGenres.length;
+  const isAllGenresShown = visibleGenresCount >= filteredGenres.length;
 
   const visibleLanguages = languagesAll?.slice(0, visibleLanguagesCount) ?? [];
   const hasMoreLanguages = visibleLanguagesCount < (languagesAll?.length ?? 0);
@@ -147,6 +154,19 @@ const BookFilter = ({
               Genres
             </h3>
           </div>
+          <div className="relative mb-2">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Find genre..."
+              value={genreSearch}
+              onChange={(e) => {
+                setGenreSearch(e.target.value);
+                setVisibleGenresCount(ITEMS_PER_SHOW);
+              }}
+              className="h-8 pl-8 text-xs bg-muted/50 focus:bg-background transition-colors"
+            />
+          </div>
+
           <div className={`flex flex-wrap gap-2`}>
             {visibleGenres.map((g) => {
               const isSelected = genresSelected.includes(g.name);
@@ -156,10 +176,10 @@ const BookFilter = ({
                   variant={isSelected ? "default" : "outline"}
                   size="sm"
                   className={cn(
-                    "text-xs font-medium transition-all",
+                    "text-xs font-medium transition-all active:scale-95",
                     isSelected
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "hover:bg-slate-100"
+                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                      : "hover:bg-slate-100 hover:text-slate-900"
                   )}
                   onClick={() => onToggleGenre(g.name, !isSelected)}
                 >
@@ -167,9 +187,15 @@ const BookFilter = ({
                 </Button>
               );
             })}
+            
+            {filteredGenres.length === 0 && (
+              <span className="text-xs text-muted-foreground italic w-full text-center py-2">
+                No genres found
+              </span>
+            )}
           </div>
 
-          {(hasMoreGenres || isAllGenresShown) && (
+          {(hasMoreGenres || (!isAllGenresShown && filteredGenres.length > 0)) && (
             <Button
               variant="ghost"
               size="sm"
@@ -178,7 +204,7 @@ const BookFilter = ({
                 isAllGenresShown ? handleShowLessGenres : handleShowMoreGenres
               }
             >
-              {isAllGenresShown ? "- Show Less" : "+ Show More"}
+              {isAllGenresShown ? "- Show Less" : `+ Show More (${filteredGenres.length - visibleGenresCount})`}
               <ChevronDown
                 className={cn(
                   "ml-1 h-3.5 w-3.5 transition-transform",

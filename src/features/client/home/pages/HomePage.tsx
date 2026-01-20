@@ -6,6 +6,7 @@ import {
   BookCarousel,
   MembershipCTA,
   IntroPage,
+  MemberHeroSection,
 } from "@/features/client/home/components";
 import { useHomePage } from "@/features/client/home/hooks/useHomePage";
 
@@ -23,23 +24,29 @@ const HomePage: React.FC = () => {
     handleRegister,
     handleMember,
     handleViewLoans,
-    handleViewReservations,
+    loans,
   } = useHomePage();
 
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection
-        isHaveCard={checkCard}
-        onSearch={handleSearch}
-        onMember={handleMember}
-      />
+      {isAuthenticated && user ? (
+        <MemberHeroSection
+          user={user}
+          loans={loans}
+          onSearch={handleSearch}
+        />
+      ) : (
+        <HeroSection
+          isHaveCard={checkCard}
+          onSearch={handleSearch}
+          onMember={handleMember}
+        />
+      )}
 
       {isAuthenticated && (
         <ActionableAlerts
-          loans={[]}
-          reservations={[]}
+          loans={loans}
           onViewLoans={handleViewLoans}
-          onViewReservations={handleViewReservations}
         />
       )}
       <div className="container mx-auto">

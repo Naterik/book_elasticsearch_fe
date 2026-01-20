@@ -15,11 +15,7 @@ const createInstanceAxios = (baseURL: string) => {
       config.headers["Authorization"] = auth;
 
       // Add 0.5 second delay before sending request (for loader display)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(config);
-        }, 500);
-      });
+      return config;
     },
     function (error) {
       // Do something with request error

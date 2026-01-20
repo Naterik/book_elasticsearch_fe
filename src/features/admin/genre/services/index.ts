@@ -1,7 +1,7 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
 import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
 import type { IGenre } from "@/types/entities/genre";
-import { genreByIdUrl, genresUrl } from "./url";
+import { genreByIdUrl, genresAllBooksUrl, genresUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
@@ -28,7 +28,7 @@ export const deleteGenre = (id: number) => {
 };
 
 export const getAllGenres = () => {
-  return axios.get<IBackendRes<IGenre[]>>(genresUrl);
+  return axios.get<IBackendRes<IGenre[]>>(genresAllBooksUrl);
 };
 
 const GenreService = {

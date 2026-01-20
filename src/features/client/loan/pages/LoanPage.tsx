@@ -6,7 +6,7 @@ import { LoanCurrent } from "@/features/client/loan";
 
 import LoanFine from "@/features/client/loan/components/LoanFine";
 import LoanHistory from "@/features/client/loan/components/LoanHistory";
-import LoanReservation from "@/features/client/loan/components/LoanReservation";
+
 import { useLoanPage } from "@/features/client/loan/hooks/useLoanPage";
 import { AlertTriangle } from "lucide-react";
 
@@ -14,14 +14,11 @@ const LoanPage = () => {
   const {
     dataLoanReturn,
     dataOnLoan,
-    dataReservation,
     fine,
-    cancellingId,
     renewingId,
-    checkStatus,
+
     stats,
     handleRenewLoan,
-    onCancelReservation,
     fetchFineByUserId,
   } = useLoanPage();
 
@@ -68,15 +65,7 @@ const LoanPage = () => {
               </TabsTrigger>
             )}
 
-            {checkStatus && dataReservation.length > 0 && (
-              <TabsTrigger value="reservations">
-                Reservation
-                <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5">
-                  {dataReservation.length}
-                  <span className="sr-only"> book reservations</span>
-                </Badge>
-              </TabsTrigger>
-            )}
+
           </TabsList>
           <TabsContent value="current">
             <LoanCurrent
@@ -91,13 +80,7 @@ const LoanPage = () => {
           <TabsContent value="fine">
             <LoanFine loanFine={fine} onFinePaid={fetchFineByUserId} />
           </TabsContent>
-          <TabsContent value="reservations">
-            <LoanReservation
-              reservationData={dataReservation}
-              onCancelReservation={onCancelReservation}
-              cancellingId={cancellingId}
-            />
-          </TabsContent>
+
         </Tabs>
       </div>
     </div>

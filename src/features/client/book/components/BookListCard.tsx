@@ -44,6 +44,8 @@ export default function BookListCard({
             <img
               src={item.image || IMAGE_DEFAULT}
               alt={item.title}
+              loading="lazy"
+              decoding="async"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 if (target.src !== IMAGE_DEFAULT) {
