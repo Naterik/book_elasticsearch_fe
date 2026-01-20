@@ -8,9 +8,9 @@ export const useLoanPage = () => {
   const { user, setIsLoading } = useCurrentApp();
   const [dataLoanReturn, setDataLoanReturn] = useState<ILoan[]>([]);
   const [dataOnLoan, setDataOnLoan] = useState<ILoan[]>([]);
-  const [dataReservation, setReservation] = useState<IReservation[]>([]);
+
   const [fine, setFine] = useState<IFine[] | null>(null);
-  const [cancellingId, setCancellingId] = useState<number | null>(null);
+
   const [renewingId, setRenewingId] = useState<number | null>(null);
   const userId = user?.id ?? 0;
   const checkStatus = user?.status === "ACTIVE";
@@ -61,17 +61,7 @@ export const useLoanPage = () => {
     }
   }, [userId]);
 
-  const fetchReservation = useCallback(async () => {
-    if (!userId || userId === 0) return;
-    try {
-      const res = await LoanService.getReservationByUser(userId);
-      if (res.data) {
-        setReservation(res.data);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch reservation");
-    }
-  }, [userId]);
+
 
   const fetchFineByUserId = useCallback(async () => {
     if (!userId || userId === 0) return;
@@ -99,23 +89,7 @@ export const useLoanPage = () => {
     }
   };
 
-  const onCancelReservation = async (id: number) => {
-    setCancellingId(id);
-    try {
-      const res = await LoanService.cancelReservation(id);
-      if (res.data) {
-        toast.success("Cancel reservation success!");
-        fetchReservation();
-      } else {
-        toast.error(res.message || "Cancel reservation failed.");
-      }
-    } catch (error) {
-      toast.error("Something wrong with cancelling.");
-      console.error(error);
-    } finally {
-      setCancellingId(null);
-    }
-  };
+
 
   useEffect(() => {
     const initData = async () => {
@@ -124,7 +98,7 @@ export const useLoanPage = () => {
         fetchAllLoans(),
         fetchReturnedLoan(),
         fetchFineByUserId(),
-        checkStatus ? fetchReservation() : Promise.resolve(),
+
       ]);
       setIsLoading(false);
     };
@@ -132,7 +106,7 @@ export const useLoanPage = () => {
   }, [
     fetchAllLoans,
     fetchReturnedLoan,
-    fetchReservation,
+
     fetchFineByUserId,
     checkStatus,
     setIsLoading,
@@ -141,14 +115,11 @@ export const useLoanPage = () => {
   return {
     dataLoanReturn,
     dataOnLoan,
-    dataReservation,
     fine,
-    cancellingId,
     renewingId,
     checkStatus,
     stats,
     handleRenewLoan,
-    onCancelReservation,
     fetchFineByUserId,
   };
 };

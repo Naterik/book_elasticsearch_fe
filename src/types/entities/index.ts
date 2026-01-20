@@ -7,7 +7,7 @@ export * from "./user";
 export * from "./loan";
 export * from "./payment";
 export * from "./notification";
-export * from "./reservation";
+
 export * from "./auth";
 export * from "./dashboard";
 export * from "./digital";

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/helper";
+import { getImageUrl } from "@/lib/utils";
 import UserService from "@admin/user/services";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -65,7 +66,7 @@ const UserDetailDialog = ({
       setIsLoading(false);
     }
   };
-
+  console.log("object :>> ", getImageUrl(user?.avatar, "users"));
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
@@ -85,7 +86,7 @@ const UserDetailDialog = ({
             <div className="flex items-start gap-4">
               <Avatar className="h-20 w-20">
                 <AvatarImage
-                  src={user.avatar || undefined}
+                  src={getImageUrl(user.avatar, "users")}
                   alt={user.fullName || "User"}
                 />
                 <AvatarFallback className="text-lg">

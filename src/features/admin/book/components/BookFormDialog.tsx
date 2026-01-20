@@ -22,13 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import AuthorService from "@/features/admin/author/services";
 import BookService from "@/features/admin/book/services";
 import GenreService from "@/features/admin/genre/services";
@@ -36,7 +29,10 @@ import PublisherService from "@/features/admin/publisher/services";
 
 import { Textarea } from "@/components/ui/textarea";
 import { bookFormSchema, type BookFormValues } from "@/lib/validators/book";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
+
+import { ImageUpload } from "@/components/ui/image-upload";
+import { InfiniteSelect } from "@/components/ui/infinite-select";
 
 interface BookFormDialogProps {
   open: boolean;
@@ -52,9 +48,8 @@ const BookFormDialog = ({
   onSuccess,
 }: BookFormDialogProps) => {
   // const { setIsLoading } = useCurrentApp();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [authors, setAuthors] = useState<IAuthor[]>([]);
-  const [publishers, setPublishers] = useState<IPublisher[]>([]);
+
+  // Removed authors/publishers state as they are handled by InfiniteSelect
   const [genres, setGenres] = useState<IGenre[]>([]);
   const isEditMode = !!book;
 
@@ -103,9 +98,6 @@ const BookFormDialog = ({
           genreIds: book.genres.map((g) => g.genres.id.toString()),
           image: undefined,
         });
-        if (book.image) {
-          setImagePreview(book.image);
-        }
       } else {
         form.reset({
           isbn: "",
@@ -122,7 +114,6 @@ const BookFormDialog = ({
           genreIds: [],
           image: undefined,
         });
-        setImagePreview(null);
       }
     };
 
@@ -135,52 +126,14 @@ const BookFormDialog = ({
 
   const fetchDropdownData = async () => {
     try {
-      const [authorsRes, publishersRes, genresRes] = await Promise.all([
-        AuthorService.getAllAuthors(),
-        PublisherService.getAllPublishers(),
-        GenreService.getAllGenres(),
-      ]);
+      const [genresRes] = await Promise.all([GenreService.getAllGenres()]);
 
-      if (authorsRes.data) {
-        setAuthors(authorsRes.data);
-      }
-      if (publishersRes.data) {
-        setPublishers(publishersRes.data);
-      }
       if (genresRes.data) {
         setGenres(genresRes.data);
       }
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
       toast.error("Failed to load form data");
-    }
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size must be less than 5MB");
-        return;
-      }
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      form.setValue("image", file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    form.setValue("image", undefined);
-    const fileInput = document.getElementById(
-      "image-input"
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = "";
     }
   };
 
@@ -410,28 +363,25 @@ const BookFormDialog = ({
                 control={form.control}
                 name="authorId"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Author *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an author" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {authors.map((author) => (
-                          <SelectItem
-                            key={author.id}
-                            value={author.id.toString()}
-                          >
-                            {author.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <InfiniteSelect
+                      label="Author"
+                      value={field.value}
+                      onChange={field.onChange}
+                      fetchFn={async (page, search) => {
+                        const res = await AuthorService.getAuthors(
+                          page,
+                          search
+                        );
+                        return res;
+                      }}
+                      queryKey="authors"
+                      getItemValue={(item: IAuthor) => item.id.toString()}
+                      getItemLabel={(item: IAuthor) => item.name}
+                      initialLabel={book?.authors?.name}
+                      modal
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -441,28 +391,25 @@ const BookFormDialog = ({
                 control={form.control}
                 name="publisherId"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Publisher *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a publisher" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {publishers.map((publisher) => (
-                          <SelectItem
-                            key={publisher.id}
-                            value={publisher.id.toString()}
-                          >
-                            {publisher.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <InfiniteSelect
+                      label="Publisher"
+                      value={field.value}
+                      onChange={field.onChange}
+                      fetchFn={async (page, search) => {
+                        const res = await PublisherService.getPublishers(
+                          page,
+                          search
+                        );
+                        return res;
+                      }}
+                      queryKey="publishers"
+                      getItemValue={(item: IPublisher) => item.id.toString()}
+                      getItemLabel={(item: IPublisher) => item.name}
+                      initialLabel={book?.publishers?.name}
+                      modal
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -524,44 +471,17 @@ const BookFormDialog = ({
             <FormField
               control={form.control}
               name="image"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Book Cover Image</FormLabel>
                   <FormControl>
-                    <div className="space-y-2">
-                      {imagePreview && (
-                        <div className="relative inline-block">
-                          <img
-                            src={imagePreview}
-                            alt="Book cover preview"
-                            className="border-border h-48 w-32 rounded-md border-2 object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={handleRemoveImage}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="image-input"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="cursor-pointer"
-                        />
-                        <Upload className="text-muted-foreground h-4 w-4" />
-                      </div>
-                      <p className="text-muted-foreground text-xs">
-                        Max file size: 5MB. Supported formats: JPG, PNG, GIF
-                      </p>
-                    </div>
+                    <ImageUpload
+                      value={field.value as File}
+                      onChange={field.onChange}
+                      existingImageUrl={book?.image}
+                      folder="books"
+                      label="book-cover"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

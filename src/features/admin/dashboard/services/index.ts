@@ -4,7 +4,7 @@ import type {
   IBookCopiesStatusChartData,
   IDashboardSummary,
   ILoanTrend,
-  IPendingReservation,
+
   IRevenueChartData,
   ISearchTermsChartData,
   IUserWithCard,
@@ -14,7 +14,7 @@ import {
   chartLoanTrendsUrl,
   chartRevenueUrl,
   chartSearchTermsUrl,
-  pendingReservationsUrl,
+
   summaryUrl,
   userWithCardUrl,
 } from "./url";
@@ -45,9 +45,7 @@ const getChartForSearchTerms = () => {
   return axios.get<IBackendRes<ISearchTermsChartData[]>>(chartSearchTermsUrl);
 };
 
-const getPendingReservations = () => {
-  return axios.get<IBackendRes<IPendingReservation[]>>(pendingReservationsUrl);
-};
+
 
 const getUserWithCard = (timeframe: string) => {
   return axios.get<IBackendRes<IUserWithCard[]>>(userWithCardUrl, {
@@ -61,7 +59,7 @@ const DashboardService = {
   getChartForLoanTrends,
   getChartForRevenue,
   getChartForSearchTerms,
-  getPendingReservations,
+
   getUserWithCard,
 };
 

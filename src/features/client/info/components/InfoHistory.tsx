@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   BookOpen,
-  Calendar,
+
   Clock,
   AlertCircle,
   CheckCircle2,
@@ -19,7 +19,7 @@ import { useCurrentApp } from "@/app/providers/app.context";
 
 type Activity = {
   id: string;
-  type: "loan_active" | "loan_returned" | "reservation" | "fine";
+  type: "loan_active" | "loan_returned" | "fine";
   title: string;
   description: string;
   date: string;
@@ -37,11 +37,10 @@ export default function InfoHistory() {
 
     setIsLoading(true);
     try {
-      const [loansRes, returnsRes, reservationsRes, finesRes] =
+      const [loansRes, returnsRes, finesRes] =
         await Promise.all([
           LoanService.getLoanByUserId(user.id),
           LoanService.getReturnedLoanByUser(user.id),
-          LoanService.getReservationByUser(user.id),
           LoanService.getFineByUserId(user.id),
         ]);
 
@@ -83,20 +82,7 @@ export default function InfoHistory() {
         });
       }
 
-      // Add reservations
-      if (reservationsRes?.data && Array.isArray(reservationsRes.data)) {
-        reservationsRes.data.forEach((reservation: IReservation) => {
-          allActivities.push({
-            id: `reservation-${reservation.id}`,
-            type: "reservation",
-            title: `Reserved: ${reservation.book?.title || "Book"}`,
-            description: `Status: ${reservation.status}`,
-            date: new Date(reservation.requestDate).toLocaleDateString(),
-            icon: <Calendar className="h-4 w-4 text-orange-600" />,
-            status: "pending",
-          });
-        });
-      }
+
 
       // Add fines
       if (finesRes?.data && Array.isArray(finesRes.data)) {

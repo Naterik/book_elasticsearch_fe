@@ -1,8 +1,9 @@
-import { Outlet } from "react-router";
-import AppHeader from "../components/layout/client/AppHeader";
+import { useCurrentApp } from "@/app/providers/app.context";
 import AppFooter from "@/components/layout/client/AppFooter";
 import { GlobalLoader } from "@/components/Loader";
-import { useCurrentApp } from "@/app/providers/app.context";
+import { Suspense } from "react";
+import { Outlet } from "react-router";
+import AppHeader from "../components/layout/client/AppHeader";
 
 const ClientLayout = () => {
   const { isLoading } = useCurrentApp();
@@ -11,7 +12,9 @@ const ClientLayout = () => {
     <div>
       <AppHeader />
       <main>
-        <Outlet />
+        <Suspense fallback={<GlobalLoader isVisible={true} />}>
+          <Outlet />
+        </Suspense>
       </main>
       <AppFooter />
       <GlobalLoader isVisible={isLoading} />

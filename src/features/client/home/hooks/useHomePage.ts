@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { BookService } from "@/lib/api";
+import { BookService, LoanService } from "@/lib/api";
 import { toast } from "sonner";
 
 export const useHomePage = () => {
@@ -11,6 +11,7 @@ export const useHomePage = () => {
   const [newArrivals, setNewArrivals] = useState<IBook[] | undefined>([]);
   const [mostBorrowedBooks, setMostBorrowedBooks] = useState<IBook[]>([]);
   const [recommendedBooks, setRecommendedBooks] = useState<IBook[]>([]);
+  const [loans, setLoans] = useState<ILoan[]>([]);
   const checkCard = user?.status !== "ACTIVE" && isAuthenticated === true;
 
   useEffect(() => {
@@ -44,9 +45,16 @@ export const useHomePage = () => {
 
   const fetchUserData = async (userId: number) => {
     try {
-      const recommended = await BookService.getRecommendedBooks(userId);
+      const [recommended, userLoans] = await Promise.all([
+        BookService.getRecommendedBooks(userId),
+        LoanService.getLoanByUserId(userId),
+      ]);
+
       if (recommended.data) {
         setRecommendedBooks(recommended.data);
+      }
+      if (userLoans.data) {
+        setLoans(userLoans.data);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -55,11 +63,11 @@ export const useHomePage = () => {
   };
 
   const handleSearch = (query: string) => {
-    navigate(`/book?q=${encodeURIComponent(query)}`);
+    navigate(`/books?q=${encodeURIComponent(query)}`);
   };
 
   const handleBookClick = (bookId: number) => {
-    navigate(`/book/${bookId}`);
+    navigate(`/books/${bookId}`);
   };
 
   const handleRegister = () => {
@@ -74,15 +82,12 @@ export const useHomePage = () => {
     navigate("/user/loan");
   };
 
-  const handleViewReservations = () => {
-    navigate("/user/loan");
-  };
-
   return {
     trendingBooks,
     newArrivals,
     mostBorrowedBooks,
     recommendedBooks,
+    loans,
     isAuthenticated,
     user,
     checkCard,
@@ -91,6 +96,5 @@ export const useHomePage = () => {
     handleRegister,
     handleMember,
     handleViewLoans,
-    handleViewReservations,
   };
 };

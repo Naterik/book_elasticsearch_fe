@@ -1,42 +1,48 @@
-export interface IUserBase {
+// --- Common Types ---
+
+export interface IUserCore {
   id: number;
   username: string;
   fullName: string | null;
+  avatar: string | null;
+  status: string; // Use string or import UserStatus from enums if needed
+  cardNumber: string | null;
+}
+
+// --- Client / Auth Context ---
+
+export interface IClientUser extends IUserCore {
+  role: string; // Flattened role name (e.g. "ADMIN")
+}
+
+// --- Admin / Dashboard Context ---
+
+export interface IRole {
+  id?: number;
+  name: string;
+}
+
+export interface ISystemUser extends IUserCore {
+  password?: string;
   address: string | null;
   phone: string | null;
-  avatar: string | null;
-  status: string;
-  roleId: number;
-}
-
-// Standard User (from auth)
-export interface IUser {
-  id: number;
-  email: string;
-  fullName: string | null;
-  avatar: string;
-  status: string;
-  role: string;
-  cardNumber: string | null;
-}
-
-export interface IUserInfo extends IUserBase {
-  cardNumber: string | null;
-  membershipStart: string | null;
-  membershipEnd: string | null;
-}
-
-export interface IAdminUser extends IUserBase {
-  fullName: string;
   type: string;
-  cardNumber: string | null;
+
+  roleId: number;
+  role: IRole;
+
   membershipStart: string | null;
   membershipEnd: string | null;
-  role: {
-    name: string;
-  };
+
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
-export interface IAdminUserDetail extends IAdminUser {
-  createdAt?: string;
-  updatedAt?: string;
-}
+
+// --- Aliases for Compat & Semantics ---
+
+// Legacy/Compatibility aliases
+export type IUser = IClientUser;
+export type IAdminUser = ISystemUser;
+export type IAdminUserDetail = ISystemUser;
+export type IUserBase = ISystemUser; // For compatibility with Pick<IUserBase>
+export type Role = IRole;

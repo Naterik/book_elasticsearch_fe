@@ -1,14 +1,12 @@
 import { BookCopiesDonutChart } from "@/features/admin/dashboard/components/BookCopiesDonutChart";
 import { LoanTrendsChart } from "@/features/admin/dashboard/components/LoanTrendsChart";
-import { PendingReservationsTable } from "@/features/admin/dashboard/components/PendingReservationsTable";
 import { RevenueBarChart } from "@/features/admin/dashboard/components/RevenueBarChart";
 import { SearchTermsBarChart } from "@/features/admin/dashboard/components/SearchTermsBarChart";
-import { UserWithCardTable } from "@/features/admin/dashboard/components/UserWithCardTable";
 import type {
   IBookCopiesStatusChartData,
   IDashboardSummary,
   ILoanTrend,
-  IPendingReservation,
+
   IRevenueChartData,
   ISearchTermsChartData,
   IUserWithCard,
@@ -28,9 +26,6 @@ const Dashboard = () => {
   const [revenueData, setRevenueData] = useState<IRevenueChartData[]>([]);
   const [searchTermsData, setSearchTermsData] = useState<
     ISearchTermsChartData[]
-  >([]);
-  const [pendingReservations, setPendingReservations] = useState<
-    IPendingReservation[]
   >([]);
   const [userWithCard, setUserWithCard] = useState<IUserWithCard[]>([]);
 
@@ -53,16 +48,16 @@ const Dashboard = () => {
         revenueRes,
         searchTermsRes,
         loanTrendsRes,
-        pendingReservationsRes,
-        userWithCardRes,
+        // pendingReservationsRes,
+        // userWithCardRes,
       ] = await Promise.all([
         DashboardService.getSummary(),
         DashboardService.getChartForBookCopiesStatus(),
         DashboardService.getChartForRevenue(),
         DashboardService.getChartForSearchTerms(),
         DashboardService.getChartForLoanTrends(timeframe),
-        DashboardService.getPendingReservations(),
-        DashboardService.getUserWithCard(timeframe),
+        // DashboardService.getPendingReservations(),
+        // DashboardService.getUserWithCard(timeframe),
       ]);
       if (summaryRes.data) {
         setSummary(summaryRes.data);
@@ -72,9 +67,9 @@ const Dashboard = () => {
       if (revenueRes.data) setRevenueData(revenueRes.data);
       if (searchTermsRes.data) setSearchTermsData(searchTermsRes.data);
       if (loanTrendsRes.data) setLoanTrendsData(loanTrendsRes.data);
-      if (pendingReservationsRes.data)
-        setPendingReservations(pendingReservationsRes.data);
-      if (userWithCardRes.data) setUserWithCard(userWithCardRes.data);
+      // if (pendingReservationsRes.data)
+      //   setPendingReservations(pendingReservationsRes.data);
+      // if (userWithCardRes.data) setUserWithCard(userWithCardRes.data);
     } catch (error) {
       console.error("Failed to fetch dashboard data", error);
       toast.error("Failed to load dashboard data");
@@ -143,14 +138,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="col-span-4">
-          <PendingReservationsTable data={pendingReservations} />
-        </div>
-        <div className="col-span-3">
-          <UserWithCardTable data={userWithCard} />
-        </div>
-      </div>
     </div>
   );
 };

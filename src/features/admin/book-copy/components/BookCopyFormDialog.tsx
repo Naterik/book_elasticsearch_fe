@@ -74,7 +74,7 @@ const BookCopyFormDialog = ({
     resolver: zodResolver(bookCopyFormSchema),
     defaultValues: {
       copyNumber: "",
-      year_published: new Date().getFullYear(),
+      year_published: new Date().getFullYear().toString(),
       status: BookCopyStatus.AVAILABLE,
       bookId: 100,
     },
@@ -86,14 +86,14 @@ const BookCopyFormDialog = ({
       if (bookCopy) {
         form.reset({
           copyNumber: bookCopy.copyNumber,
-          year_published: bookCopy.year_published,
+          year_published: `${bookCopy.year_published}`,
           status: bookCopy.status,
           bookId: bookCopy.bookId,
         });
       } else {
         form.reset({
           copyNumber: "",
-          year_published: new Date().getFullYear(),
+          year_published: `${new Date().getFullYear()}`,
           status: BookCopyStatus.AVAILABLE,
           bookId: 0,
         });
@@ -122,7 +122,7 @@ const BookCopyFormDialog = ({
     try {
       const submitData = {
         copyNumber: values.copyNumber,
-        year_published: +values.year_published,
+        year_published: values.year_published,
         status: values.status,
         bookId: +values.bookId,
       };

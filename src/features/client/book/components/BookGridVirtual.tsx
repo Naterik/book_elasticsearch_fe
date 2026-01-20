@@ -1,10 +1,12 @@
 import { Spinner } from "@/components/ui/spinner";
+import { Search } from "lucide-react";
 import { useWindowWidth } from "@/hooks/useMobile";
 import type { ViewCard } from "@/types";
 import type { IBookElasticIndex } from "@/types/entities/book";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { memo, useEffect, useMemo, useRef } from "react";
 import BookCard from "./BookCard";
+import BookCardSkeleton from "./BookCardSkeleton";
 import BookListCard from "./BookListCard";
 
 interface BookGridVirtualProps {
@@ -51,7 +53,7 @@ const BookGridVirtual = ({
     count: hasNextPage ? rows.length + 1 : rows.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => (view === "List" ? 280 : 500),
-    overscan: 10,
+    overscan: 5,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -82,16 +84,35 @@ const BookGridVirtual = ({
 
   if (isLoading) {
     return (
-      <div className="flex h-[calc(100vh-250px)] min-h-[1100px] items-center justify-center rounded border bg-gray-50">
-        <Spinner />
+      <div
+        className={`grid gap-4 ${
+          view === "List"
+            ? "grid-cols-1"
+            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        }`}
+      >
+        {Array.from({ length: 8 }).map((_, i) => (
+          <BookCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
   if (dataBook.length === 0) {
     return (
-      <div className="flex h-[calc(100vh-250px)] min-h-[1100px] items-center justify-center rounded border bg-gray-50">
-        <p className="text-gray-500">No books found</p>
+      <div className="flex h-[calc(100vh-250px)] min-h-[500px] flex-col items-center justify-center gap-4 rounded border bg-gray-50 text-center">
+        <div className="rounded-full bg-slate-100 p-4">
+          <Search className="h-8 w-8 text-slate-400" />
+        </div>
+        <div className="max-w-md px-4">
+          <h3 className="text-lg font-semibold text-slate-900">
+            No books found
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            We couldn't find any books matching your search. Try checking for
+            typos or using broader terms.
+          </p>
+        </div>
       </div>
     );
   }

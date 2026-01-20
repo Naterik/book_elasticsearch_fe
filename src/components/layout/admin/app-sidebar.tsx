@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Book,
   BookUp,
@@ -15,7 +14,9 @@ import {
   PenSquare,
   Users,
 } from "lucide-react";
+import * as React from "react";
 
+import { useCurrentApp } from "@/app/providers/app.context";
 import {
   Sidebar,
   SidebarContent,
@@ -23,10 +24,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { TeamSwitcher } from "./team-switcher";
-import { NavUser } from "./nav-user";
-import { NavMain } from "./nav-main";
 import { useLocation } from "react-router-dom";
+import { NavMain } from "./nav-main";
+import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
 const navItems = [
   {
@@ -70,11 +71,6 @@ const navItems = [
     icon: BookUp,
   },
   {
-    title: "Reservations",
-    url: "/admin/reservations",
-    icon: CalendarClock,
-  },
-  {
     title: "Fines",
     url: "/admin/fines",
     icon: CircleDollarSign,
@@ -103,6 +99,7 @@ const sampleData = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
+  const { user } = useCurrentApp();
 
   const processedNavItems = React.useMemo(() => {
     return navItems.map((item) => ({
@@ -119,9 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={processedNavItems} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={sampleData.user} />
-      </SidebarFooter>
+      <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
