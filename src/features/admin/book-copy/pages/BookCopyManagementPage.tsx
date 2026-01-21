@@ -21,7 +21,9 @@ import {
 } from "@/components/ui/select";
 import BookCopyFormDialog from "@/features/admin/book-copy/components/BookCopyFormDialog";
 import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
-import { PlusIcon, X } from "lucide-react";
+import { FileSpreadsheet, PlusIcon, X } from "lucide-react";
+import { exportToExcel } from "@/helper/excel";
+import { toast } from "sonner";
 
 const BookCopyManagementPage = () => {
   const {
@@ -53,6 +55,30 @@ const BookCopyManagementPage = () => {
     dataCountStatus,
   } = useBookCopyManagement();
 
+  const handleExport = () => {
+    if (!bookCopies || bookCopies.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const exportData = bookCopies.map((copy) => ({
+      ID: copy.id,
+      "Copy Number": copy.copyNumber,
+      Status: copy.status,
+      "Year Published": copy.year_published,
+      "Book Title": copy.books?.title || "N/A",
+      ISBN: copy.books?.isbn || "N/A",
+    }));
+
+    exportToExcel({
+      data: exportData,
+      fileName: `Book_Copies_${new Date().toISOString().split("T")[0]}`,
+      sheetName: "Book Copies",
+    });
+
+    toast.success("Exported successfully!");
+  };
+
   const toolbarLeftContent = (
     <>
       <div className="relative w-full lg:w-[350px]">
@@ -72,7 +98,7 @@ const BookCopyManagementPage = () => {
           </button>
         )}
       </div>
-      <div className="flex gap-2 md:gap-6 lg:gap-10">
+      <div className="flex gap-2 md:gap-4 lg:gap-6">
         <Select onValueChange={(val) => handleYearPublishedChange(+val)}>
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Select a year" />
@@ -121,10 +147,16 @@ const BookCopyManagementPage = () => {
             Manage book copies and their availability status
           </p>
         </div>
-        <Button onClick={handleCreateBookCopy} className="gap-2">
-          <PlusIcon className="h-4 w-4" />
-          Add Book Copy
-        </Button>
+        <div className="flex items-center gap-2">
+           <Button variant="outline" onClick={handleExport} size="sm" className="gap-2 hidden lg:flex">
+              <FileSpreadsheet className="h-4 w-4 text-green-600" />
+              Export Excel
+            </Button>
+            <Button onClick={handleCreateBookCopy} className="gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Add Book Copy
+            </Button>
+        </div>
       </div>
 
       <DataTable

@@ -2,10 +2,14 @@ import { IconChevronDown, IconLayoutColumns } from "@tabler/icons-react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type ExpandedState,
+  type OnChangeFn,
+  type Row,
   type SortingState,
   type VisibilityState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
@@ -57,6 +61,9 @@ interface DataTableProps<TData, TValue> {
   onSearch?: (value: string) => void;
   searchValue?: string;
   toolbarLeftContent?: React.ReactNode;
+  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
+  expanded?: ExpandedState;
+  onExpandedChange?: OnChangeFn<ExpandedState>;
 }
 
 export function DataTable<TData, TValue>({
@@ -81,6 +88,9 @@ export function DataTable<TData, TValue>({
   onSearch,
   searchValue,
   toolbarLeftContent,
+  renderSubComponent,
+  expanded,
+  onExpandedChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -89,6 +99,10 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  // Fallback if controlled state is not provided
+  const [internalExpanded, setInternalExpanded] = React.useState<ExpandedState>(
+    {}
+  );
 
   const table = useReactTable({
     data,
@@ -98,13 +112,17 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      expanded: expanded ?? internalExpanded,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onExpandedChange: onExpandedChange ?? setInternalExpanded,
+    getRowCanExpand: () => !!renderSubComponent,
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // Required for expansion
     getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
     manualPagination: !!onPageChange,
@@ -220,19 +238,33 @@ export function DataTable<TData, TValue>({
               ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsSelected() && "selected"}
+                    onClick={
+                      renderSubComponent
+                        ? () => row.toggleExpanded()
+                        : undefined
+                    }
+                    className={renderSubComponent ? "cursor-pointer" : ""}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && renderSubComponent && (
+                    <TableRow>
+                      <TableCell colSpan={row.getVisibleCells().length}>
+                        {renderSubComponent({ row })}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
