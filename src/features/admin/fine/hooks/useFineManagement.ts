@@ -132,6 +132,5 @@ export const useFineManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isLoading,
   };
 };

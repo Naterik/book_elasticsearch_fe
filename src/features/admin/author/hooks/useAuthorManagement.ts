@@ -129,6 +129,5 @@ export const useAuthorManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isLoading,
   };
 };

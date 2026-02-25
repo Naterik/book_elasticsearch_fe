@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { toast } from "sonner";
@@ -9,7 +9,12 @@ const AuthCallback = () => {
   const navigate = useNavigate();
   const { setUser, setIsAuthenticated } = useCurrentApp();
 
+  const hasRun = useRef(false);
+
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const token = searchParams.get("token");
     const userString = searchParams.get("user");
 

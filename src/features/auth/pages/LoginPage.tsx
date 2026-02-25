@@ -22,22 +22,29 @@ const LoginPage = () => {
   const onFinish = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmit(true);
-    const res = await AuthService.login(
-      usernameRef.current?.value || "",
-      passwordRef.current?.value || ""
-    );
-    setIsSubmit(false);
-    if (res.data) {
-      setUser(res.data.user);
-      setIsAuthenticated(true);
-      toast.success("Login success!");
-      localStorage.setItem("access_token", res.data.access_token);
-      navigate("/");
-    } else {
-      toast.error("Have error", {
-        description: res.message,
-        duration: 2000,
-      });
+    try {
+      const res = await AuthService.login(
+        usernameRef.current?.value || "",
+        passwordRef.current?.value || ""
+      );
+
+      if (res.data) {
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+        toast.success("Login success!");
+        localStorage.setItem("access_token", res.data.access_token);
+        navigate("/");
+      } else {
+        setIsSubmit(false);
+        toast.error("Have error", {
+          description: res.message,
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setIsSubmit(false);
+      toast.error("An unexpected error occurred");
     }
   };
 

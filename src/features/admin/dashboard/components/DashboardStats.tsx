@@ -65,7 +65,7 @@ export function DashboardStats({ data }: DashboardStatsProps) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat, index) => {
         const data = stat.data || { value: 0, change: 0, trend: "neutral" };
         const isPositive = data.trend === "up";

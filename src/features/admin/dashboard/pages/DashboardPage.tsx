@@ -6,10 +6,8 @@ import type {
   IBookCopiesStatusChartData,
   IDashboardSummary,
   ILoanTrend,
-
   IRevenueChartData,
   ISearchTermsChartData,
-  IUserWithCard,
 } from "@/types/entities/dashboard";
 import { DashboardStats } from "@admin/dashboard/components/DashboardStats";
 import DashboardService from "@admin/dashboard/services";
@@ -27,7 +25,6 @@ const Dashboard = () => {
   const [searchTermsData, setSearchTermsData] = useState<
     ISearchTermsChartData[]
   >([]);
-  const [userWithCard, setUserWithCard] = useState<IUserWithCard[]>([]);
 
   const [timeframe, setTimeframe] = useState("1m");
 
@@ -92,8 +89,8 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
             <div
               key={i}
               className="bg-muted/50 h-32 animate-pulse rounded-xl"
@@ -137,7 +134,6 @@ const Dashboard = () => {
           <SearchTermsBarChart data={searchTermsData} />
         </div>
       </div>
-
     </div>
   );
 };

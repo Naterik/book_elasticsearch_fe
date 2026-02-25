@@ -48,29 +48,25 @@ export function InfiniteSelect<T>({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(null);
+  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(
+    null
+  );
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteQuery({
-    queryKey: [queryKey, debouncedSearch],
-    queryFn: async ({ pageParam = 1 }) => {
-      const res = await fetchFn(pageParam, debouncedSearch);
-      return res.data;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
-        return lastPage.pagination.currentPage + 1;
-      }
-      return undefined;
-    },
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
+      queryKey: [queryKey, debouncedSearch],
+      queryFn: async ({ pageParam = 1 }) => {
+        const res = await fetchFn(pageParam, debouncedSearch);
+        return res.data;
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
+          return lastPage.pagination.currentPage + 1;
+        }
+        return undefined;
+      },
+    });
 
   const flattenData = data?.pages.flatMap((page) => page.result) || [];
 
@@ -94,7 +90,14 @@ export function InfiniteSelect<T>({
     }
 
     return () => observer.disconnect();
-  }, [open, hasNextPage, isFetchingNextPage, fetchNextPage, containerNode, data]);
+  }, [
+    open,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    containerNode,
+    data,
+  ]);
 
   const selectedItem = flattenData.find((item) => getItemValue(item) === value);
 
@@ -127,7 +130,10 @@ export function InfiniteSelect<T>({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="max-w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent
+        className="max-w-[--radix-popover-trigger-width] p-0"
+        align="start"
+      >
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={`Search ${label}...`}
@@ -153,7 +159,7 @@ export function InfiniteSelect<T>({
                 <CommandItem
                   key={getItemValue(item)}
                   value={getItemLabel(item)} // search is handled by server, but cmdk require value to not filter out everything if strict
-                  onSelect={(currentValue) => {
+                  onSelect={() => {
                     onChange(getItemValue(item));
                     setOpen(false);
                   }}

@@ -1,3 +1,5 @@
+import { useCurrentApp } from "@/app/providers/app.context";
+import { useNotifications } from "@/app/providers/notification.context";
 import PaymentService from "@client/payment/services";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -8,6 +10,9 @@ export const usePaymentReturn = () => {
   const [paymentStatus, setPaymentStatus] = useState<string>("");
   const [paymentRef, setPaymentRef] = useState<string>("");
   const [paymentType, setPaymentType] = useState<string>("");
+
+  const { fetchUser } = useCurrentApp();
+  const { refreshNotifications } = useNotifications();
 
   useEffect(() => {
     const processPayment = async () => {
@@ -27,9 +32,11 @@ export const usePaymentReturn = () => {
         try {
           if (type === "membership") {
             await PaymentService.updatePaymentMember("SUCCESS", ref);
+            await fetchUser(); // Refresh user status (active/inactive)
           } else {
             await PaymentService.updatePaymentFine("SUCCESS", ref);
           }
+          await refreshNotifications(); // Refresh notifications
         } catch (error) {
           console.error("Failed to update payment status", error);
         }
@@ -38,7 +45,8 @@ export const usePaymentReturn = () => {
     };
 
     processPayment();
-  }, [searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { isProcessing, paymentStatus, paymentRef, paymentType };
 };

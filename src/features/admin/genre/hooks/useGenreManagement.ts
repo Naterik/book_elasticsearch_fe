@@ -123,6 +123,5 @@ export const useGenreManagement = () => {
     handleFormSuccess,
     handlePageChange,
     handlePageSizeChange,
-    isLoading,
   };
 };

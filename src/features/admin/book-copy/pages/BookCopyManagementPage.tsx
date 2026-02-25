@@ -53,6 +53,9 @@ const BookCopyManagementPage = () => {
     handleStatusFilterChange,
     dataCountYearPublished,
     dataCountStatus,
+    handleClearFilters,
+    yearPublished,
+    statusFilter,
   } = useBookCopyManagement();
 
   const handleExport = () => {
@@ -98,15 +101,18 @@ const BookCopyManagementPage = () => {
           </button>
         )}
       </div>
-      <div className="flex gap-2 md:gap-4 lg:gap-6">
-        <Select onValueChange={(val) => handleYearPublishedChange(+val)}>
+      <div className="flex gap-2 md:gap-4 lg:gap-6 items-center">
+        <Select
+          value={yearPublished ? yearPublished.toString() : ""}
+          onValueChange={(val) => handleYearPublishedChange(+val)}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Select a year" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               {dataCountYearPublished?.map((year: IAggregations) => (
-                <SelectItem key={year.key} value={year.key}>
+                <SelectItem key={year.key} value={year.key.toString()}>
                   {year.key}{" "}
                   <span className="font-light text-gray-600">
                     ({year.doc_count})
@@ -117,7 +123,10 @@ const BookCopyManagementPage = () => {
           </SelectContent>
         </Select>
 
-        <Select onValueChange={(val) => handleStatusFilterChange(val)}>
+        <Select
+          value={statusFilter}
+          onValueChange={(val) => handleStatusFilterChange(val)}
+        >
           <SelectTrigger className="min-w-40">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
@@ -134,6 +143,17 @@ const BookCopyManagementPage = () => {
             </SelectGroup>
           </SelectContent>
         </Select>
+
+        {(searchQuery || yearPublished || statusFilter) && (
+          <Button
+            variant="ghost"
+            onClick={handleClearFilters}
+            className="px-2 lg:px-3 text-red-500 hover:text-red-700 hover:bg-red-50"
+          >
+            <X className="mr-2 h-4 w-4" />
+            Clear Filters
+          </Button>
+        )}
       </div>
     </>
   );

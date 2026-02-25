@@ -27,9 +27,7 @@ export const usePublisherManagement = () => {
   const fetchPublishers = async () => {
     setIsLoading(true);
     try {
-      const response = await PublisherService.getPublishers({
-        page: currentPage,
-      });
+      const response = await PublisherService.getPublishers(currentPage);
       if (response.data && response.data.result) {
         setPublishers(response.data.result);
         setTotalPages(response.data.pagination.totalPages);

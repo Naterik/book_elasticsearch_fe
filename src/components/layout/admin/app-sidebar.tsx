@@ -4,7 +4,6 @@ import {
   Book,
   BookUp,
   Building,
-  CalendarClock,
   CircleDollarSign,
   Copy,
   CreditCard,

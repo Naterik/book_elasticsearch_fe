@@ -1,4 +1,4 @@
-import { Bell, ChevronsUpDown, Home, LogOut } from "lucide-react";
+import { ChevronsUpDown, Home, LogOut } from "lucide-react";
 
 import { useCurrentApp } from "@/app/providers/app.context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
