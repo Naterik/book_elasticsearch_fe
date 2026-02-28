@@ -1,43 +1,57 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
+import type { ILoan } from "@/types/entities/loan";
+import { loanByIdUrl, loanReturnUrl, loansUrl, loansUserUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-export const getAllLoansAdminAPI = (page: number = 1) => {
-  const urlBackend = `/api/v1/loans?page=${page}`;
-  return axios.get<IBackendRes<IModelPaginate<ILoan>>>(urlBackend);
+export const getAllLoans = (page: number = 1) => {
+  return axios.get<IBackendRes<IModelPaginate<ILoan>>>(loansUrl, {
+    params: { page },
+  });
 };
 
-export const getLoanByIdAdminAPI = (id: number) => {
-  const urlBackend = `/api/v1/loans/${id}`;
-  return axios.get<IBackendRes<ILoan>>(urlBackend);
+export const getLoanById = (id: number) => {
+  return axios.get<IBackendRes<ILoan>>(loanByIdUrl(id));
 };
 
-export const createLoanAPI = (data: {
+export const getLoansByUserId = (userId: number) => {
+  return axios.get<IBackendRes<IModelPaginate<ILoan>>>(loansUserUrl(userId));
+};
+
+export const createLoan = (data: {
   bookId: number;
   userId: number;
   dueDate: string;
 }) => {
-  const urlBackend = "/api/v1/loans";
-  return axios.post<IBackendRes<ILoan>>(urlBackend, data);
+  return axios.post<IBackendRes<ILoan>>(loansUrl, data);
 };
 
-export const updateLoanAPI = (
+export const updateLoan = (
   id: number,
   data: {
     dueDate: string;
     status: string;
   }
 ) => {
-  const urlBackend = `/api/v1/loans/${id}`;
-  return axios.put<IBackendRes<ILoan>>(urlBackend, data);
+  return axios.put<IBackendRes<ILoan>>(loanByIdUrl(id), data);
 };
 
-export const deleteLoanAPI = (id: number) => {
-  const urlBackend = `/api/v1/loans/${id}`;
-  return axios.delete<IBackendRes<void>>(urlBackend);
+export const deleteLoan = (id: number) => {
+  return axios.delete<IBackendRes<void>>(loanByIdUrl(id));
 };
 
-export const returnBookApproveAPI = (loanId: number, userId: number) => {
-  const urlBackend = `/api/v1/loans/return-book`;
-  return axios.put<IBackendRes<ILoan>>(urlBackend, { loanId, userId });
+export const returnBookApprove = (loanId: number, userId: number) => {
+  return axios.put<IBackendRes<ILoan>>(loanReturnUrl, { loanId, userId });
 };
+
+const LoanService = {
+  getAllLoans,
+  getLoanById,
+  createLoan,
+  updateLoan,
+  deleteLoan,
+  returnBookApprove,
+};
+
+export default LoanService;

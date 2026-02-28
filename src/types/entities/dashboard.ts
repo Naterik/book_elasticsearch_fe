@@ -8,7 +8,7 @@ export interface IDashboardSummary {
   monthlyRevenue: IDashboardMetric;
   userWithCard: IDashboardMetric;
   overdueLoans: IDashboardMetric;
-  pendingReservations: IDashboardMetric;
+
 }
 
 export interface IBookCopiesStatusChartData {
@@ -46,26 +46,7 @@ export interface ISearchTermsChartData {
   value: number;
 }
 
-export interface IPendingReservation {
-  id: number;
-  requestDate: string;
-  user: {
-    id: number;
-    name: string;
-    avatar: string | null;
-  };
-  book: {
-    id: number;
-    title: string;
-    image: string | null;
-    availableCopiesCount: number;
-    availableCopies: {
-      id: number;
-      copyNumber: string;
-      location: string;
-    }[];
-  };
-}
+
 
 export interface IUserWithCard {
   id: number;

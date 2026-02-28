@@ -1,23 +1,25 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import {
-  Filter,
-  RotateCcw,
-  DollarSign,
-  Calendar,
-  BookOpen,
-  Globe,
-  ChevronDown,
-} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { formatCurrency } from "@/helper";
+import { LANGUAGE_FLAGS } from "@/helper/icon";
 import { useIsMobile } from "@/hooks/useMobile";
 import { cn } from "@/lib/utils";
-import { memo, useState } from "react";
-import { LANGUAGE_FLAGS } from "@/helper/icon";
 import { ITEMS_PER_SHOW } from "@/types";
+import { Input } from "@/components/ui/input";
+import {
+  BookOpen,
+  Calendar,
+  ChevronDown,
+  DollarSign,
+  Filter,
+  Globe,
+  RotateCcw,
+  Search,
+} from "lucide-react";
+import { memo, useState } from "react";
 
 type Props = {
   genresAll: IGenre[];
@@ -60,10 +62,15 @@ const BookFilter = ({
   const isMobile = useIsMobile();
   const [visibleGenresCount, setVisibleGenresCount] = useState(10);
   const [visibleLanguagesCount, setVisibleLanguagesCount] = useState(10);
+  const [genreSearch, setGenreSearch] = useState("");
 
-  const visibleGenres = genresAll.slice(0, visibleGenresCount);
-  const hasMoreGenres = visibleGenresCount < genresAll.length;
-  const isAllGenresShown = visibleGenresCount >= genresAll.length;
+  const filteredGenres = genresAll.filter((g) =>
+    g.name.toLowerCase().includes(genreSearch.toLowerCase())
+  );
+
+  const visibleGenres = filteredGenres.slice(0, visibleGenresCount);
+  const hasMoreGenres = visibleGenresCount < filteredGenres.length;
+  const isAllGenresShown = visibleGenresCount >= filteredGenres.length;
 
   const visibleLanguages = languagesAll?.slice(0, visibleLanguagesCount) ?? [];
   const hasMoreLanguages = visibleLanguagesCount < (languagesAll?.length ?? 0);
@@ -117,7 +124,7 @@ const BookFilter = ({
           {hasActiveFilters && (
             <Badge
               variant="secondary"
-              className="bg-blue-500 text-white dark:bg-blue-600 text-xs"
+              className="bg-blue-500 text-xs text-white dark:bg-blue-600"
             >
               {[genresSelected.length, selectedLanguage ? 1 : 0].reduce(
                 (a, b) => a + b,
@@ -140,13 +147,26 @@ const BookFilter = ({
               }`}
             />
             <h3
-              className={`font-semibold uppercase text-muted-foreground ${
+              className={`text-muted-foreground font-semibold uppercase ${
                 isCompact ? "text-xs" : "text-xs"
               }`}
             >
               Genres
             </h3>
           </div>
+          <div className="relative mb-2">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Find genre..."
+              value={genreSearch}
+              onChange={(e) => {
+                setGenreSearch(e.target.value);
+                setVisibleGenresCount(ITEMS_PER_SHOW);
+              }}
+              className="h-8 pl-8 text-xs bg-muted/50 focus:bg-background transition-colors"
+            />
+          </div>
+
           <div className={`flex flex-wrap gap-2`}>
             {visibleGenres.map((g) => {
               const isSelected = genresSelected.includes(g.name);
@@ -156,10 +176,10 @@ const BookFilter = ({
                   variant={isSelected ? "default" : "outline"}
                   size="sm"
                   className={cn(
-                    "text-xs font-medium transition-all",
+                    "text-xs font-medium transition-all active:scale-95",
                     isSelected
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "hover:bg-slate-100"
+                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                      : "hover:bg-slate-100 hover:text-slate-900"
                   )}
                   onClick={() => onToggleGenre(g.name, !isSelected)}
                 >
@@ -167,21 +187,27 @@ const BookFilter = ({
                 </Button>
               );
             })}
+            
+            {filteredGenres.length === 0 && (
+              <span className="text-xs text-muted-foreground italic w-full text-center py-2">
+                No genres found
+              </span>
+            )}
           </div>
 
-          {(hasMoreGenres || isAllGenresShown) && (
+          {(hasMoreGenres || (!isAllGenresShown && filteredGenres.length > 0)) && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 p-0 h-auto mt-2"
+              className="mt-2 h-auto p-0 text-xs font-medium text-blue-600 hover:text-blue-700"
               onClick={
                 isAllGenresShown ? handleShowLessGenres : handleShowMoreGenres
               }
             >
-              {isAllGenresShown ? "- Show Less" : "+ Show More"}
+              {isAllGenresShown ? "- Show Less" : `+ Show More (${filteredGenres.length - visibleGenresCount})`}
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 ml-1 transition-transform",
+                  "ml-1 h-3.5 w-3.5 transition-transform",
                   isAllGenresShown ? "rotate-180" : ""
                 )}
               />
@@ -193,8 +219,8 @@ const BookFilter = ({
 
         <section className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+            <Globe className="text-muted-foreground h-3.5 w-3.5" />
+            <h3 className="text-muted-foreground text-xs font-semibold uppercase">
               Language
             </h3>
           </div>
@@ -205,7 +231,7 @@ const BookFilter = ({
               className={cn(
                 "text-xs font-medium transition-all",
                 selectedLanguage === null
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "hover:bg-slate-100"
               )}
               onClick={() => onChangeLanguage(null)}
@@ -222,9 +248,9 @@ const BookFilter = ({
                   variant={isSelected ? "default" : "outline"}
                   size="sm"
                   className={cn(
-                    "text-xs font-medium transition-all flex items-center gap-1.5",
+                    "flex items-center gap-1.5 text-xs font-medium transition-all",
                     isSelected
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
                       : "hover:bg-slate-100"
                   )}
                   onClick={() => onChangeLanguage(l.key)}
@@ -248,7 +274,7 @@ const BookFilter = ({
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 p-0 h-auto mt-2"
+              className="mt-2 h-auto p-0 text-xs font-medium text-blue-600 hover:text-blue-700"
               onClick={
                 isAllLanguagesShown
                   ? handleShowLessLanguages
@@ -258,7 +284,7 @@ const BookFilter = ({
               {isAllLanguagesShown ? "- Show Less" : "+ Show More"}
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 ml-1 transition-transform",
+                  "ml-1 h-3.5 w-3.5 transition-transform",
                   isAllLanguagesShown ? "rotate-180" : ""
                 )}
               />
@@ -267,8 +293,8 @@ const BookFilter = ({
         </section>
         <section className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+            <DollarSign className="text-muted-foreground h-3.5 w-3.5" />
+            <h3 className="text-muted-foreground text-xs font-semibold uppercase">
               Price
             </h3>
           </div>
@@ -277,7 +303,7 @@ const BookFilter = ({
               <span className="text-xs font-medium text-slate-600">
                 {formatCurrency(priceRange[0])}
               </span>
-              <span className="text-xs text-muted-foreground">to</span>
+              <span className="text-muted-foreground text-xs">to</span>
               <span className="text-xs font-medium text-slate-600">
                 {formatCurrency(priceRange[1])}
               </span>
@@ -298,8 +324,8 @@ const BookFilter = ({
 
         <section className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-xs uppercase text-muted-foreground">
+            <Calendar className="text-muted-foreground h-4 w-4" />
+            <h3 className="text-muted-foreground text-xs font-semibold uppercase">
               Publication Year
             </h3>
           </div>
@@ -308,7 +334,7 @@ const BookFilter = ({
               <span className="text-xs font-medium text-slate-600">
                 {yearRange[0]}
               </span>
-              <span className="text-xs text-muted-foreground">to</span>
+              <span className="text-muted-foreground text-xs">to</span>
               <span className="text-xs font-medium text-slate-600">
                 {yearRange[1]}
               </span>
@@ -321,7 +347,7 @@ const BookFilter = ({
               onValueChange={(v) =>
                 onYearChange([v[0] ?? yearBounds[0], v[1] ?? yearBounds[1]] as [
                   number,
-                  number
+                  number,
                 ])
               }
               className="w-full"
@@ -338,7 +364,7 @@ const BookFilter = ({
           <Button
             variant="outline"
             className={`${
-              isCompact ? "h-7 text-xs" : "h-8 sm:h-9 text-xs sm:text-sm"
+              isCompact ? "h-7 text-xs" : "h-8 text-xs sm:h-9 sm:text-sm"
             }`}
             onClick={onReset}
             size="sm"

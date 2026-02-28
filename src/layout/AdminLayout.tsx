@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/admin/app-sidebar";
 import {
   Breadcrumb,
@@ -14,6 +13,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Outlet } from "react-router-dom";
+
+import { GlobalLoader } from "@/components/Loader";
+import { Suspense } from "react";
 
 export default function AdminLayout() {
   return (
@@ -30,7 +33,7 @@ export default function AdminLayout() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/admin/dashboard">
+                  <BreadcrumbLink href="/admin">
                     Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -43,7 +46,9 @@ export default function AdminLayout() {
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-6 pt-0">
-          <Outlet />
+          <Suspense fallback={<GlobalLoader isVisible={true} />}>
+            <Outlet />
+          </Suspense>
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -11,11 +11,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  getNotificationsByUserIdAPI,
-  putSingleNotificationAsReadAPI,
-  putBulkNotificationAsReadAPI,
-} from "@/lib/api";
+import { NotificationService } from "@/lib/api";
 
 export default function NotificationList() {
   const { user } = useCurrentApp();
@@ -28,7 +24,7 @@ export default function NotificationList() {
 
     setIsLoading(true);
     try {
-      const res = await getNotificationsByUserIdAPI(user.id);
+      const res = await NotificationService.getNotificationsByUserId(user.id);
       if (res.data) {
         setNotifications(res.data);
       }
@@ -47,7 +43,7 @@ export default function NotificationList() {
   const handleMarkAsRead = async (id: number) => {
     if (!user?.id) return;
     try {
-      await putSingleNotificationAsReadAPI(user.id, id);
+      await NotificationService.putSingleNotificationAsRead(user.id, id);
       setNotifications((prev) =>
         prev.map((notif) =>
           notif.id === id ? { ...notif, isRead: true } : notif
@@ -64,7 +60,7 @@ export default function NotificationList() {
 
     setIsMarkingAll(true);
     try {
-      await putBulkNotificationAsReadAPI(user.id);
+      await NotificationService.putBulkNotificationAsRead(user.id);
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, isRead: true }))
       );
@@ -76,20 +72,20 @@ export default function NotificationList() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-  };
+  // const handleDelete = async (id: number) => {
+  //   setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  // };
 
   const unreadCount = notifications?.filter((n) => !n.isRead).length;
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4">
-      <Card className="bg-white shadow-sm border-slate-200">
+    <div className="mx-auto w-full max-w-5xl p-4">
+      <Card className="border-slate-200 bg-white shadow-sm">
         <CardHeader className="border-b border-slate-100 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white shadow-md shadow-blue-200">
-                <Bell className="w-5 h-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-200">
+                <Bell className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
@@ -131,18 +127,18 @@ export default function NotificationList() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-2" />
-              <p className="text-slate-500 text-sm">Loading notifications...</p>
+              <Loader2 className="mb-2 h-8 w-8 animate-spin text-blue-600" />
+              <p className="text-sm text-slate-500">Loading notifications...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-              <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-                <Bell className="w-8 h-8 text-slate-300" />
+            <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50">
+                <Bell className="h-8 w-8 text-slate-300" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900 mb-1">
+              <h3 className="mb-1 text-lg font-medium text-slate-900">
                 No notifications yet
               </h3>
-              <p className="text-slate-500 text-sm max-w-xs">
+              <p className="max-w-xs text-sm text-slate-500">
                 When you receive notifications, they'll appear here
               </p>
             </div>
@@ -151,12 +147,12 @@ export default function NotificationList() {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className="p-4 hover:bg-slate-50/50 transition-colors"
+                  className="p-4 transition-colors hover:bg-slate-50/50"
                 >
                   <NotificationItem
                     notification={notification}
                     onMarkAsRead={handleMarkAsRead}
-                    onDelete={handleDelete}
+                    // onDelete={handleDelete}
                   />
                 </div>
               ))}
@@ -165,7 +161,7 @@ export default function NotificationList() {
         </CardContent>
 
         {notifications.length > 0 && (
-          <CardFooter className="border-t border-slate-100 py-4 bg-slate-50/30">
+          <CardFooter className="border-t border-slate-100 bg-slate-50/30 py-4">
             <div className="w-full text-center text-xs text-slate-400">
               Showing {notifications.length} notification
               {notifications.length !== 1 ? "s" : ""}

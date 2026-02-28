@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import UserService from "@admin/user/services";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { getAllUsersAPI, deleteUserAPI } from "@/features/admin/user/services";
 import { getUserColumns } from "../user-columns";
 
 export const useUserManagement = () => {
@@ -26,7 +26,7 @@ export const useUserManagement = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllUsersAPI(currentPage);
+      const response = await UserService.getAllUsers(currentPage);
 
       if (response.data && response.data.result) {
         setUsers(response.data.result);
@@ -68,7 +68,7 @@ export const useUserManagement = () => {
 
     setIsLoading(true);
     try {
-      const response = await deleteUserAPI(userToDelete);
+      const response = await UserService.deleteUser(userToDelete);
 
       if (response.message) {
         toast.error(response.message);

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/layout/admin/data-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,12 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PlusIcon } from "lucide-react";
-import BookCopyFormDialog from "@/features/admin/book-copy/components/BookCopyFormDialog";
-import { DataTable } from "@/components/layout/admin/data-table";
-import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,6 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import BookCopyFormDialog from "@/features/admin/book-copy/components/BookCopyFormDialog";
+import { useBookCopyManagement } from "@/features/admin/book-copy/hooks/useBookCopyManagement";
+import { FileSpreadsheet, PlusIcon, X } from "lucide-react";
+import { exportToExcel } from "@/helper/excel";
+import { toast } from "sonner";
 
 const BookCopyManagementPage = () => {
   const {
@@ -52,7 +53,34 @@ const BookCopyManagementPage = () => {
     handleStatusFilterChange,
     dataCountYearPublished,
     dataCountStatus,
+    handleClearFilters,
+    yearPublished,
+    statusFilter,
   } = useBookCopyManagement();
+
+  const handleExport = () => {
+    if (!bookCopies || bookCopies.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const exportData = bookCopies.map((copy) => ({
+      ID: copy.id,
+      "Copy Number": copy.copyNumber,
+      Status: copy.status,
+      "Year Published": copy.year_published,
+      "Book Title": copy.books?.title || "N/A",
+      ISBN: copy.books?.isbn || "N/A",
+    }));
+
+    exportToExcel({
+      data: exportData,
+      fileName: `Book_Copies_${new Date().toISOString().split("T")[0]}`,
+      sheetName: "Book Copies",
+    });
+
+    toast.success("Exported successfully!");
+  };
 
   const toolbarLeftContent = (
     <>
@@ -67,23 +95,26 @@ const BookCopyManagementPage = () => {
         {searchQuery && (
           <button
             onClick={handleClearSearch}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded cursor-pointer"
+            className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded p-1 hover:bg-gray-100"
           >
             <X className="h-4 w-4 text-gray-500" />
           </button>
         )}
       </div>
-      <div className="flex gap-2  md:gap-6 lg:gap-10">
-        <Select onValueChange={(val) => handleYearPublishedChange(+val)}>
+      <div className="flex gap-2 md:gap-4 lg:gap-6 items-center">
+        <Select
+          value={yearPublished ? yearPublished.toString() : ""}
+          onValueChange={(val) => handleYearPublishedChange(+val)}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Select a year" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               {dataCountYearPublished?.map((year: IAggregations) => (
-                <SelectItem key={year.key} value={year.key}>
+                <SelectItem key={year.key} value={year.key.toString()}>
                   {year.key}{" "}
-                  <span className=" text-gray-600 font-light">
+                  <span className="font-light text-gray-600">
                     ({year.doc_count})
                   </span>
                 </SelectItem>
@@ -92,7 +123,10 @@ const BookCopyManagementPage = () => {
           </SelectContent>
         </Select>
 
-        <Select onValueChange={(val) => handleStatusFilterChange(val)}>
+        <Select
+          value={statusFilter}
+          onValueChange={(val) => handleStatusFilterChange(val)}
+        >
           <SelectTrigger className="min-w-40">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
@@ -101,7 +135,7 @@ const BookCopyManagementPage = () => {
               {dataCountStatus?.map((status: IAggregations) => (
                 <SelectItem key={status.key} value={status.key}>
                   {status.key}{" "}
-                  <span className=" text-gray-600 font-light">
+                  <span className="font-light text-gray-600">
                     ({status.doc_count})
                   </span>
                 </SelectItem>
@@ -109,23 +143,40 @@ const BookCopyManagementPage = () => {
             </SelectGroup>
           </SelectContent>
         </Select>
+
+        {(searchQuery || yearPublished || statusFilter) && (
+          <Button
+            variant="ghost"
+            onClick={handleClearFilters}
+            className="px-2 lg:px-3 text-red-500 hover:text-red-700 hover:bg-red-50"
+          >
+            <X className="mr-2 h-4 w-4" />
+            Clear Filters
+          </Button>
+        )}
       </div>
     </>
   );
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Book Copy Management</h1>
           <p className="text-muted-foreground mt-1">
             Manage book copies and their availability status
           </p>
         </div>
-        <Button onClick={handleCreateBookCopy} className="gap-2">
-          <PlusIcon className="h-4 w-4" />
-          Add Book Copy
-        </Button>
+        <div className="flex items-center gap-2">
+           <Button variant="outline" onClick={handleExport} size="sm" className="gap-2 hidden lg:flex">
+              <FileSpreadsheet className="h-4 w-4 text-green-600" />
+              Export Excel
+            </Button>
+            <Button onClick={handleCreateBookCopy} className="gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Add Book Copy
+            </Button>
+        </div>
       </div>
 
       <DataTable

@@ -2,7 +2,7 @@ import axios from "axios";
 const createInstanceAxios = (baseURL: string) => {
   const instance = axios.create({
     // baseURL: import.meta.env.VITE_BACKEND_URL,
-    baseURL: baseURL,
+    baseURL: baseURL + "/api/v1",
     withCredentials: true,
   });
 
@@ -15,11 +15,7 @@ const createInstanceAxios = (baseURL: string) => {
       config.headers["Authorization"] = auth;
 
       // Add 0.5 second delay before sending request (for loader display)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(config);
-        }, 500);
-      });
+      return config;
     },
     function (error) {
       // Do something with request error

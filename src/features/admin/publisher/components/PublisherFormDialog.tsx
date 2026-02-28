@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +16,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { createPublisherAPI, updatePublisherAPI } from "../services";
 import {
   publisherFormSchema,
   type PublisherFormValues,
 } from "@/lib/validators/publisher";
+import PublisherService from "@admin/publisher/services";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface PublisherFormDialogProps {
   open: boolean;
@@ -67,9 +67,12 @@ const PublisherFormDialog = ({
     try {
       let response;
       if (isEditMode && publisher) {
-        response = await updatePublisherAPI(+publisher.id, values);
+        response = await PublisherService.updatePublisher(
+          +publisher.id,
+          values
+        );
       } else {
-        response = await createPublisherAPI(values);
+        response = await PublisherService.createPublisher(values);
       }
 
       if (response?.message) {

@@ -2,8 +2,8 @@
  * Payment & Fine Related Models
  */
 
-import type { IUserInfo } from "./user";
 import type { IBook } from "./book";
+import type { ISystemUser } from "./user";
 
 export interface IFine {
   id: number;
@@ -12,7 +12,7 @@ export interface IFine {
   isPaid: boolean;
   loanId: number;
   userId: number;
-  user?: IUserInfo;
+  user?: ISystemUser;
   loan?: {
     bookCopy: {
       books: IBook;
@@ -21,19 +21,17 @@ export interface IFine {
 }
 
 export interface IFineDetail extends IFine {
-  user: IUserInfo;
+  user: ISystemUser;
 }
 
 export interface IPayment {
   id: number;
   amount: number;
   paymentDate: string;
-  paymentMethod: string;
-  transactionId: string;
   status: string;
   fineId: number;
   userId: number;
-  user?: IUserInfo;
+  user?: ISystemUser;
   fine?: IFine;
   paymentRef: string | null;
   type?: string;

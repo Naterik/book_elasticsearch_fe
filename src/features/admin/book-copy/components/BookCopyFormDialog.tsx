@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +23,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -25,34 +36,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  createBookCopyAPI,
-  updateBookCopyAPI,
-} from "@/features/admin/book-copy/services";
-
+import { useDebounce } from "@/hooks/useDebounce";
+import { cn } from "@/lib/utils";
 import {
   bookCopyFormSchema,
   type BookCopyFormValues,
 } from "@/lib/validators/book-copy";
+import { BookCopyStatus } from "@/types";
+import BookCopyService from "@admin/book-copy/services";
+import BookService from "@admin/book/services";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { getBookSelectOptionsAdminAPI } from "../../book/services";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 interface BookCopyFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -77,34 +74,32 @@ const BookCopyFormDialog = ({
     resolver: zodResolver(bookCopyFormSchema),
     defaultValues: {
       copyNumber: "",
-      year_published: new Date().getFullYear(),
-      status: "",
-      location: "",
+      year_published: new Date().getFullYear().toString(),
+      status: BookCopyStatus.AVAILABLE,
       bookId: 100,
     },
   });
-
+  const selectedBookId = form.watch("bookId");
+  const selectedBook = bookOptions.find((book) => book.id === +selectedBookId);
   useEffect(() => {
     if (open) {
       if (bookCopy) {
         form.reset({
           copyNumber: bookCopy.copyNumber,
-          year_published: bookCopy.year_published,
+          year_published: `${bookCopy.year_published}`,
           status: bookCopy.status,
-          location: bookCopy.location,
           bookId: bookCopy.bookId,
         });
       } else {
         form.reset({
           copyNumber: "",
-          year_published: new Date().getFullYear(),
-          status: "",
-          location: "",
-          bookId: 100,
+          year_published: `${new Date().getFullYear()}`,
+          status: BookCopyStatus.AVAILABLE,
+          bookId: 0,
         });
       }
     }
-  }, [open, bookCopy, form]);
+  }, [open, bookCopy, selectedBookId]);
 
   useEffect(() => {
     fetchBooks(debouncedSearch);
@@ -112,7 +107,7 @@ const BookCopyFormDialog = ({
 
   const fetchBooks = async (query: string) => {
     try {
-      const res = await getBookSelectOptionsAdminAPI(query);
+      const res = await BookService.getBookSelectOptions(query);
       if (res.data && res.data) {
         setBookOptions(res.data);
       }
@@ -127,17 +122,19 @@ const BookCopyFormDialog = ({
     try {
       const submitData = {
         copyNumber: values.copyNumber,
-        year_published: +values.year_published,
+        year_published: values.year_published,
         status: values.status,
-        location: values.location,
         bookId: +values.bookId,
       };
 
       let response;
       if (isEditMode) {
-        response = await updateBookCopyAPI({ id: bookCopy.id, ...submitData });
+        response = await BookCopyService.updateBookCopy({
+          id: bookCopy.id,
+          ...submitData,
+        });
       } else {
-        response = await createBookCopyAPI(submitData);
+        response = await BookCopyService.createBookCopy(submitData);
       }
 
       if (response?.message) {
@@ -157,11 +154,10 @@ const BookCopyFormDialog = ({
       );
     }
   };
-  const selectedBookId = form.watch("bookId");
-  const selectedBook = bookOptions.find((book) => book.id === +selectedBookId);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] ">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Book Copy" : "Create New Book Copy"}
@@ -174,12 +170,12 @@ const BookCopyFormDialog = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="bookId"
               render={({ field }) => (
-                <FormItem className="flex flex-col min-w-50">
+                <FormItem className="flex min-w-50 flex-col">
                   <FormLabel>Book</FormLabel>
                   <Popover
                     open={openCombobox}
@@ -194,22 +190,22 @@ const BookCopyFormDialog = ({
                           aria-expanded={openCombobox}
                           disabled={isEditMode}
                           className={cn(
-                            "w-112  justify-between disabled:bg-gray-200 disabled:font-semibold",
-                            !field.value && "text-muted-foreground "
+                            "w-112 justify-between disabled:bg-gray-200 disabled:font-semibold",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           <span className="truncate">
                             {selectedBook
                               ? selectedBook.title
                               : bookCopy && !selectedBook // Trường hợp edit nhưng book chưa load vào list
-                              ? `Book : ${bookCopy.books.title}` // Hoặc hiển thị title từ props nếu có
-                              : "Select a book"}
+                                ? `Book : ${bookCopy.books.title}` // Hoặc hiển thị title từ props nếu có
+                                : "Select a book"}
                           </span>
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[450px] p-0 " align="start">
+                    <PopoverContent className="w-[450px] p-0" align="start">
                       {/* shouldFilter={false} để tắt lọc client-side của cmkd */}
                       <Command shouldFilter={false}>
                         <CommandInput
@@ -219,7 +215,7 @@ const BookCopyFormDialog = ({
                         />
                         <CommandList className="max-h-[300px] overflow-y-auto">
                           {loadingBooks && (
-                            <div className="py-6 text-center text-sm text-muted-foreground">
+                            <div className="text-muted-foreground py-6 text-center text-sm">
                               Loading books...
                             </div>
                           )}
@@ -248,7 +244,7 @@ const BookCopyFormDialog = ({
                                   <span className="font-medium">
                                     {book.title}
                                   </span>
-                                  <span className="text-xs text-muted-foreground">
+                                  <span className="text-muted-foreground text-xs">
                                     ISBN: {book.isbn} - {book.authors?.name}
                                   </span>
                                 </div>
@@ -299,35 +295,32 @@ const BookCopyFormDialog = ({
 
             <FormField
               control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location </FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Shelf A1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status </FormLabel>
-                  <Select onValueChange={field.onChange} value={field?.value}>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                    disabled={!isEditMode}
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
+                        <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="AVAILABLE">Available</SelectItem>
-                      <SelectItem value="ON_LOAN">Borrowed</SelectItem>
-                      <SelectItem value="ON_HOLD">Reserved</SelectItem>
-                      <SelectItem value="LOST">Lost</SelectItem>
+                      <SelectItem value={BookCopyStatus.AVAILABLE}>
+                        Available
+                      </SelectItem>
+                      <SelectItem value={BookCopyStatus.ON_HOLD}>
+                        On Hold
+                      </SelectItem>
+                      <SelectItem value={BookCopyStatus.ON_LOAN}>
+                        On Loan
+                      </SelectItem>
+                      <SelectItem value={BookCopyStatus.LOST}>Lost</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

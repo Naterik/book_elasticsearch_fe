@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import { useCurrentApp } from "@/app/providers/app.context";
-import { getUserProfileAPI } from "@/lib/api";
+import InfoService from "@client/info/services";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const useInfoPage = () => {
@@ -13,7 +13,7 @@ export const useInfoPage = () => {
     if (!checkUserId || checkUserId === 0) return;
     setIsLoading(true);
     try {
-      const res = await getUserProfileAPI(checkUserId);
+      const res = await InfoService.getUserProfile(checkUserId);
       if (res.data) {
         setCurrentUser(res.data);
       } else {

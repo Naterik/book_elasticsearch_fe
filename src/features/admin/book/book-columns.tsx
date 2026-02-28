@@ -1,17 +1,20 @@
-import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatCurrency } from "@/helper";
-import { IMAGE_DEFAULT } from "@/types";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export const getBookColumns = (
   onEdit: (book: IBook) => void,
@@ -21,32 +24,15 @@ export const getBookColumns = (
   {
     accessorKey: "id",
     header: "#ID",
+    size: 80,
     cell: ({ row }) => {
       return (
         <button
           onClick={() => onView(row.original.id)}
-          className="text-blue-600 hover:text-blue-800 hover:underline"
+          className="font-bold text-blue-600 hover:text-blue-800 hover:underline"
         >
           #{row.original.id}
         </button>
-      );
-    },
-  },
-  {
-    accessorKey: "image",
-    header: "Cover",
-    cell: ({ row }) => {
-      const book = row.original;
-      return book.image ? (
-        <img
-          src={book.image || IMAGE_DEFAULT}
-          alt={book.title}
-          className="w-12 h-16 object-cover rounded"
-        />
-      ) : (
-        <div className="w-12 h-16 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
-          No Image
-        </div>
       );
     },
   },
@@ -56,12 +42,30 @@ export const getBookColumns = (
     cell: ({ row }) => {
       const book = row.original;
       return (
-        <div className="max-w-xs">
-          <div className="truncate font-medium">{book.title}</div>
-          <div className="text-xs text-muted-foreground truncate">
-            {book.shortDesc || "-"}
-          </div>
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="max-w-[200px] hover:cursor-pointer">
+                {book.highlight?.title ? (
+                  <div
+                    className="truncate font-medium [&_em]:not-italic [&_em]:rounded [&_em]:bg-yellow-100 [&_em]:px-0.5 [&_em]:font-bold [&_em]:text-yellow-700"
+                    dangerouslySetInnerHTML={{
+                      __html: book.highlight.title[0],
+                    }}
+                  />
+                ) : (
+                  <div className="truncate font-medium">{book.title}</div>
+                )}
+                <div className="text-muted-foreground truncate text-xs">
+                  {book.shortDesc || "-"}
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{book.title}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     },
   },
@@ -71,7 +75,7 @@ export const getBookColumns = (
 
     cell: ({ row }) => {
       return (
-        <div className="text-md text-muted-foreground truncate max-w-xs">
+        <div className="text-md text-muted-foreground max-w-[150px] truncate">
           {row.original.authors.name || "-"}
         </div>
       );
@@ -82,18 +86,15 @@ export const getBookColumns = (
     header: "ISBN",
     cell: ({ row }) => {
       return (
-        <code className="text-xs bg-muted px-1 py-0.5 rounded">
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            row.toggleExpanded();
+          }}
+          className="bg-muted rounded px-1 py-0.5 text-xs font-mono cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors inline-block"
+        >
           {row.original.isbn}
-        </code>
-      );
-    },
-  },
-  {
-    accessorKey: "price",
-    header: "Price",
-    cell: ({ row }) => {
-      return (
-        <div className="font-medium">{formatCurrency(row.original.price)}</div>
+        </div>
       );
     },
   },
@@ -117,11 +118,12 @@ export const getBookColumns = (
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const book = row.original;
 
       return (
-        <div className="text-right">
+        <div className="text-left">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -129,20 +131,18 @@ export const getBookColumns = (
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => onView(book.id)}>
-                <Eye className="mr-2 h-4 w-4" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(book)}>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                onClick={() => onEdit(book)}
+                className="cursor-pointer"
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit Book
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(book.id)}
-                className="text-destructive"
+                className="text-destructive cursor-pointer"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Book

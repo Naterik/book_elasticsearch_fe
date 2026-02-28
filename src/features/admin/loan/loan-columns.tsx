@@ -1,26 +1,42 @@
-import { BadgeCheck, MoreHorizontal, Trash2 } from "lucide-react";
+import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ColumnDef } from "@tanstack/react-table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { formatDate } from "@/helper";
-import { StatusBadge } from "@/components/StatusBadge";
+import type { ColumnDef } from "@tanstack/react-table";
+import { BadgeCheck, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 
 export const getLoanColumns = (
   onDelete: (loanId: number) => void,
-  onBookReturn: (loanId: number, userId: number) => void
+  onBookReturn: (loanId: number, userId: number) => void,
+  onView: (loanId: number) => void
 ): ColumnDef<ILoan>[] => [
   {
     accessorKey: "id",
     header: "#ID",
+    size: 50,
     cell: ({ row }) => {
-      return <span className="text-sm font-medium">#{row.original.id}</span>;
+      return (
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            onView(row.original.id);
+          }}
+          className="cursor-pointer font-bold text-blue-600 no-underline hover:no-underline"
+        >
+          #{row.original.id}
+        </a>
+      );
     },
   },
   {
@@ -29,14 +45,21 @@ export const getLoanColumns = (
     cell: ({ row }) => {
       const loan = row.original;
       return (
-        <div className="max-w-xs">
-          <div className="font-medium text-sm truncate">
-            {loan.bookCopy?.books?.title || "-"}
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Copy: {loan.bookCopy?.copyNumber || "-"}
-          </div>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="max-w-xs">
+              <div className="truncate text-sm font-medium hover:cursor-pointer">
+                {loan.bookCopy?.books?.title || "-"}
+              </div>
+              <div className="text-muted-foreground text-xs">
+                Copy: {loan.bookCopy?.copyNumber || "-"}
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span>{loan.bookCopy?.books?.title || "-"}</span>
+          </TooltipContent>
+        </Tooltip>
       );
     },
   },
@@ -47,10 +70,10 @@ export const getLoanColumns = (
       const loan = row.original;
       return (
         <div className="max-w-xs">
-          <div className="font-medium text-sm truncate">
+          <div className="truncate text-sm font-medium">
             {loan.user?.fullName || "-"}
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-muted-foreground text-xs">
             {loan.user?.cardNumber || "-"}
           </div>
         </div>
@@ -101,32 +124,43 @@ export const getLoanColumns = (
       const loan = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onBookReturn(loan.id, loan.userId)}
-              className="cursor-pointer text-[#26ec18] focus:text-[#0fad0398]"
-            >
-              <BadgeCheck className="mr-2 h-4 w-4 " color="#26ec18" />
-              Approved
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(loan.id)}
-              className="cursor-pointer text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" color="red" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="text-left">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {loan.status?.toUpperCase() === "ON_LOAN" ? (
+                <DropdownMenuItem
+                  onClick={() => onBookReturn(loan.id, loan.userId)}
+                  className="cursor-pointer text-[#26ec18] focus:text-[#0fad0398]"
+                >
+                  <BadgeCheck color="#26ec18" className="mr-2 h-4 w-4" />
+                  Approved
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onClick={() => onView(loan.id)}
+                  className="cursor-pointer"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onDelete(loan.id)}
+                className="text-destructive focus:text-destructive cursor-pointer"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Loan
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },

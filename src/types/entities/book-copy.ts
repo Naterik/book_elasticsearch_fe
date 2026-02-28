@@ -2,12 +2,9 @@ import type { IBook } from "./book";
 
 export interface IBookCopy {
   id: number;
-  year_published: number;
+  year_published: string;
   copyNumber: string;
-  status: string;
-  location: string;
-  heldByUserId: number | null;
-  holdExpiryDate: string | null;
+  status: BookCopyStatus;
   bookId: number;
   books: IBook;
 }

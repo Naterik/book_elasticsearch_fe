@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
-import { getAllGenreAPI, getAllLanguagesElasticAPI } from "@/lib/api";
+import { BookService } from "@/lib/api";
 import { useCurrentApp } from "@/app/providers/app.context";
 import { PRICE_BOUNDS, YEAR_BOUNDS } from "@/types/enums/book";
 import { useSearchParams } from "react-router";
@@ -41,6 +41,10 @@ export const useBookFilter = () => {
     ];
   });
 
+  const [exactId, setExactId] = useState<string | null>(() => {
+    return searchParams.get("exactId") || null;
+  });
+
   const priceDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const yearDebounceTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -48,6 +52,18 @@ export const useBookFilter = () => {
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     let hasChanges = false;
+
+    // Exact ID
+    const currentExactId = params.get("exactId");
+    if (exactId) {
+      if (currentExactId !== exactId) {
+        params.set("exactId", exactId);
+        hasChanges = true;
+      }
+    } else if (currentExactId) {
+      params.delete("exactId");
+      hasChanges = true;
+    }
 
     // Genres
     const currentGenres = params.get("genres");
@@ -117,6 +133,7 @@ export const useBookFilter = () => {
       setSearchParams(params, { replace: true });
     }
   }, [
+    exactId,
     selectedGenres,
     selectedLanguage,
     priceRange,
@@ -137,8 +154,8 @@ export const useBookFilter = () => {
       try {
         setIsLoading(true);
         const [allGenres, allLanguages] = await Promise.all([
-          getAllGenreAPI(),
-          getAllLanguagesElasticAPI(),
+          BookService.getAllGenres(),
+          BookService.getAllLanguagesElastic(),
         ]);
         if (allGenres.data && allLanguages.data) {
           setGenres(allGenres.data);
@@ -156,6 +173,16 @@ export const useBookFilter = () => {
     loadFilterData();
   }, [setIsLoading]);
 
+  // Sync exactId from URL if changed externally
+  useEffect(() => {
+      const id = searchParams.get("exactId");
+      if (id !== exactId) {
+          setExactId(id);
+      }
+  }, [searchParams]); // Careful with dependency loop, but since we check value it should be fine. Actually better to rely on local state driving URL.
+  // Correction: We initialize state from URL. If URL changes (e.g. navigation), we might need to sync back? 
+  // For now, let's keep it simple. The state drives the URL.
+
   const isFilterPriceApplied = useMemo(() => {
     return (
       priceRange[0] !== PRICE_BOUNDS[0] || priceRange[1] !== PRICE_BOUNDS[1]
@@ -172,29 +199,35 @@ export const useBookFilter = () => {
     if (selectedLanguage) count += 1;
     if (isFilterPriceApplied) count += 1;
     if (isFilterYearApplied) count += 1;
+    if (exactId) count += 1; 
     return count;
   }, [
     selectedGenres,
     selectedLanguage,
     isFilterPriceApplied,
     isFilterYearApplied,
+    exactId
   ]);
 
   const toggleGenre = useCallback((value: string, checked: boolean) => {
+    setExactId(null); // Clear exactId
     setSelectedGenres((prev) =>
       checked ? [...prev, value] : prev.filter((g) => g !== value)
     );
   }, []);
 
   const handlePriceChange = (range: [number, number]) => {
+    setExactId(null); // Clear exactId
     setPriceRange(range);
   };
 
   const handleYearChange = (range: [number, number]) => {
+    setExactId(null); // Clear exactId
     setYearRange(range);
   };
 
   const handleLanguageChange = (lang: string | null) => {
+    setExactId(null); // Clear exactId
     setSelectedLanguage(lang);
   };
 
@@ -205,8 +238,13 @@ export const useBookFilter = () => {
   const removeLanguageFromSelected = () => {
     setSelectedLanguage(null);
   };
+  
+  const clearExactId = () => {
+      setExactId(null);
+  };
 
   const resetFilters = useCallback(() => {
+    setExactId(null);
     setSelectedGenres([]);
     setSelectedLanguage(null);
     setPriceRange([PRICE_BOUNDS[0], PRICE_BOUNDS[1]]);
@@ -220,6 +258,7 @@ export const useBookFilter = () => {
     selectedLanguage,
     priceRange,
     yearRange,
+    exactId,
 
     isFilterOpen,
     setIsFilterOpen,
@@ -232,6 +271,7 @@ export const useBookFilter = () => {
     removeGenreFromSelected,
     removeLanguageFromSelected,
     resetFilters,
+    clearExactId,
 
     PRICE_BOUNDS,
     YEAR_BOUNDS,

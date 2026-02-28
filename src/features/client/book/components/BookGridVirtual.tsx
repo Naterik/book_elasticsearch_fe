@@ -1,11 +1,13 @@
-import { useMemo, useRef, useEffect, memo } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import BookCard from "./BookCard";
-import BookListCard from "./BookListCard";
+import { Search } from "lucide-react";
+import { useWindowWidth } from "@/hooks/useMobile";
+import type { ViewCard } from "@/types";
 import type { IBookElasticIndex } from "@/types/entities/book";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import type { ViewCard } from "@/types";
-import { useWindowWidth } from "@/hooks/useMobile";
+import { memo, useEffect, useMemo, useRef } from "react";
+import BookCard from "./BookCard";
+import BookCardSkeleton from "./BookCardSkeleton";
+import BookListCard from "./BookListCard";
 
 interface BookGridVirtualProps {
   dataBook: IBookElasticIndex[];
@@ -51,7 +53,7 @@ const BookGridVirtual = ({
     count: hasNextPage ? rows.length + 1 : rows.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => (view === "List" ? 280 : 500),
-    overscan: 10,
+    overscan: 5,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -82,16 +84,35 @@ const BookGridVirtual = ({
 
   if (isLoading) {
     return (
-      <div className="flex h-[calc(100vh-250px)] min-h-[1100px] items-center justify-center rounded border bg-gray-50">
-        <Spinner />
+      <div
+        className={`grid gap-4 ${
+          view === "List"
+            ? "grid-cols-1"
+            : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        }`}
+      >
+        {Array.from({ length: 8 }).map((_, i) => (
+          <BookCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
   if (dataBook.length === 0) {
     return (
-      <div className="flex h-[calc(100vh-250px)] min-h-[1100px] items-center justify-center rounded border bg-gray-50">
-        <p className="text-gray-500">No books found</p>
+      <div className="flex h-[calc(100vh-250px)] min-h-[500px] flex-col items-center justify-center gap-4 rounded border bg-gray-50 text-center">
+        <div className="rounded-full bg-slate-100 p-4">
+          <Search className="h-8 w-8 text-slate-400" />
+        </div>
+        <div className="max-w-md px-4">
+          <h3 className="text-lg font-semibold text-slate-900">
+            No books found
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            We couldn't find any books matching your search. Try checking for
+            typos or using broader terms.
+          </p>
+        </div>
       </div>
     );
   }
@@ -109,7 +130,7 @@ const BookGridVirtual = ({
       {/* Virtual Scrolling Container */}
       <div
         ref={parentRef}
-        className="overflow-y-auto rounded border bg-gray-50 h-[calc(100vh-250px)] min-h-[1100px]"
+        className="h-[calc(100vh-250px)] min-h-[1100px] overflow-y-auto rounded border bg-gray-50"
       >
         <div
           style={{
@@ -126,21 +147,22 @@ const BookGridVirtual = ({
               return (
                 <div
                   key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
                   style={{
-                    height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
-                  className="flex items-center justify-center absolute top-0 left-0 w-full "
+                  className="absolute top-0 left-0 flex w-full items-center justify-center py-4"
                 >
                   {isFetchingNextPage ? (
-                    <div className="flex flex-col items-center gap-2 py-4 rounded">
+                    <div className="flex flex-col items-center gap-2 rounded py-4">
                       <Spinner />
                       <p className="text-sm text-gray-500">
                         Loading more books...
                       </p>
                     </div>
                   ) : hasNextPage ? (
-                    <span className="text-gray-400 text-sm">Load more</span>
+                    <span className="text-sm text-gray-400">Load more</span>
                   ) : null}
                 </div>
               );
@@ -151,24 +173,24 @@ const BookGridVirtual = ({
             return (
               <div
                 key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
                 style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
                   width: "100%",
-                  height: `${virtualRow.size}px`,
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
                 <div
-                  className="p-4"
+                  className={`grid px-4 ${view === "List" ? "py-2" : "py-3"}`}
                   style={{
-                    display: "grid",
                     gridTemplateColumns:
                       view === "List"
                         ? "1fr"
-                        : `repeat(${cols}, minmax(0, 1fr))`,
-                    gap: "1rem",
+                        : `repeat(${cols}, minmax(0, 1fr)) `,
+                    gap: view === "List" ? "1rem" : `1.5rem`,
                   }}
                 >
                   {row.map((book) =>

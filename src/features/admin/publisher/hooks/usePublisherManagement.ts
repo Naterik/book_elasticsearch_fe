@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import PublisherService from "@admin/publisher/services";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { getPublishersAPI, deletePublisherAPI } from "../services";
 import { getPublisherColumns } from "../publisher-columns";
 
 export const usePublisherManagement = () => {
@@ -11,7 +11,11 @@ export const usePublisherManagement = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState<IPublisher | null>(
+    null
+  );
+  const [selectedPublisherId, setSelectedPublisherId] = useState<number | null>(
     null
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -23,7 +27,7 @@ export const usePublisherManagement = () => {
   const fetchPublishers = async () => {
     setIsLoading(true);
     try {
-      const response = await getPublishersAPI({ page: currentPage });
+      const response = await PublisherService.getPublishers(currentPage);
       if (response.data && response.data.result) {
         setPublishers(response.data.result);
         setTotalPages(response.data.pagination.totalPages);
@@ -49,7 +53,10 @@ export const usePublisherManagement = () => {
     setSelectedPublisher(publisher);
     setIsFormDialogOpen(true);
   };
-
+  const handleViewPublisher = (publisherId: number) => {
+    setSelectedPublisherId(publisherId);
+    setIsDetailDialogOpen(true);
+  };
   const handleDeleteClick = (publisher: IPublisher) => {
     setSelectedPublisher(publisher);
     setIsDeleteDialogOpen(true);
@@ -59,7 +66,9 @@ export const usePublisherManagement = () => {
     if (!selectedPublisher) return;
     setIsLoading(true);
     try {
-      const response = await deletePublisherAPI(+selectedPublisher.id);
+      const response = await PublisherService.deletePublisher(
+        +selectedPublisher.id
+      );
       if (response.message) {
         toast.error(response.message);
       } else {
@@ -93,7 +102,12 @@ export const usePublisherManagement = () => {
   };
 
   const columns = useMemo(
-    () => getPublisherColumns(handleEditPublisher, handleDeleteClick),
+    () =>
+      getPublisherColumns(
+        handleEditPublisher,
+        handleDeleteClick,
+        handleViewPublisher
+      ),
     []
   );
 
@@ -106,7 +120,10 @@ export const usePublisherManagement = () => {
     columns,
     isFormDialogOpen,
     setIsFormDialogOpen,
+    isDetailDialogOpen,
+    setIsDetailDialogOpen,
     selectedPublisher,
+    selectedPublisherId,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleCreatePublisher,

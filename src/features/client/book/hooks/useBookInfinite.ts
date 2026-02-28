@@ -1,10 +1,10 @@
 import type { IBookElasticResponse } from "@/types/entities/book";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router";
-import { getFilterBookElasticAPI } from "@/lib/api";
+import { BookService } from "@/lib/api";
 import { PRICE_BOUNDS, ViewCard, YEAR_BOUNDS, type FilterState } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 
 export const useBookInfinite = ({
   priceRange,
@@ -21,8 +21,9 @@ export const useBookInfinite = ({
   const [sortBy, setSortBy] = useState<string>(
     searchParams.get("sort") || "newest"
   );
+  const exactId = searchParams.get("exactId") || null;
 
-  const debouncedSearch = useDebounce(searchInput, 500);
+  const debouncedSearch = useDebounce(searchInput, 300);
   const debouncedPrice = useDebounce(priceRange, 500);
   const debouncedYear = useDebounce(yearRange, 500);
 
@@ -60,6 +61,8 @@ export const useBookInfinite = ({
     if (searchInput) {
       if (currentQ !== searchInput) {
         params.set("q", searchInput);
+        // Clear exactId if query triggers manual change
+        params.delete("exactId");
         hasChanges = true;
       }
     } else if (currentQ) {
@@ -90,9 +93,10 @@ export const useBookInfinite = ({
       sortBy,
       selectedGenres,
       selectedLanguage,
+      exactId,
     ],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await getFilterBookElasticAPI(
+      const res = await BookService.getFilterBooksElastic(
         pageParam,
         debouncedYear[0] !== YEAR_BOUNDS[0] ||
           debouncedYear[1] !== YEAR_BOUNDS[1]
@@ -105,7 +109,9 @@ export const useBookInfinite = ({
         debouncedSearch,
         sortBy,
         selectedGenres,
-        selectedLanguage
+        selectedLanguage,
+        exactId,
+        24 // limit
       );
       return res.data as IBookElasticResponse;
     },
@@ -114,6 +120,7 @@ export const useBookInfinite = ({
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
+    placeholderData: keepPreviousData,
   });
 
   const allRows = data?.pages.flatMap((page) => page.result) ?? [];
@@ -148,5 +155,6 @@ export const useBookInfinite = ({
     setSortBy,
     fetchNextPage,
     refetch,
+    exactId,
   };
 };

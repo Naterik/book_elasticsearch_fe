@@ -1,29 +1,46 @@
 import createInstanceAxios from "@/lib/api/axios.customize";
+import type { IBackendRes, IModelPaginate } from "@/types/api/response.types";
+import type { IAuthor } from "@/types/entities/author";
+import { authorByIdUrl, authorsAllBooksUrl, authorsUrl } from "./url";
 
 const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
 
-export const getAuthorsAPI = (page: number) => {
-  return axios.get<IBackendRes<IModelPaginate<IAuthor>>>("/api/v1/authors", {
-    params: { page },
+export const getAuthors = (page: number, name?: string) => {
+  return axios.get<IBackendRes<IModelPaginate<IAuthor>>>(authorsUrl, {
+    params: { page, name },
   });
 };
 
-export const createAuthorAPI = (data: { name: string; bio?: string }) => {
-  return axios.post<IBackendRes<IAuthor>>("/api/v1/authors", data);
+export const createAuthor = (data: { name: string; bio?: string }) => {
+  return axios.post<IBackendRes<IAuthor>>(authorsUrl, data);
 };
 
-export const updateAuthorAPI = (
+export const updateAuthor = (
   id: number,
   data: { name: string; bio?: string }
 ) => {
-  return axios.put<IBackendRes<IAuthor>>(`/api/v1/authors/${id}`, data);
+  return axios.put<IBackendRes<IAuthor>>(authorByIdUrl(id), data);
 };
 
-export const getAllAuthorsAPI = () => {
-  const urlBackend = `/api/v1/authors`;
-  return axios.get<IBackendRes<IAuthor[]>>(urlBackend);
+export const getAuthorById = (id: number) => {
+  return axios.get<IBackendRes<IAuthor>>(authorByIdUrl(id));
 };
 
-export const deleteAuthorAPI = (id: number) => {
-  return axios.delete<IBackendRes<void>>(`/api/v1/authors/${id}`);
+export const getAllAuthors = () => {
+  return axios.get<IBackendRes<IAuthor[]>>(authorsAllBooksUrl);
 };
+
+export const deleteAuthor = (id: number) => {
+  return axios.delete<IBackendRes<void>>(authorByIdUrl(id));
+};
+
+const AuthorService = {
+  getAuthors,
+  createAuthor,
+  updateAuthor,
+  getAllAuthors,
+  deleteAuthor,
+  getAuthorById,
+};
+
+export default AuthorService;

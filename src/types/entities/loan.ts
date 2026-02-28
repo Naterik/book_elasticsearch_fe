@@ -1,5 +1,5 @@
 import type { IBookCopy } from "./book-copy";
-import type { IUserInfo } from "./user";
+import type { ISystemUser } from "./user";
 
 export interface ILoan {
   id: number;
@@ -11,5 +11,5 @@ export interface ILoan {
   bookcopyId: number;
   userId: number;
   bookCopy: IBookCopy;
-  user: IUserInfo;
+  user: ISystemUser;
 }

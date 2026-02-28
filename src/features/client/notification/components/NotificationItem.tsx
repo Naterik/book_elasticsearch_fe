@@ -1,25 +1,25 @@
-import { useNavigate } from "react-router-dom";
 import {
-  getNotificationIcon,
-  getNotificationIconColor,
-  getNotificationColor,
-  getNotificationTitle,
   formatNotificationContent,
   formatTimeAgo,
+  getNotificationColor,
+  getNotificationIcon,
+  getNotificationIconColor,
   getNotificationPath,
+  getNotificationTitle,
 } from "@/helper/notificationUtils";
+import { useNavigate } from "react-router-dom";
 
 type NotificationItemProps = {
   notification: INotification;
   onMarkAsRead?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  // onDelete?: (id: number) => void;
   onClick?: () => void;
 };
 
 export default function NotificationItem({
   notification,
   onMarkAsRead,
-  onDelete,
+  // onDelete,
   onClick,
 }: NotificationItemProps) {
   const navigate = useNavigate();
@@ -46,27 +46,22 @@ export default function NotificationItem({
     }
   };
 
-  const handleMarkAsRead = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onMarkAsRead) {
-      onMarkAsRead(notification.id);
-    }
-  };
+  // const handleMarkAsRead = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   if (onMarkAsRead) {
+  //     onMarkAsRead(notification.id);
+  //   }
+  // };
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onDelete) {
-      onDelete(notification.id);
-    }
-  };
+  // const handleDelete = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   if (onDelete) {
+  //     onDelete(notification.id);
+  //   }
+  // };
 
   return (
     <div
-      className={`group relative bg-white rounded-lg border transition-all duration-200 ${
-        !notification.isRead
-          ? "border-blue-200 shadow-sm hover:shadow-md bg-blue-50/30"
-          : "border-transparent hover:bg-slate-50"
-      } cursor-pointer`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -76,39 +71,40 @@ export default function NotificationItem({
           handleClick(e as any);
         }
       }}
+      className={`group relative cursor-pointer rounded-lg border bg-white transition-all duration-200 ${
+        !notification.isRead
+          ? "border-blue-200 bg-blue-50/30 shadow-sm hover:shadow-md"
+          : "border-transparent hover:bg-slate-50"
+      } `}
     >
       {/* Unread indicator dot */}
       {!notification.isRead && (
-        <div className="absolute right-4 top-4 w-2 h-2 bg-blue-600 rounded-full" />
+        <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-blue-600" />
       )}
 
       <div className="p-3">
         <div className="flex gap-4">
           {/* Icon container */}
-          <div className="flex-shrink-0 mt-1">
+          <div className="mt-1 flex-shrink-0">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${bgColor}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${bgColor} `}
             >
               <Icon className={`h-4 w-4 ${iconColor}`} />
             </div>
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0 pr-6">
-            <div className="flex items-start justify-between gap-2 mb-0.5">
+          <div className="min-w-0 flex-1 pr-6">
+            <div className="mb-0.5 flex items-start justify-between gap-2">
               <h3
-                className={`font-semibold text-sm ${
-                  !notification.isRead ? "text-slate-900" : "text-slate-700"
-                }`}
+                className={`text-sm font-semibold ${!notification.isRead ? "text-slate-900" : "text-slate-700"} `}
               >
                 {title}
               </h3>
             </div>
 
             <p
-              className={`text-sm leading-relaxed mb-1.5 ${
-                !notification.isRead ? "text-slate-800" : "text-slate-600"
-              }`}
+              className={`mb-1.5 text-sm leading-relaxed ${!notification.isRead ? "text-slate-800" : "text-slate-600"} `}
             >
               {content}
             </p>
@@ -116,13 +112,13 @@ export default function NotificationItem({
             <div className="flex items-center gap-2">
               <time className="text-xs text-slate-400">{timeAgo}</time>
               {!notification.isRead && (
-                <span className="text-xs text-blue-600 font-medium">• New</span>
+                <span className="text-xs font-medium text-blue-600">• New</span>
               )}
             </div>
           </div>
 
           {/* Action buttons - visible on hover */}
-          <div className="flex-shrink-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity self-center">
+          <div className="flex flex-shrink-0 flex-col gap-1 self-center opacity-0 transition-opacity group-hover:opacity-100">
             {/* Actions moved to right side or handled differently if needed */}
           </div>
         </div>

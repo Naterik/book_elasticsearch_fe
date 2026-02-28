@@ -1,11 +1,9 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, BookCheck, Calendar } from "lucide-react";
+import { AlertTriangle, Calendar } from "lucide-react";
 
 const ActionableAlerts = ({
   loans,
-  reservations,
   onViewLoans,
-  onViewReservations,
 }: any) => {
   const overdueLoans =
     loans?.filter((loan: ILoan) => {
@@ -28,8 +26,7 @@ const ActionableAlerts = ({
       );
     }) || [];
 
-  const readyReservations =
-    reservations?.filter((r: IReservation) => r.status === "NOTIFIED") || [];
+
 
   type AlertVariant = "destructive" | "default";
   const alerts: {
@@ -67,18 +64,7 @@ const ActionableAlerts = ({
     });
   }
 
-  if (readyReservations.length > 0) {
-    alerts.push({
-      variant: "default",
-      icon: BookCheck,
-      title: "Books Ready for Pickup",
-      description: `You have ${readyReservations.length} book${
-        readyReservations.length > 1 ? "s" : ""
-      } ready for pickup. Visit the library to collect them!`,
-      action: "View Reservations",
-      onClick: onViewReservations,
-    });
-  }
+
 
   if (alerts.length === 0) {
     return null;

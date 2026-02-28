@@ -23,6 +23,12 @@ export interface IBook {
   genres: IGenreBook[];
   publishers: IPublisher;
   digitalBook: IDigitalBook | null;
+  highlight?: {
+    title?: string[];
+  };
+  matchedCopyId?: number;
+  isDirectBarcodeMatch?: boolean;
+
 }
 
 export interface IBookElasticIndex extends IBook {
@@ -33,6 +39,18 @@ export interface IBookElasticIndex extends IBook {
 export interface IBookElasticResponse {
   result: IBookElasticIndex[];
   pagination: IPagination;
+  aggregations?: {
+    languages: Record<string, number>;
+    // Add other aggregations if needed
+  };
+}
+
+export interface AdminBookResponse {
+    result: IBook[];
+    pagination: IPagination;
+    aggregations?: {
+        languages: Record<string, number>;
+    }
 }
 
 export interface IGenreBook {
@@ -52,4 +70,14 @@ export interface ISelectBookOption {
   isbn: string;
   image: string;
   authors: IAuthor;
+}
+
+export interface AdminBookSearchParams {
+  q?: string;
+  page?: number;
+  limit?: number;
+  stock?: "available" | "out_of_stock";
+  genreIds?: string; // Comma-separated IDs
+  authorIds?: string; // Comma-separated IDs
+  language?: string;
 }
