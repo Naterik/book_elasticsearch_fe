@@ -3,7 +3,7 @@
  */
 
 import type { IBook } from "./book";
-import type { IUserInfo } from "./user";
+import type { ISystemUser } from "./user";
 
 export interface IFine {
   id: number;
@@ -12,7 +12,7 @@ export interface IFine {
   isPaid: boolean;
   loanId: number;
   userId: number;
-  user?: IUserInfo;
+  user?: ISystemUser;
   loan?: {
     bookCopy: {
       books: IBook;
@@ -21,7 +21,7 @@ export interface IFine {
 }
 
 export interface IFineDetail extends IFine {
-  user: IUserInfo;
+  user: ISystemUser;
 }
 
 export interface IPayment {
@@ -31,7 +31,7 @@ export interface IPayment {
   status: string;
   fineId: number;
   userId: number;
-  user?: IUserInfo;
+  user?: ISystemUser;
   fine?: IFine;
   paymentRef: string | null;
   type?: string;

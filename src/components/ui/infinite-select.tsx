@@ -48,35 +48,33 @@ export function InfiniteSelect<T>({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(
+    null
+  );
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteQuery({
-    queryKey: [queryKey, debouncedSearch],
-    queryFn: async ({ pageParam = 1 }) => {
-      const res = await fetchFn(pageParam, debouncedSearch);
-      return res.data;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
-        return lastPage.pagination.currentPage + 1;
-      }
-      return undefined;
-    },
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
+      queryKey: [queryKey, debouncedSearch],
+      queryFn: async ({ pageParam = 1 }) => {
+        const res = await fetchFn(pageParam, debouncedSearch);
+        return res.data;
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
+          return lastPage.pagination.currentPage + 1;
+        }
+        return undefined;
+      },
+    });
 
   const flattenData = data?.pages.flatMap((page) => page.result) || [];
 
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   // Logic for infinite scroll intersection observer
   useEffect(() => {
-    if (!open) return;
+    if (!open || !containerNode) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -84,16 +82,22 @@ export function InfiniteSelect<T>({
           fetchNextPage();
         }
       },
-      { threshold: 1.0, root: containerRef.current }
+      { threshold: 0.1, root: containerNode }
     );
 
-    const trigger = document.getElementById(`load-more-trigger-${queryKey}`);
-    if (trigger) {
-      observer.observe(trigger);
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
     }
 
     return () => observer.disconnect();
-  }, [open, hasNextPage, isFetchingNextPage, queryKey, data]); // Re-run when data changes to re-attach
+  }, [
+    open,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    containerNode,
+    data,
+  ]);
 
   const selectedItem = flattenData.find((item) => getItemValue(item) === value);
 
@@ -116,15 +120,20 @@ export function InfiniteSelect<T>({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {selectedItem
-            ? getItemLabel(selectedItem)
-            : initialLabel
-              ? initialLabel
-              : "Select " + label}
+          <span className="truncate text-left">
+            {selectedItem
+              ? getItemLabel(selectedItem)
+              : initialLabel
+                ? initialLabel
+                : "Select " + label}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent
+        className="max-w-[--radix-popover-trigger-width] p-0"
+        align="start"
+      >
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={`Search ${label}...`}
@@ -132,7 +141,7 @@ export function InfiniteSelect<T>({
             onValueChange={setSearch}
           />
           <CommandList
-            ref={containerRef}
+            ref={setContainerNode}
             className="max-h-[200px] overflow-y-auto"
           >
             {isLoading && (
@@ -150,25 +159,25 @@ export function InfiniteSelect<T>({
                 <CommandItem
                   key={getItemValue(item)}
                   value={getItemLabel(item)} // search is handled by server, but cmdk require value to not filter out everything if strict
-                  onSelect={(currentValue) => {
+                  onSelect={() => {
                     onChange(getItemValue(item));
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 shrink-0",
                       value === getItemValue(item) ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {getItemLabel(item)}
+                  <span className="truncate">{getItemLabel(item)}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
 
             {hasNextPage && (
               <div
-                id={`load-more-trigger-${queryKey}`}
+                ref={loadMoreRef}
                 className="flex items-center justify-center p-2"
               >
                 {isFetchingNextPage ? (

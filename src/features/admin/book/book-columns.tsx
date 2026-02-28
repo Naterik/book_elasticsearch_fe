@@ -13,8 +13,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatCurrency } from "@/helper";
-import { IMAGE_DEFAULT } from "@/types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
@@ -31,25 +29,10 @@ export const getBookColumns = (
       return (
         <button
           onClick={() => onView(row.original.id)}
-          className="text-blue-600 hover:text-blue-800 hover:underline"
+          className="font-bold text-blue-600 hover:text-blue-800 hover:underline"
         >
           #{row.original.id}
         </button>
-      );
-    },
-  },
-  {
-    accessorKey: "image",
-    header: "Cover",
-    size: 100,
-    cell: ({ row }) => {
-      const book = row.original;
-      return (
-        <img
-          src={book.image || IMAGE_DEFAULT}
-          alt={book.title}
-          className="h-16 w-12 rounded object-cover"
-        />
       );
     },
   },
@@ -62,8 +45,17 @@ export const getBookColumns = (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="max-w-[170px] hover:cursor-pointer">
-                <div className="truncate font-medium">{book.title}</div>
+              <div className="max-w-[200px] hover:cursor-pointer">
+                {book.highlight?.title ? (
+                  <div
+                    className="truncate font-medium [&_em]:not-italic [&_em]:rounded [&_em]:bg-yellow-100 [&_em]:px-0.5 [&_em]:font-bold [&_em]:text-yellow-700"
+                    dangerouslySetInnerHTML={{
+                      __html: book.highlight.title[0],
+                    }}
+                  />
+                ) : (
+                  <div className="truncate font-medium">{book.title}</div>
+                )}
                 <div className="text-muted-foreground truncate text-xs">
                   {book.shortDesc || "-"}
                 </div>
@@ -94,19 +86,15 @@ export const getBookColumns = (
     header: "ISBN",
     cell: ({ row }) => {
       return (
-        <code className="bg-muted rounded px-1 py-0.5 text-xs">
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            row.toggleExpanded();
+          }}
+          className="bg-muted rounded px-1 py-0.5 text-xs font-mono cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors inline-block"
+        >
           {row.original.isbn}
-        </code>
-      );
-    },
-  },
-  {
-    accessorKey: "price",
-    header: "Price",
-    size: 130,
-    cell: ({ row }) => {
-      return (
-        <div className="font-medium">{formatCurrency(row.original.price)}</div>
+        </div>
       );
     },
   },

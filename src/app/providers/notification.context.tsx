@@ -23,6 +23,7 @@ interface INotificationContext {
   markAllAsRead: () => void;
   getHighPriorityNotifications: () => INotification[];
   getUnreadNotifications: () => INotification[];
+  refreshNotifications: () => Promise<void>;
 }
 
 const NotificationContext = createContext<INotificationContext | null>(null);
@@ -41,6 +42,22 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const connectionAttempted = useRef(false);
   const socketUnsubscribe = useRef<(() => void) | null>(null);
 
+  const refreshNotifications = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await NotificationService.getNotificationsByUserId(user.id);
+      if (res.data) {
+        setNotifications(res.data);
+        const unreadCount = res.data.filter(
+          (n: INotification) => !n.isRead
+        ).length;
+        setUnreadCount(unreadCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  }, [user?.id]);
+
   useEffect(() => {
     if (!isAuthenticated || !user) {
       socketService.disconnect();
@@ -54,38 +71,22 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    // 📥 Fetch initial notifications from server
-    const fetchInitialNotifications = async () => {
-      try {
-        const res = await NotificationService.getNotificationsByUserId(user.id);
-        if (res.data) {
-          setNotifications(res.data);
-          const unreadCount = res.data.filter(
-            (n: INotification) => !n.isRead
-          ).length;
-          setUnreadCount(unreadCount);
-        }
-      } catch (error) {
-        console.error("Failed to fetch initial notifications:", error);
-      }
-    };
-
     // 🔌 Connect to Socket.IO
     socketService
       .connect(token)
       .then(() => {
         setIsConnected(true);
-        fetchInitialNotifications();
+        refreshNotifications();
       })
       .catch((error) => {
         console.error("Failed to connect socket:", error);
         setIsConnected(false);
         // Still fetch initial notifications even if socket connection fails
-        fetchInitialNotifications();
+        refreshNotifications();
       });
 
     return () => {};
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, refreshNotifications]);
 
   const handleNewNotification = useCallback((notification: INotification) => {
     // ⚡ Minimal setState - just add notification
@@ -175,6 +176,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       markAllAsRead,
       getHighPriorityNotifications,
       getUnreadNotifications,
+      refreshNotifications,
     }),
     [
       notifications,
@@ -187,6 +189,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       markAllAsRead,
       getHighPriorityNotifications,
       getUnreadNotifications,
+      refreshNotifications,
     ]
   );
 

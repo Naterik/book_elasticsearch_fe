@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { formatDate } from "@/helper";
 import type { ColumnDef } from "@tanstack/react-table";
-import { BadgeCheck, MoreHorizontal, Trash2 } from "lucide-react";
+import { BadgeCheck, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 
 export const getLoanColumns = (
   onDelete: (loanId: number) => void,
@@ -133,13 +133,23 @@ export const getLoanColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem
-                onClick={() => onBookReturn(loan.id, loan.userId)}
-                className="cursor-pointer text-[#26ec18] focus:text-[#0fad0398]"
-              >
-                <BadgeCheck color="#26ec18" className="mr-2 h-4 w-4" />
-                Approved
-              </DropdownMenuItem>
+              {loan.status?.toUpperCase() === "ON_LOAN" ? (
+                <DropdownMenuItem
+                  onClick={() => onBookReturn(loan.id, loan.userId)}
+                  className="cursor-pointer text-[#26ec18] focus:text-[#0fad0398]"
+                >
+                  <BadgeCheck color="#26ec18" className="mr-2 h-4 w-4" />
+                  Approved
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onClick={() => onView(loan.id)}
+                  className="cursor-pointer"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(loan.id)}

@@ -15,6 +15,7 @@ interface IAppContext {
   isLoading: boolean;
   setIsLoading: (v: boolean) => void;
   logout: () => void;
+  fetchUser: () => Promise<void>;
 }
 
 const CurrentAppContext = createContext<IAppContext | null>(null);
@@ -34,31 +35,32 @@ export const AppProvider = (props: TProps) => {
     setUser(null);
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setIsAuthenticated(false);
-        return;
-      }
+  const fetchUser = useCallback(async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setIsAuthenticated(false);
+      return;
+    }
 
-      try {
-        const response = await AuthService.fetchAccount();
-        if (response.data) {
-          setUser(response.data);
-          setIsAuthenticated(true);
-        } else {
-          logout();
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error);
+    try {
+      const response = await AuthService.fetchAccount();
+      if (response.data) {
+        setUser(response.data);
+        setIsAuthenticated(true);
+      } else {
         logout();
-      } finally {
-        setIsLoading(false);
       }
-    };
-    checkAuth();
-  }, []);
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      logout();
+    } finally {
+      setIsLoading(false);
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   return (
     <CurrentAppContext.Provider
@@ -70,6 +72,7 @@ export const AppProvider = (props: TProps) => {
         isLoading,
         setIsLoading,
         logout,
+        fetchUser,
       }}
     >
       {props.children}

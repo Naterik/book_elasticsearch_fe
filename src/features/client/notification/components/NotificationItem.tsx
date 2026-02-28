@@ -12,14 +12,14 @@ import { useNavigate } from "react-router-dom";
 type NotificationItemProps = {
   notification: INotification;
   onMarkAsRead?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  // onDelete?: (id: number) => void;
   onClick?: () => void;
 };
 
 export default function NotificationItem({
   notification,
   onMarkAsRead,
-  onDelete,
+  // onDelete,
   onClick,
 }: NotificationItemProps) {
   const navigate = useNavigate();
@@ -71,94 +71,54 @@ export default function NotificationItem({
           handleClick(e as any);
         }
       }}
-      className={`
-        relative
-        bg-white
-        rounded-lg border
-        transition-all cursor-pointer
-        group duration-200
-        ${
+      className={`group relative cursor-pointer rounded-lg border bg-white transition-all duration-200 ${
         !notification.isRead
-        ? "border-blue-200 shadow-sm hover:shadow-md bg-blue-50/30"
-        : "border-transparent hover:bg-slate-50"
-        }
-      `}
+          ? "border-blue-200 bg-blue-50/30 shadow-sm hover:shadow-md"
+          : "border-transparent hover:bg-slate-50"
+      } `}
     >
       {/* Unread indicator dot */}
       {!notification.isRead && (
-        <div
-          className="
-            absolute
-            w-2 h-2
-            bg-blue-600
-            rounded-full
-            right-4 top-4
-          "
-        />
+        <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-blue-600" />
       )}
 
       <div className="p-3">
         <div className="flex gap-4">
           {/* Icon container */}
-          <div className="flex-shrink-0 mt-1">
+          <div className="mt-1 flex-shrink-0">
             <div
-              className={`
-                flex
-                w-8 h-8
-                rounded-full
-                items-center justify-center ${bgColor}
-              `}
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${bgColor} `}
             >
               <Icon className={`h-4 w-4 ${iconColor}`} />
             </div>
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0 pr-6">
-            <div
-              className="
-                flex
-                gap-2 mb-0.5
-                items-start justify-between
-              "
-            >
+          <div className="min-w-0 flex-1 pr-6">
+            <div className="mb-0.5 flex items-start justify-between gap-2">
               <h3
-                className={`
-                  font-semibold text-sm
-                  ${!notification.isRead ? "text-slate-900" : "text-slate-700"}
-                `}
+                className={`text-sm font-semibold ${!notification.isRead ? "text-slate-900" : "text-slate-700"} `}
               >
                 {title}
               </h3>
             </div>
 
             <p
-              className={`
-                mb-1.5
-                text-sm leading-relaxed
-                ${!notification.isRead ? "text-slate-800" : "text-slate-600"}
-              `}
+              className={`mb-1.5 text-sm leading-relaxed ${!notification.isRead ? "text-slate-800" : "text-slate-600"} `}
             >
               {content}
             </p>
 
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <time className="text-xs text-slate-400">{timeAgo}</time>
               {!notification.isRead && (
-                <span className="text-xs text-blue-600 font-medium">• New</span>
+                <span className="text-xs font-medium text-blue-600">• New</span>
               )}
             </div>
           </div>
 
           {/* Action buttons - visible on hover */}
-          <div
-            className="
-              flex-shrink-0 flex flex-col
-              gap-1
-              opacity-0 transition-opacity
-              group-hover:opacity-100 self-center
-            "
-          >
+          <div className="flex flex-shrink-0 flex-col gap-1 self-center opacity-0 transition-opacity group-hover:opacity-100">
             {/* Actions moved to right side or handled differently if needed */}
           </div>
         </div>

@@ -54,7 +54,7 @@ export type UpdateUserPayload = Partial<Omit<CreateUserPayload, "password">> & {
 interface UserFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: IAdminUser;
+  user: IAdminUser | null;
   onSuccess: () => void;
 }
 

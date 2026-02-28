@@ -141,6 +141,13 @@ export const useBookCopyManagement = () => {
     setCurrentPage(1);
   }, []);
 
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery("");
+    setYearPublished(null);
+    setStatusFilter("");
+    setCurrentPage(1);
+  }, []);
+
   const columns = useMemo(
     () => getBookCopyColumns(handleEditBookCopy, handleDeleteClick),
     [handleEditBookCopy, handleDeleteClick]
@@ -180,5 +187,6 @@ export const useBookCopyManagement = () => {
     statusFilter,
     handleYearPublishedChange,
     handleStatusFilterChange,
+    handleClearFilters,
   };
 };

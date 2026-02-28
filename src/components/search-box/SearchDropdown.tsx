@@ -78,13 +78,13 @@ export const SearchDropdown = ({
                     className="p-3 pl-4 hover:bg-slate-50 cursor-pointer flex gap-4 transition-all group border-l-2 border-transparent hover:border-blue-500"
                   >
                     {/* Thumbnail */}
-                    <div className="shrink-0 w-12 h-16 bg-slate-100 rounded-md overflow-hidden border border-slate-200 shadow-sm relative group-hover:shadow-md transition-shadow">
+                    {/* <div className="shrink-0 w-12 h-16 bg-slate-100 rounded-md overflow-hidden border border-slate-200 shadow-sm relative group-hover:shadow-md transition-shadow">
                       <img
                         src={book.image}
                         alt=""
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                    </div> */}
 
                     {/* Content */}
                     <div className="flex-1 min-w-0 flex flex-col justify-center py-0.5">
