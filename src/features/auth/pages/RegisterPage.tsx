@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { AuthService } from "@/lib/api";
-import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import { AuthService } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 type FieldType = {
   username: string;
@@ -59,6 +59,11 @@ const RegisterPage = () => {
     }
   };
 
+  //testing the revert code
+  const handleTesting = () => {
+    console.log("testing the revert code");
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { username, password, confirmPassword } = formValues;
@@ -74,9 +79,9 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="grid place-content-center h-dvh">
+    <div className="grid h-dvh place-content-center">
       <form onSubmit={handleSubmit} className="w-xl">
-        <div className="p-10 rounded-2xl shadow-xl/30 min-w-[400px]">
+        <div className="min-w-[400px] rounded-2xl p-10 shadow-xl/30">
           <h1 className="text-3xl font-semibold">Register</h1>
           <Separator className="my-4" />
 
@@ -135,7 +140,7 @@ const RegisterPage = () => {
             </Button>
           </div>
 
-          <div className="flex items-center flex-col mt-6">
+          <div className="mt-6 flex flex-col items-center">
             <p className="font-semibold capitalize">or</p>
             <p>
               Have already an account?{" "}
