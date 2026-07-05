@@ -1,16 +1,16 @@
 // src/pages/LoginPage.tsx
 
+import { useRef, useState } from "react";
+import type { FormEvent } from "react";
+import { useNavigate } from "react-router";
 import { useCurrentApp } from "@/app/providers/app.context";
+import { AuthService } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { AuthService } from "@/lib/api";
-import { Loader2, Lock, User } from "lucide-react";
-import type { FormEvent } from "react";
-import { useRef, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { useNavigate } from "react-router";
+import { User, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
@@ -53,14 +53,14 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="grid h-dvh place-content-center">
+    <div className="grid place-content-center h-dvh">
       <form name="login" className="w-lg" onSubmit={onFinish}>
-        <div className="rounded-2xl p-10 shadow-xl/30">
+        <div className="p-10 rounded-2xl shadow-xl/30 ">
           <h1 className="text-3xl font-semibold">Login</h1>
           <Separator className="my-4" />
           <div className="mb-4">
             <div className="relative">
-              <User className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Username"
                 className="pl-9"
@@ -70,7 +70,7 @@ const LoginPage = () => {
           </div>
           <div className="mb-4">
             <div className="relative">
-              <Lock className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 ref={passwordRef}
                 type="password"
@@ -88,11 +88,11 @@ const LoginPage = () => {
                 Log in
               </Button>
 
-              <div className="mt-2 flex flex-col items-center gap-4">
-                <p className="font-bold uppercase">or</p>
+              <div className="flex items-center flex-col gap-4 mt-2">
+                <p className="uppercase font-bold">or</p>
                 <button
                   type="button"
-                  className="cursor-pointer transition hover:opacity-80"
+                  className="hover:opacity-80 transition cursor-pointer"
                   onClick={handleGoogleLogin}
                   aria-label="Sign in with Google"
                 >
